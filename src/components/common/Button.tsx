@@ -1,10 +1,10 @@
 import React from 'react';
-import { IbuttonProps } from '@/types/common/IbuttonProps';
+import { IbuttonProps } from '@/@types/common/IbuttonProps';
 
-const Button: React.FC<IbuttonProps> = ({ children, className, onClick }) => {
+const Button: React.FC<IbuttonProps> = ({ text, className, onClick }) => {
   return (
     <button className={className} onClick={onClick}>
-      {children}
+      {text}
     </button>
   );
 };

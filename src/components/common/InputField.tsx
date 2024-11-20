@@ -1,4 +1,4 @@
-import { IinputFieldProps } from '@/types/common/IinputFieldProps'
+import { IinputFieldProps } from '@/@types/common/IinputFieldProps'
 import React from 'react'
 
 const InputField: React.FC<IinputFieldProps> = ({ value, label, name, placeholder, type, onChange }) => {

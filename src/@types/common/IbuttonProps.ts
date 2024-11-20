@@ -2,7 +2,7 @@ import {  ReactNode } from "react";
 
 
 export interface IbuttonProps {
-  children: ReactNode;
+  text: string;
   onClick?: () => void;
   className?: string; 
 }
