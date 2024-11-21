@@ -6,14 +6,14 @@ import { createBrowserRouter } from "react-router-dom";
 
       // User side
 const LandingPage = lazy(()=>import('@/pages/UserLandingPage'));
-const UserSignIn = lazy(()=>import('@/featurs /auth/pages/SignIn'));
-
+const UserSignIn = lazy(()=>import('@/featurs/auth/pages/SignIn'));
+const UserSignUp = lazy(()=> import('@/featurs/auth/pages/SignUp'))
 
 
 
 const routes = createBrowserRouter([
   {
-    path: '/',
+    path: UserUrls.home,
     element: < UserLayout />,
     children: [
       {
@@ -29,6 +29,14 @@ const routes = createBrowserRouter([
         element:(
           <Suspense fallback={ <div>Loading....</div> }>
             < UserSignIn />
+          </Suspense>
+        )
+      },
+      {
+        path: UserUrls.signUp,
+        element:(
+          <Suspense fallback= { <div>Loading....</div>}>
+            <UserSignUp/>
           </Suspense>
         )
       }
