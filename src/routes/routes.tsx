@@ -39,7 +39,15 @@ const routes = createBrowserRouter([
             <UserSignUp/>
           </Suspense>
         )
-      }
+      },
+     {
+      path: UserUrls.otp,
+      element: (
+        <Suspense fallback={ <div>Loading....</div> }>
+
+        </Suspense>
+      )
+     }
     ],
   },
 ], {

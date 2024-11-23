@@ -1,7 +1,8 @@
 export enum UserUrls  {
     home = '/',
-    signUp = '/siginup',
     signIn = '/signin',
+    signUp = '/siginup',
+    otp = '/otp/:id',
     signOut = '/signout',
     profile = '/profile',
     subscription = '/subscription'

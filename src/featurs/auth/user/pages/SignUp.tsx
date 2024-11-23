@@ -1,5 +1,5 @@
 import  { useState } from 'react'
-import SignUpForm from '../components/SignUpFormPage'
+import SignUpFormPage from '../components/SignUpFormPage'
 import SignUpOptions from '../components/SignUpOptions'
 
 function SignUp() {
@@ -7,7 +7,7 @@ function SignUp() {
   return (
     <>
     {
-      isFormVisible ? < SignUpForm setIsFormVisible={setIsFormVisible} /> : < SignUpOptions  setIsFormVisible={setIsFormVisible}/>
+      isFormVisible ? < SignUpFormPage setIsFormVisible={setIsFormVisible} /> : < SignUpOptions  setIsFormVisible={setIsFormVisible}/>
     }
     </>
   )

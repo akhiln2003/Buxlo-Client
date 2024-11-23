@@ -5,6 +5,10 @@ export interface IsignUpOptionProps {
 
 }
 
-export interface IsignUpFormProps{
+export interface IsignUpFormPageProps{
     setIsFormVisible: Dispatch<SetStateAction<boolean>>;
 }
+
+export interface IsignUnFormProps {
+    setIsFormFilled: React.Dispatch<React.SetStateAction<boolean>>;
+  }

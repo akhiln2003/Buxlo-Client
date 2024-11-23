@@ -7,6 +7,8 @@ import GoogleIcon from '@/assets/images/GoogleIcon.png';
 // import GitHubIcon from '@/assets/images/GitHubIcon.png';
 import FbIcon from '@/assets/images/fbIcon.png';
 import AppleIcon from '@/assets/images/AppleIcon.png';
+import { SigninForm } from '../components/SignInForm';
+
 
 function SignIn() {
 
@@ -41,10 +43,8 @@ function SignIn() {
         <div className='w-full flex items-center justify-center  mt-[3rem]'>
           <div className='w-[55rem] h-fit flex justify-center '>
 
-            <div className='w-1/2  h-full flex flex-col py-2'>
-            <div className='w-full h-14 bg-gray-600 mt-2'></div>
-            <div className='w-full h-14 bg-gray-600 mt-1'></div>
-            <div className='w-full h-14 bg-gray-600 mt-1'></div>
+            <div className='w-1/2  h-full flex flex-col px-[2rem]'>
+            < SigninForm />
             </div>
             <div className='h-full flex flex-col justify-between items-center'>
               <div className='h-[6rem] bg-zinc-500 dark:bg-zinc-700 w-0.5'></div>

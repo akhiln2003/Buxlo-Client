@@ -1,14 +1,17 @@
 // import React from 'react'
 
 import { Link } from "react-router-dom"
-import { IsignUpFormProps } from "../types/Iprops"
+import { IsignUpFormPageProps } from "../@types/Iprops"
 import { UserUrls } from "@/@types/enums/UserUrls"
 import { ArrowLeft, ChevronLeft } from "lucide-react"
 
-function SignUpForm({ setIsFormVisible }: IsignUpFormProps) {
+import { SignUnForm } from "./SignUpForm"
+
+function SignUpFormPage({ setIsFormVisible }: IsignUpFormPageProps) {
   const navigateOptions = () => {
     setIsFormVisible(false)
   }
+
   return (
     <>
       <div className=' dark:bg-zinc-800 min-h-screen'>
@@ -41,15 +44,10 @@ function SignUpForm({ setIsFormVisible }: IsignUpFormProps) {
 
         <div className="w-full flex flex-col items-center py-10">
 
-          <div className="w-[22rem] h-96 bg-slate-100"></div>
-
-          <div className='w-full flex flex-col items-center justify-center  mt-[1rem]'>
-            <p className='text-zinc-600 dark:text-zinc-400 font-cabinet text-xs font-medium' >By creating an account, you agree to our <span className=' underline '>Terms of Service</span></p>
-            <p className='text-zinc-600 dark:text-zinc-400 font-cabinet text-xs font-medium ' >and have read and understood the <span className=' underline'>Privacy Policy</span></p>
+          <div className="w-[22rem] h-fit my-2">
+            < SignUnForm  />
           </div>
-
-          <div className="w-[22rem] h-10 bg-slate-100 my-5 flex justify-center items-center">Continue</div>
-          <span className="font-cabinet font-semibold text-sm relative group mb-5 cursor-pointer" onClick={() => navigateOptions}>
+          <span className="font-cabinet font-semibold text-sm relative group my-5 cursor-pointer" onClick={() => navigateOptions()}>
             Back
             <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-black dark:bg-zinc-300 transition-all duration-300 group-hover:w-full"></span>
           </span>
@@ -69,4 +67,4 @@ function SignUpForm({ setIsFormVisible }: IsignUpFormProps) {
   )
 }
 
-export default SignUpForm
+export default SignUpFormPage

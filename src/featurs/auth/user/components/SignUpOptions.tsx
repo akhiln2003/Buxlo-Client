@@ -8,7 +8,7 @@ import FbIcon from '@/assets/images/fbIcon.png';
 import AppleIcon from '@/assets/images/AppleIcon.png'
 import TraditionalLoginIcon  from '@/assets/images/TraditionalLoginIcon.png';
 import { useState } from 'react';
-import { IsignUpOptionProps } from '../types/Iprops';
+import { IsignUpOptionProps } from '../@types/Iprops';
 function SignUpOptions({setIsFormVisible}:IsignUpOptionProps) {
   const [showMore, setShowMore] = useState<boolean>(false);
 
