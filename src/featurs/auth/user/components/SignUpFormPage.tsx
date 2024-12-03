@@ -2,7 +2,7 @@
 
 import { Link } from "react-router-dom"
 import { IsignUpFormPageProps } from "../@types/Iprops"
-import { UserUrls } from "@/@types/enums/UserUrls"
+import { UserUrls } from "@/@types/urlEnums/UserUrls"
 import { ArrowLeft, ChevronLeft } from "lucide-react"
 
 import { SignUnForm } from "./SignUpForm"

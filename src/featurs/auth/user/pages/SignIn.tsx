@@ -1,17 +1,28 @@
-// import logoIconWhite from '@/assets/images/logoIconWhite.png';
+import logoIconWhite from '@/assets/images/logoIconWhite.png';
 import logoIconBlack from '@/assets/images/logoIconBlack.png';
 import { Link } from 'react-router-dom';
-import { UserUrls } from '@/@types/enums/UserUrls';
+import { UserUrls } from '@/@types/urlEnums/UserUrls';
 import { ArrowLeft, ChevronLeft } from 'lucide-react';
 import GoogleIcon from '@/assets/images/GoogleIcon.png';
 // import GitHubIcon from '@/assets/images/GitHubIcon.png';
 import FbIcon from '@/assets/images/fbIcon.png';
 import AppleIcon from '@/assets/images/AppleIcon.png';
 import { SigninForm } from '../components/SignInForm';
+import { useGoogleLogin } from '@react-oauth/google';
+import { useTheme } from '@/contexts/themeContext';
 
 
 function SignIn() {
 
+  const {isDarkMode} = useTheme()
+
+  const signInWithGoogle = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      console.log(tokenResponse);
+    },
+    onError: (error) => {
+      console.error("Google login error: ", error);
+    }  });
   return (
     <>
       <div className=' dark:bg-zinc-800  min-h-screen' >
@@ -36,7 +47,7 @@ function SignIn() {
         </div>
         <div className='w-full flex flex-col items-center mt-[3rem] '>
           <div className='w-10  '>
-            <img src={logoIconBlack} alt="BUXLO ICON" />
+            <img src={ isDarkMode ? logoIconWhite : logoIconBlack } alt="BUXLO ICON" />
           </div>
           <p className="text-2xl font-semibold font-supreme">Sign Into Buxlo</p>
         </div>
@@ -44,7 +55,7 @@ function SignIn() {
           <div className='w-[55rem] h-fit flex justify-center '>
 
             <div className='w-1/2  h-full flex flex-col px-[2rem]'>
-            < SigninForm />
+              < SigninForm />
             </div>
             <div className='h-full flex flex-col justify-between items-center'>
               <div className='h-[6rem] bg-zinc-500 dark:bg-zinc-700 w-0.5'></div>
@@ -54,7 +65,8 @@ function SignIn() {
 
             <div className='w-1/2 h-fit flex py-3'>
               <div className='w-full flex flex-col items-center  '>
-                <div className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-700 pl-[1rem] flex items-center overflow-hidden">
+                <div className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-700 pl-[1rem] flex items-center overflow-hidden"
+                  onClick={() => signInWithGoogle()}>
                   <div className="absolute inset-0 bg-gradient-to-r from-slate-100 dark:from-zinc-600 to-slate-100 dark:to-zinc-600 scale-x-0 group-hover:scale-x-100 transform origin-left transition-all duration-100"></div>
                   <div className="w-5 rounded overflow-hidden ml-[1rem] relative z-10">
                     <img src={GoogleIcon} alt="googleIcon" />

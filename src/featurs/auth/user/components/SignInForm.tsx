@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
+import { UserApis } from "@/services/apis/UserApis";
 
 export const formSchema = z.object({
   email: z.string().email({
@@ -36,14 +37,18 @@ export function SigninForm() {
   // Watch for changes in both fields
   const email = form.watch("email");
   const password = form.watch("password");
+  
 
   // Update button state when either field changes
   useEffect(() => {
     setIsFormFilled(email.length > 0 && password.length > 0);
   }, [email, password]);
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log("Form submitted:", data);
+  const onSubmit = async(data: z.infer<typeof formSchema>) => {
+    const { email, password } =  data
+    const vvv = await UserApis.signIn(email , password)
+    console.log("Login form submit : " ,vvv);
+    
   };
 
   return (

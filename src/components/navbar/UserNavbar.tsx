@@ -13,21 +13,22 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { UserUrls } from '@/@types/enums/UserUrls';
+import { UserUrls } from '@/@types/urlEnums/UserUrls';
+import { useTheme } from '@/contexts/themeContext';
 
 function UserNavbar() {
+
     const [isOpen, setIsOpen] = useState(false);
-    const [darkMode, setDarkMode] = useState(false);
+    const { isDarkMode, toggleTheme } = useTheme();
+    
     const navigate = useNavigate();
 
-    const darkModeHandler = () => {
-        setDarkMode(!darkMode);
-        document.body.classList.toggle('dark');
-    }
-    const navigateLoginLogout = ()=>{
+    const navigateLoginLogout = () => {
         navigate(UserUrls.signIn)
     }
-    const colorTheam = darkMode ? "white" : 'black'
+    const colorTheam = isDarkMode ? "white" : 'black'
+    console.log(isDarkMode);
+    
     return (
         <>
             <nav className='fixed top-0 left-0 right-0 bg-white/70 dark:bg-zinc-950/70 backdrop-blur-md z-50'>
@@ -37,7 +38,7 @@ function UserNavbar() {
                         <div className='flex-shrink-0 '>
                             <Link to={UserUrls.home}>
                                 <img
-                                    src={darkMode ? logoWhite : logoBlack}
+                                    src={isDarkMode ? logoWhite : logoBlack}
                                     alt="BUXLo Logo"
                                     className="h-16 w-auto " />
                             </Link>
@@ -101,13 +102,13 @@ function UserNavbar() {
                                     </div></DropdownMenuLabel>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem><Link to={UserUrls.profile} className='flex' > <User size={15} /> <span className='ml-[0.5rem]' >Profile</span></Link> </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => darkModeHandler()} >
+                                    <DropdownMenuItem onClick={toggleTheme} >
                                         <button className='flex' >
-                                            {darkMode ? < Sun color='white' strokeWidth={1.5} size={19} /> : < SunMoon strokeWidth={1.5} />}
+                                            {isDarkMode ? < Sun color='white' strokeWidth={1.5} size={19} /> : < SunMoon strokeWidth={1.5} />}
                                             <span className='ml-[0.5rem]'>Team</span>
                                         </button>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem><Link to={UserUrls.subscription} className='flex' > < Sparkles size={15}  strokeWidth={2.5}/> <span className='ml-[0.5rem]'>Subscription</span></Link></DropdownMenuItem>
+                                    <DropdownMenuItem><Link to={UserUrls.subscription} className='flex' > < Sparkles size={15} strokeWidth={2.5} /> <span className='ml-[0.5rem]'>Subscription</span></Link></DropdownMenuItem>
                                     <DropdownMenuItem onClick={navigateLoginLogout} >
                                         <LogIn size={20} /><span className='ml-[0.5rem]'>SignIn</span>
                                         {/* <Link to={UserUrls.signOut} className=' w-full flex text-red-700'><LogOut size={20}/><span className='ml-[0.5rem]'>SignOut</span></Link> */}

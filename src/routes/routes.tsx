@@ -1,13 +1,19 @@
-import { UserUrls } from "@/@types/enums/UserUrls";
+import { MentorUrl } from "@/@types/urlEnums/MentorUrl";
+import { UserUrls } from "@/@types/urlEnums/UserUrls";
+import MentorLayout from "@/layout/MentorLayout";
 import UserLayout from "@/layout/UserLayout";
 import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
 
 
-      // User side
-const LandingPage = lazy(()=>import('@/pages/UserLandingPage'));
+      // User side  
+const UserLandingPage = lazy(()=>import('@/pages/UserLandingPage'));
 const UserSignIn = lazy(()=>import('@/featurs/auth/user/pages/SignIn'));
-const UserSignUp = lazy(()=> import('@/featurs/auth/user/pages/SignUp'))
+const UserSignUp = lazy(()=> import('@/featurs/auth/user/pages/SignUp'));
+const UserOtpPage = lazy(()=>import('@/featurs/auth/user/pages/Otp'))
+
+
+const MentorLandingPage = lazy(()=>import("@/pages/MentorLandingPage"))
 
 
 
@@ -20,7 +26,7 @@ const routes = createBrowserRouter([
         path: UserUrls.home,
         element: (
           <Suspense fallback={<div>Loading...</div>}>
-            <LandingPage />
+            < UserLandingPage />
           </Suspense>
         ),
       },
@@ -44,12 +50,26 @@ const routes = createBrowserRouter([
       path: UserUrls.otp,
       element: (
         <Suspense fallback={ <div>Loading....</div> }>
-
+          < UserOtpPage />
         </Suspense>
       )
      }
     ],
   },
+  {
+    path: MentorUrl.home,
+    element: < MentorLayout />,
+    children: [
+      {
+        path: MentorUrl.home,
+        element: (
+          < Suspense fallback={ <div>Loading....</div> }>
+              < MentorLandingPage />
+          </Suspense>
+        )
+      }
+    ]
+  }
 ], {
   future: {
     // v7_startTransition: true,

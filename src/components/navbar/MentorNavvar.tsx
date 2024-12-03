@@ -13,7 +13,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MentorUrl } from '@/@types/enums/MentorUrl';
+import { MentorUrl } from '@/@types/urlEnums/MentorUrl';
 
 function MentorNavbar() {
     const [isOpen, setIsOpen] = useState(false);

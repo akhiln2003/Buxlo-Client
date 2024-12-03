@@ -12,19 +12,20 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
-import { IsignUnFormProps } from "../@types/Iprops";
 import { Button } from "@/components/ui/button";
+import { UserApis } from "@/services/apis/UserApis";
+import { useNavigate } from "react-router-dom";
+import { UserUrls } from "@/@types/urlEnums/UserUrls";
 
 // Zod Schema
-export const formSchema = z
-  .object({
-    userName: z.string().trim().min(3, "Username must be at least 3 characters").max(20, "Enter a valid username"),
-    email: z.string().email({
-      message: "Email must be valid",
-    }),
-    password: z.string().min(6, "Password should be at least 6 characters"),
-    confirmPassword: z.string().min(6, "Confirm Password should be at least 6 characters"),
-  })
+export const formSchema = z.object({
+  userName: z.string().trim().min(3, "Username must be at least 3 characters").max(20, "Enter a valid username"),
+  email: z.string().email({
+    message: "Email must be valid",
+  }),
+  password: z.string().trim().min(6, "Password should be at least 6 characters"),
+  confirmPassword: z.string().min(6, "Confirm Password should be at least 6 characters"),
+})
   .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],
     message: "Passwords do not match",
@@ -33,6 +34,9 @@ export function SignUnForm() {
   const [passwordVisibility, setPasswordVisibility] = useState<boolean>(false);
   const [isFormFilled, setIsFormFilled] = useState<boolean>(false);
 
+  const navigate = useNavigate()
+
+  // zode schema for validation
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -54,8 +58,15 @@ export function SignUnForm() {
     setIsFormFilled(userName.length > 0 && email.length > 0 && password.length > 0 && confirmPassword.length > 0);
   }, [userName, email, password, confirmPassword]);
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log("Form submitted:", data);
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    try {
+      const { userName, email, password } = data
+      await UserApis.signUp(userName, email, password)
+      navigate(UserUrls.otp , {state: { userName , email } })
+    } catch (error) {
+      console.log("error :" , error);
+      
+    }
   };
 
   return (
@@ -84,7 +95,7 @@ export function SignUnForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="font-cabinet font-semibold text-xs text-zinc-500 dark:text-zinc-50">
+              <FormLabel className="font-cabinet font-semibold text-xs text-zinc-500 dark:text-zinc-50 ">
                 EMAIL ADDRESS
               </FormLabel>
               <FormControl>
@@ -138,17 +149,17 @@ export function SignUnForm() {
           )}
         />
         <div className='w-full flex flex-col items-center justify-center  mt-[1rem]'>
-            <p className='text-zinc-600 dark:text-zinc-400 font-cabinet text-xs font-medium' >By creating an account, you agree to our <span className=' underline '>Terms of Service</span></p>
-            <p className='text-zinc-600 dark:text-zinc-400 font-cabinet text-xs font-medium ' >and have read and understood the <span className=' underline'>Privacy Policy</span></p>
-          </div>
+          <p className='text-zinc-600 dark:text-zinc-400 font-cabinet text-xs font-medium' >By creating an account, you agree to our <span className=' underline '>Terms of Service</span></p>
+          <p className='text-zinc-600 dark:text-zinc-400 font-cabinet text-xs font-medium ' >and have read and understood the <span className=' underline'>Privacy Policy</span></p>
+        </div>
 
         {/* Submit Button */}
         <Button
           //  onClick={}
           type={isFormFilled ? "submit" : "button"}
           className={`font-cabinet w-5/6 rounded-none mx-[2rem] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${!isFormFilled
-              ? "cursor-not-allowed bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-700 dark:text-zinc-700 dark:hover:bg-zinc-700"
-              : "cursor-default"
+            ? "cursor-not-allowed bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-700 dark:text-zinc-700 dark:hover:bg-zinc-700"
+            : "cursor-default"
             }`}
         >
           Sign In

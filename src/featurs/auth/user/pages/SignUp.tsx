@@ -3,7 +3,7 @@ import SignUpFormPage from '../components/SignUpFormPage'
 import SignUpOptions from '../components/SignUpOptions'
 
 function SignUp() {
-  const[ isFormVisible , setIsFormVisible] = useState<boolean>(false)
+  const[ isFormVisible , setIsFormVisible] = useState<boolean>(false);
   return (
     <>
     {
