@@ -13,21 +13,20 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
-import { UserApis } from "@/services/apis/UserApis";
+import { signInFormSchema } from "../zodeSchema/authSchema";
+import { useSignInMutation } from "@/services/apis/UserApis";
+import { IaxiosResponse } from "../@types/IaxiosResponse";
 
-export const formSchema = z.object({
-  email: z.string().email({
-    message: "Email must be valid",
-  }),
-  password: z.string().min(6, "Password should be at least 6 characters"),
-});
+
 export function SigninForm() {
   const [passwordVisibility, setPasswordVisibility] = useState<boolean>(false);
   const [isFormFilled, setIsFormFilled] = useState<boolean>(false);
 
+  const [ signIn ] = useSignInMutation();
+
   // Zod Schema
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof signInFormSchema>>({
+    resolver: zodResolver(signInFormSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -44,10 +43,14 @@ export function SigninForm() {
     setIsFormFilled(email.length > 0 && password.length > 0);
   }, [email, password]);
 
-  const onSubmit = async(data: z.infer<typeof formSchema>) => {
+  const onSubmit = async(data: z.infer<typeof signInFormSchema>) => {
     const { email, password } =  data
-    const vvv = await UserApis.signIn(email , password)
-    console.log("Login form submit : " ,vvv);
+    const response: IaxiosResponse = await signIn({email , password});
+    if( response.data ){
+
+    }else{
+
+    }
     
   };
 

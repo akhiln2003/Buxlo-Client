@@ -1,112 +1,62 @@
-import { AuthApiClient } from "../axios";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { axiosBaseQuery } from "../axios";
 import { UserApiEndPoints } from "../endPoints/UserEndPoints";
-import { AxiosError } from "axios";
-import { toast } from "@/hooks/use-toast";
-import { AuthUnexpectedErrorTost } from "@/components/ui/authUnexpectedErrorTost";
+import { addUser } from "@/redux/slices/userSlice";
 
-interface ErrorResponse {
-    error: string;
+interface User {
+    uerName: string;
+    email: string;
+    password: string
 }
 
+export const userApi = createApi({
+    reducerPath: 'userApi',
+    baseQuery: axiosBaseQuery({ baseUrl: import.meta.env.VITE_AUTH_API_URl }),
+    tagTypes: ['User'],
+    endpoints: (builder) => ({
 
+        // signUp new User
+        signUp: builder.mutation({
+            query: (newUser) => ({
+                url: UserApiEndPoints.signUp,
+                method: 'POST',
+                data: newUser
+            }),
+        }),
 
+        // signUp new User
+        verify: builder.mutation({
+            query: (data) => ({
+                url: UserApiEndPoints.verifyOtp,
+                method: 'POST',
+                data: data
+            }),
 
-export class UserApis {
-    static async signIn(email: string, password: string): Promise<any> {
-        try {
-            const response = await AuthApiClient.post(UserApiEndPoints.signIn, { email, password });
-            return response
-        } catch (err) {
-            const axiosError = err as AxiosError<ErrorResponse>
-            if (axiosError.response && axiosError.response.data) {
-                console.log(axiosError.response);
-                
-                toast({
-                    title: axiosError.response.data.error ,
-                    description: "You entered invalid otp try one more time to currect otp",
-                    className: "text-red-700 border bg-gray-200 mb-6",
-                });
-            } else {
-
-                // Handle unexpected error shapes
-                AuthUnexpectedErrorTost
+            async onQueryStarted(arg, { dispatch, queryFulfilled }) { 
+                try {
+                    const { data }  = await queryFulfilled;
+                    dispatch(addUser(data))
+                } catch (error) { }
             }
 
-            throw axiosError;
-        }
-    }
-    static async signUp(name: string, email: string, password: string): Promise<any> {
-        try {
-            const response = await AuthApiClient.post(UserApiEndPoints.signUp, { name, email, password });            
-            return response
-        } catch (err) {
-            const axiosError = err as AxiosError<ErrorResponse>;
+        }),
 
-            // Check if the error has a response and a data object
-            if (axiosError.response && axiosError.response.data) {
-                toast({
-                    title: axiosError.response.data.error,
-                    description: "This email is already used, try with another email.",
-                    className: "text-red-700 border bg-gray-200 mb-6",
-                });
-            } else {
-                // Handle unexpected error shapes
-                toast({
-                    title: "An unexpected error occurred",
-                    description: "Please try again later.",
-                    className: "text-red-700 border bg-gray-200 mb-6",
-                });
-            }
 
-            throw axiosError;
-        }
-    }
-    static async verifyOtp(otp: string, email: string): Promise<any> {
-        try {
-            const response = await AuthApiClient.post(UserApiEndPoints.verifyOtp, { otp, email });
-            console.log( 'this is verify OTP  response : ' ,response);
+        // signIn User
+        signIn: builder.mutation({
+            query: (data) => ({
+                url: UserApiEndPoints.signIn,
+                method: "POST",
+                data: data
+            })
+        })
 
-            return response
-        } catch (err) {
-            const axiosError = err as AxiosError<ErrorResponse>;
+    })
+});
 
-            // Check if the error has a response and a data object
-            if (axiosError.response && axiosError.response.data) {
-                toast({
-                    title: axiosError.response.data.error || 'Invalid OTP',
-                    description: "You entered invalid otp try one more time to currect otp",
-                    className: "text-red-700 border bg-gray-200 mb-6",
-                });
-            } else {
-
-                // Handle unexpected error shapes
-                AuthUnexpectedErrorTost
-            }
-
-            throw axiosError;
-
-        }
-    }
-
-    static async resendOtp(email: string, name: string) {
-        try {
-
-            const response = await AuthApiClient.post(UserApiEndPoints.resendOtp, { email, name });
-            return response
-
-        } catch (err) {
-            const axiosError = err as AxiosError<ErrorResponse>;
-
-            if (axiosError.response && axiosError.response.data) {
-                toast({
-                    title: axiosError.response.data.error,
-                    description: "",
-                    className: "text-red-700 border bg-gray-200 mb-6",
-                })
-            } else {
-                AuthUnexpectedErrorTost
-            }
-            throw axiosError
-        }
-    }
-}
+// Export the hook directly from the API slice
+export const {
+    useSignUpMutation,
+    useVerifyMutation,
+    useSignInMutation
+} = userApi;

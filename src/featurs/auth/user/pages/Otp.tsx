@@ -14,18 +14,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { toast } from "@/hooks/use-toast";
-import { UserApis } from "@/services/apis/UserApis";
+import { useVerifyMutation } from "@/services/apis/UserApis";
+import { otpFormSchema } from "../zodeSchema/authSchema";
+import { errorTost } from "@/components/ui/tosastMessage";
+import { IaxiosResponse } from "../@types/IaxiosResponse";
 
 
 
 
-// Zod validation schema
-const formSchema = z.object({
-    otpOne: z.string().regex(/^\d$/, "Each field must be a single digit (0-9)"),
-    otpTwo: z.string().regex(/^\d$/, "Each field must be a single digit (0-9)"),
-    otpThree: z.string().regex(/^\d$/, "Each field must be a single digit (0-9)"),
-    otpFour: z.string().regex(/^\d$/, "Each field must be a single digit (0-9)"),
-});
+
 
 function Otp() {
 
@@ -34,10 +31,11 @@ function Otp() {
     const [ resendTimer , setresendTimer ] = useState<boolean>(true)
     const navigate = useNavigate()
     const location = useLocation();
-    const { email, userName } = location.state
+    const { email, name } = location.state;
+    const [ verifyOtp ]    = useVerifyMutation()
     
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
+    const form = useForm<z.infer<typeof otpFormSchema>>({
+        resolver: zodResolver(otpFormSchema),
         mode: "onChange", // Enable real-time validation
         defaultValues: {
             otpOne: "",
@@ -47,10 +45,14 @@ function Otp() {
         },
     });
 
-    const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    const onSubmit = async (data: z.infer<typeof otpFormSchema>) => {
         const otp = data.otpOne + data.otpTwo + data.otpThree + data.otpFour;
-        await UserApis.verifyOtp(otp , email);
-        navigate(UserUrls.home)
+        const response: IaxiosResponse = await verifyOtp({otp , email} );        
+        if( response.data ){
+            navigate(UserUrls.home)
+        }else{            
+            errorTost("Incorrect OTP "  , response.error.data.message)
+        }
     };
 
     // Check if there are any errors
@@ -64,11 +66,7 @@ function Otp() {
             if (seconds == 0) {
                 if (minutes == 0) {
                     clearInterval(interval);
-                    toast({
-                        title: "OTP has expired",
-                        description: "This email is already used, try with another email.",
-                        className: "text-red-700 border bg-gray-200 mb-6",
-                    });
+                   
                 } else {
                     setSeconds(59);
                     setMinutes(minutes - 1)
@@ -81,14 +79,7 @@ function Otp() {
         };
     },);
 
-    // const sendOTP = () => {
-    //     setMinutes(2);
-    //     setSeconds(59);
-    //   };
-    //   const resendOTP = () => {
-    //     setMinutes(2);
-    //     setSeconds(59);
-    //   };
+
 
     const handilResendOtp = ()=>{
         setresendTimer(false)
@@ -98,7 +89,7 @@ function Otp() {
             className: "text-green-700 border bg-gray-200 mb-6",
         })
         setTimeout(()=> setresendTimer(true),100000)
-        UserApis.resendOtp(email,userName);
+
     }
     return (
         <div className="dark:bg-zinc-800 min-h-screen">
@@ -140,7 +131,7 @@ function Otp() {
                                         <FormField
                                             key={otpField}
                                             control={form.control}
-                                            name={otpField as keyof z.infer<typeof formSchema>}
+                                            name={otpField as keyof z.infer<typeof otpFormSchema>}
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>

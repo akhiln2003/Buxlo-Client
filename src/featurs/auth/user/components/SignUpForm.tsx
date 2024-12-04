@@ -13,34 +13,31 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { UserApis } from "@/services/apis/UserApis";
 import { useNavigate } from "react-router-dom";
+import { useSignUpMutation } from "@/services/apis/UserApis";
 import { UserUrls } from "@/@types/urlEnums/UserUrls";
+import { errorTost } from "@/components/ui/tosastMessage";
+import { signUpFormSchema } from "../zodeSchema/authSchema";
+import { IaxiosResponse } from "../@types/IaxiosResponse";
+
+
+
 
 // Zod Schema
-export const formSchema = z.object({
-  userName: z.string().trim().min(3, "Username must be at least 3 characters").max(20, "Enter a valid username"),
-  email: z.string().email({
-    message: "Email must be valid",
-  }),
-  password: z.string().trim().min(6, "Password should be at least 6 characters"),
-  confirmPassword: z.string().min(6, "Confirm Password should be at least 6 characters"),
-})
-  .refine((data) => data.password === data.confirmPassword, {
-    path: ["confirmPassword"],
-    message: "Passwords do not match",
-  });
+
 export function SignUnForm() {
   const [passwordVisibility, setPasswordVisibility] = useState<boolean>(false);
   const [isFormFilled, setIsFormFilled] = useState<boolean>(false);
 
-  const navigate = useNavigate()
+  const [signUp] = useSignUpMutation();
+
+  const navigate = useNavigate();
 
   // zode schema for validation
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof signUpFormSchema>>({
+    resolver: zodResolver(signUpFormSchema),
     defaultValues: {
-      userName: "",
+      name: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -48,34 +45,49 @@ export function SignUnForm() {
   });
 
   // Watch for changes in both fields
-  const userName = form.watch("userName");
+  const name = form.watch("name");
   const email = form.watch("email");
   const password = form.watch("password");
   const confirmPassword = form.watch("confirmPassword");
 
+
+
   // Update button state when either field changes
   useEffect(() => {
-    setIsFormFilled(userName.length > 0 && email.length > 0 && password.length > 0 && confirmPassword.length > 0);
-  }, [userName, email, password, confirmPassword]);
+    setIsFormFilled(name.length > 0 && email.length > 0 && password.length > 0 && confirmPassword.length > 0);
+  }, [name, email, password, confirmPassword]);
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data: z.infer<typeof signUpFormSchema>) => {
     try {
-      const { userName, email, password } = data
-      await UserApis.signUp(userName, email, password)
-      navigate(UserUrls.otp , {state: { userName , email } })
-    } catch (error) {
-      console.log("error :" , error);
+      const { name, email, password } = data
+      const newUser = {
+        name,
+        email,
+        password
+      }
+
+      const response: IaxiosResponse = await signUp(newUser)
+      console.log( "es:" , response);
+
+      if( response.data){        
+        navigate(UserUrls.otp, { state: { name, email } })
+      }
+      else{        
+        errorTost("Somthing wrong" , response.error.data.error[0].message)
+      }
       
+    } catch (error) {
+      console.log("error :", error);
     }
   };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        {/* UserName Field */}
+        {/* name Field */}
         <FormField
           control={form.control}
-          name="userName"
+          name="name"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="font-cabinet font-semibold text-xs text-zinc-500 dark:text-zinc-50">
