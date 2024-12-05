@@ -3,11 +3,6 @@ import { axiosBaseQuery } from "../axios";
 import { UserApiEndPoints } from "../endPoints/UserEndPoints";
 import { addUser } from "@/redux/slices/userSlice";
 
-interface User {
-    uerName: string;
-    email: string;
-    password: string
-}
 
 export const userApi = createApi({
     reducerPath: 'userApi',
@@ -31,13 +26,6 @@ export const userApi = createApi({
                 method: 'POST',
                 data: data
             }),
-
-            async onQueryStarted(arg, { dispatch, queryFulfilled }) { 
-                try {
-                    const { data }  = await queryFulfilled;
-                    dispatch(addUser(data))
-                } catch (error) { }
-            }
 
         }),
 

@@ -8,9 +8,9 @@ import { createBrowserRouter } from "react-router-dom";
 
       // User side  
 const UserLandingPage = lazy(()=>import('@/pages/UserLandingPage'));
-const UserSignIn = lazy(()=>import('@/featurs/auth/user/pages/SignIn'));
-const UserSignUp = lazy(()=> import('@/featurs/auth/user/pages/SignUp'));
-const UserOtpPage = lazy(()=>import('@/featurs/auth/user/pages/Otp'))
+const UserSignIn = lazy(()=>import('@/features/auth/user/pages/SignIn'));
+const UserSignUp = lazy(()=> import('@/features/auth/user/pages/SignUp'));
+const UserOtpPage = lazy(()=>import('@/features/auth/user/pages/Otp'))
 
 
 const MentorLandingPage = lazy(()=>import("@/pages/MentorLandingPage"))

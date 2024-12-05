@@ -18,6 +18,9 @@ import { useVerifyMutation } from "@/services/apis/UserApis";
 import { otpFormSchema } from "../zodeSchema/authSchema";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { IaxiosResponse } from "../@types/IaxiosResponse";
+import { useDispatch } from "react-redux";
+import { addUser } from "@/redux/slices/userSlice";
+import { Iuser } from "@/@types/interface/IdataBase";
 
 
 
@@ -29,6 +32,7 @@ function Otp() {
     const [minutes, setMinutes] = useState(1);
     const [seconds, setSeconds] = useState(59);
     const [ resendTimer , setresendTimer ] = useState<boolean>(true)
+    const dispatch = useDispatch();
     const navigate = useNavigate()
     const location = useLocation();
     const { email, name } = location.state;
@@ -49,6 +53,14 @@ function Otp() {
         const otp = data.otpOne + data.otpTwo + data.otpThree + data.otpFour;
         const response: IaxiosResponse = await verifyOtp({otp , email} );        
         if( response.data ){
+            const val: Iuser = {
+                name: response.data.userVerified.name,
+                email: response.data.userVerified.email,
+                role: response.data.userVerified.role
+            }
+
+            dispatch(addUser(val))
+            
             navigate(UserUrls.home)
         }else{            
             errorTost("Incorrect OTP "  , response.error.data.message)
