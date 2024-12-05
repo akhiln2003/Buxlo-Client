@@ -27,7 +27,6 @@ function UserNavbar() {
         navigate(UserUrls.signIn)
     }
     const colorTheam = isDarkMode ? "white" : 'black'
-    console.log(isDarkMode);
     
     return (
         <>

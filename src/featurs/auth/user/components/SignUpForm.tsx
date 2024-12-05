@@ -67,7 +67,6 @@ export function SignUnForm() {
       }
 
       const response: IaxiosResponse = await signUp(newUser)
-      console.log( "es:" , response);
 
       if( response.data){        
         navigate(UserUrls.otp, { state: { name, email } })
