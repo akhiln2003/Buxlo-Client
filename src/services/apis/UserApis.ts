@@ -1,7 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { axiosBaseQuery } from "../axios";
 import { UserApiEndPoints } from "../endPoints/UserEndPoints";
-import { addUser } from "@/redux/slices/userSlice";
+import { InewUserData, IresendOtpData, IsignInData, IverifyOtpData } from "@/@types/interface/IuserApisQuery";
 
 
 export const userApi = createApi({
@@ -12,7 +12,7 @@ export const userApi = createApi({
 
         // signUp new User
         signUp: builder.mutation({
-            query: (newUser) => ({
+            query: (newUser: InewUserData) => ({
                 url: UserApiEndPoints.signUp,
                 method: 'POST',
                 data: newUser
@@ -21,7 +21,7 @@ export const userApi = createApi({
 
         // signUp new User
         verify: builder.mutation({
-            query: (data) => ({
+            query: (data: IverifyOtpData) => ({
                 url: UserApiEndPoints.verifyOtp,
                 method: 'POST',
                 data: data
@@ -30,9 +30,19 @@ export const userApi = createApi({
         }),
 
 
+        // Resend OTP
+        resendOtp: builder.mutation({
+            query: (data: IresendOtpData)=>({
+                url: UserApiEndPoints.resendOtp,
+                method: "POST",
+                data: data
+            })
+        }),
+
+
         // signIn User
         signIn: builder.mutation({
-            query: (data) => ({
+            query: (data: IsignInData) => ({
                 url: UserApiEndPoints.signIn,
                 method: "POST",
                 data: data
@@ -46,5 +56,6 @@ export const userApi = createApi({
 export const {
     useSignUpMutation,
     useVerifyMutation,
+    useResendOtpMutation,
     useSignInMutation
 } = userApi;
