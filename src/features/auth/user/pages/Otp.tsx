@@ -13,10 +13,9 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
-import { toast } from "@/hooks/use-toast";
-import { useVerifyMutation } from "@/services/apis/UserApis";
+import { useResendOtpMutation, useVerifyMutation } from "@/services/apis/UserApis";
 import { otpFormSchema } from "../zodeSchema/authSchema";
-import { errorTost } from "@/components/ui/tosastMessage";
+import { errorTost, successToast } from "@/components/ui/tosastMessage";
 import { IaxiosResponse } from "../@types/IaxiosResponse";
 import { useDispatch } from "react-redux";
 import { addUser } from "@/redux/slices/userSlice";
@@ -36,7 +35,8 @@ function Otp() {
     const navigate = useNavigate()
     const location = useLocation();
     const { email, name } = location.state;
-    const [verifyOtp, { isLoading }] = useVerifyMutation()
+    const [verifyOtp , { isLoading }] = useVerifyMutation();
+    const [ resendOtp ] = useResendOtpMutation();
 
     const form = useForm<z.infer<typeof otpFormSchema>>({
         resolver: zodResolver(otpFormSchema),
@@ -93,14 +93,19 @@ function Otp() {
 
 
 
-    const handilResendOtp = () => {
-        setresendTimer(false)
-        toast({
-            title: "Resented Otp to your email",
-            description: "check you email for the new otp and verify it",
-            className: "text-green-700 border bg-gray-200 mb-6",
-        })
-        setTimeout(() => setresendTimer(true), 100000)
+    const  handilResendOtp = async () => {
+        setresendTimer(false);
+        setTimeout(() => setresendTimer(true), 100000);
+        const response: IaxiosResponse = await resendOtp({ email , name}); 
+        console.log(response);
+        if( response.data ){
+            successToast("OTP sended" ,  response.data.message)
+        }else{
+            console.log(response.error.data);
+            
+            errorTost("somthing wrong" , response.error.data)
+        }
+
 
     }
     return (
