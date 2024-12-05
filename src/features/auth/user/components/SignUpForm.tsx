@@ -19,6 +19,7 @@ import { UserUrls } from "@/@types/urlEnums/UserUrls";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { signUpFormSchema } from "../zodeSchema/authSchema";
 import { IaxiosResponse } from "../@types/IaxiosResponse";
+import { Loader } from "lucide-react";
 
 
 
@@ -29,7 +30,7 @@ export function SignUnForm() {
   const [passwordVisibility, setPasswordVisibility] = useState<boolean>(false);
   const [isFormFilled, setIsFormFilled] = useState<boolean>(false);
 
-  const [signUp] = useSignUpMutation();
+  const [signUp,{ isLoading }] = useSignUpMutation();
 
   const navigate = useNavigate();
 
@@ -167,13 +168,14 @@ export function SignUnForm() {
         {/* Submit Button */}
         <Button
           //  onClick={}
-          type={isFormFilled ? "submit" : "button"}
-          className={`font-cabinet w-5/6 rounded-none mx-[2rem] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${!isFormFilled
+          type={isFormFilled && !isLoading ? "submit" : "button"}
+          className={`font-cabinet w-5/6 rounded-none mx-[2rem] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${!isFormFilled 
             ? "cursor-not-allowed bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-800"
-            : "cursor-default bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-black"
+            : "cursor-default bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-black"
             }`}
         >
-          Sign In
+          { isLoading ? "Loading " : "Sign Up"}
+          { isLoading && <Loader className="animate-spin"/> }
         </Button>
 
       </form>

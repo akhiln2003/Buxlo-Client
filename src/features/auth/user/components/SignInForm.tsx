@@ -16,13 +16,14 @@ import { useState, useEffect } from "react";
 import { signInFormSchema } from "../zodeSchema/authSchema";
 import { useSignInMutation } from "@/services/apis/UserApis";
 import { IaxiosResponse } from "../@types/IaxiosResponse";
+import { Loader } from "lucide-react";
 
 
 export function SigninForm() {
   const [passwordVisibility, setPasswordVisibility] = useState<boolean>(false);
   const [isFormFilled, setIsFormFilled] = useState<boolean>(false);
 
-  const [ signIn ] = useSignInMutation();
+  const [ signIn , {isLoading} ] = useSignInMutation();
 
   // Zod Schema
   const form = useForm<z.infer<typeof signInFormSchema>>({
@@ -99,13 +100,15 @@ export function SigninForm() {
 
         {/* Submit Button */}
         <Button
-          type={isFormFilled ? "submit" : "button"}
-          className={`font-cabinet w-5/6 rounded-none mx-[2rem] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${!isFormFilled
+          type={isFormFilled  && !isLoading ? "submit" : "button"}
+          className={`font-cabinet w-5/6 rounded-none mx-[2rem] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${!isFormFilled && isLoading
               ? "cursor-not-allowed bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-800"
-              : "cursor-default bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-black"
+              : "cursor-default bg-zinc-800 hover:bg-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-black"
             }`}
         >
-          Sign In
+          
+          { isLoading ? "Loading " : "Sign In"}
+          { isLoading && <Loader className="animate-spin"/> }
         </Button>
       </form>
     </Form>

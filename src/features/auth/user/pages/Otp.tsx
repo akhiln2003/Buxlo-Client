@@ -1,6 +1,6 @@
 import { UserUrls } from "@/@types/urlEnums/UserUrls";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ChevronLeft } from "lucide-react";
+import { ArrowLeft, ChevronLeft, Loader } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
     Form,
@@ -31,13 +31,13 @@ function Otp() {
 
     const [minutes, setMinutes] = useState(1);
     const [seconds, setSeconds] = useState(59);
-    const [ resendTimer , setresendTimer ] = useState<boolean>(true)
+    const [resendTimer, setresendTimer] = useState<boolean>(true)
     const dispatch = useDispatch();
     const navigate = useNavigate()
     const location = useLocation();
     const { email, name } = location.state;
-    const [ verifyOtp ]    = useVerifyMutation()
-    
+    const [verifyOtp, { isLoading }] = useVerifyMutation()
+
     const form = useForm<z.infer<typeof otpFormSchema>>({
         resolver: zodResolver(otpFormSchema),
         mode: "onChange", // Enable real-time validation
@@ -51,8 +51,8 @@ function Otp() {
 
     const onSubmit = async (data: z.infer<typeof otpFormSchema>) => {
         const otp = data.otpOne + data.otpTwo + data.otpThree + data.otpFour;
-        const response: IaxiosResponse = await verifyOtp({otp , email} );        
-        if( response.data ){
+        const response: IaxiosResponse = await verifyOtp({ otp, email });
+        if (response.data) {
             const val: Iuser = {
                 name: response.data.userVerified.name,
                 email: response.data.userVerified.email,
@@ -60,10 +60,10 @@ function Otp() {
             }
 
             dispatch(addUser(val))
-            
+
             navigate(UserUrls.home)
-        }else{            
-            errorTost("Incorrect OTP "  , response.error.data.message)
+        } else {
+            errorTost("Incorrect OTP ", response.error.data.message)
         }
     };
 
@@ -78,7 +78,7 @@ function Otp() {
             if (seconds == 0) {
                 if (minutes == 0) {
                     clearInterval(interval);
-                   
+
                 } else {
                     setSeconds(59);
                     setMinutes(minutes - 1)
@@ -93,14 +93,14 @@ function Otp() {
 
 
 
-    const handilResendOtp = ()=>{
+    const handilResendOtp = () => {
         setresendTimer(false)
         toast({
-            title:"Resented Otp to your email",
-            description:"check you email for the new otp and verify it",
+            title: "Resented Otp to your email",
+            description: "check you email for the new otp and verify it",
             className: "text-green-700 border bg-gray-200 mb-6",
         })
-        setTimeout(()=> setresendTimer(true),100000)
+        setTimeout(() => setresendTimer(true), 100000)
 
     }
     return (
@@ -172,22 +172,24 @@ function Otp() {
                                 </p>
                                 <p className="text-zinc-600 dark:text-zinc-400 font-cabinet text-xs font-medium">
                                     Did't receved code ?  <span
-                                    
-                                        className={`font-cabinet font-semibold text-xs relative group ${ resendTimer ? 'text-black dark:text-zinc-300 cursor-pointer' : 'text-zinc-300  dark:text-zinc-900 cursor-not-allowed '} `}
+
+                                        className={`font-cabinet font-semibold text-xs relative group ${resendTimer ? 'text-black dark:text-zinc-300 cursor-pointer' : 'text-zinc-300  dark:text-zinc-900 cursor-not-allowed '} `}
                                         onClick={() => resendTimer && handilResendOtp()} >
                                         Resend
-                                        <span className={`absolute bottom-0 left-0 w-0 h-[2px] ${ resendTimer && 'bg-black dark:bg-zinc-500'} transition-all duration-300 group-hover:w-full`}></span>
+                                        <span className={`absolute bottom-0 left-0 w-0 h-[2px] ${resendTimer && 'bg-black dark:bg-zinc-500'} transition-all duration-300 group-hover:w-full`}></span>
                                     </span>
                                 </p>
 
                                 {/* Submit Button */}
                                 <Button
-                                    type={form.formState.isValid ? "submit" : "button"}
-                                    className={`font-cabinet w-full rounded-none transition-all duration-200 ${!form.formState.isValid   ?  "cursor-not-allowed bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                                    type={form.formState.isValid && !isLoading ? "submit" : "button"}
+                                    className={`font-cabinet w-full rounded-none transition-all duration-200 ${!form.formState.isValid ? "cursor-not-allowed bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-800"
                                         : "cursor-default bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-black"
-                                        }` }
+                                        }`}
                                 >
-                                    Verify
+
+                                    {isLoading ? "Verifying " : "Verify"}
+                                    {isLoading && <Loader className="animate-spin" />}
                                 </Button>
                             </form>
                         </Form>
