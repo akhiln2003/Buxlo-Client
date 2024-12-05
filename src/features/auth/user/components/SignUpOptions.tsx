@@ -31,7 +31,7 @@ function SignUpOptions({ setIsFormVisible }: IsignUpOptionProps) {
 
   return (
     <>
-      <div className=' dark:bg-zinc-800 min-h-screen'>
+      <div className=' dark:bg-zinc-900 min-h-screen'>
         <div className='w-full'>
           <div className='w-full flex justify-between items-center pt-12 px-[2rem] '>
             <Link to={UserUrls.home} className="flex items-center  group">
@@ -60,7 +60,7 @@ function SignUpOptions({ setIsFormVisible }: IsignUpOptionProps) {
         </div>
         <div className='w-full flex flex-col items-center '>
 
-          <div className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-700 mt-[1.7rem] pl-[1rem] flex items-center overflow-hidden"
+          <div className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-600 mt-[1.7rem] pl-[1rem] flex items-center overflow-hidden"
             onClick={() => signInWithGoogle()}>
             <div className="absolute inset-0 bg-gradient-to-r from-slate-100 dark:from-zinc-600 to-slate-100 dark:to-zinc-600 scale-x-0 group-hover:scale-x-100 transform origin-left transition-all duration-100"></div>
             <div className="w-5 rounded overflow-hidden ml-[1rem] relative z-10">
@@ -72,7 +72,7 @@ function SignUpOptions({ setIsFormVisible }: IsignUpOptionProps) {
           {
             showMore ?
               <>
-                <div className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-700 mt-[0.7rem] pl-[1rem] flex items-center overflow-hidden">
+                <div className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-600 mt-[0.7rem] pl-[1rem] flex items-center overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-slate-100 dark:from-zinc-600 to-slate-100 dark:to-zinc-600  scale-x-0 group-hover:scale-x-125 transform origin-left transition-all duration-100"></div>
                   <div className="w-10 rounded overflow-hidden m-[0.3rem] relative z-10">
                     <img src={AppleIcon} alt="appleIcon" />
@@ -80,7 +80,7 @@ function SignUpOptions({ setIsFormVisible }: IsignUpOptionProps) {
                   <p className="font-cabinet font-semibold text-sm ml-[1.9rem] relative z-10">Continue with AppleId</p>
                 </div>
 
-                <div className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-700 mt-[0.7rem] pl-[1rem] flex items-center overflow-hidden">
+                <div className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-600 mt-[0.7rem] pl-[1rem] flex items-center overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-slate-100 dark:from-zinc-600 to-slate-100 dark:to-zinc-600 scale-x-0 group-hover:scale-x-100 transform origin-left transition-all duration-100"></div>
                   <div className="w-6 rounded overflow-hidden m-[0.8rem] relative z-10">
                     <img src={FbIcon} alt="fbIcon" />
@@ -88,7 +88,7 @@ function SignUpOptions({ setIsFormVisible }: IsignUpOptionProps) {
                   <p className="font-cabinet font-semibold text-sm ml-[1.9rem] relative z-10">Continue with Facebook</p>
                 </div>
 
-                <div onClick={() => navigateForm()} className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-700 mt-[0.7rem] pl-[1rem] flex items-center overflow-hidden">
+                <div onClick={() => navigateForm()} className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-600 mt-[0.7rem] pl-[1rem] flex items-center overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-slate-100 dark:from-zinc-600 to-slate-100 dark:to-zinc-600 scale-x-0 group-hover:scale-x-100 transform origin-left transition-all duration-100"></div>
                   <div className="w-6 rounded overflow-hidden m-[1rem] relative z-10">
                     <img src={TraditionalLoginIcon} alt="emailIcon" />
@@ -103,7 +103,7 @@ function SignUpOptions({ setIsFormVisible }: IsignUpOptionProps) {
               </>
               :
               <>
-                <div onClick={() => navigateForm()} className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-700 mt-[0.7rem] pl-[1rem] flex items-center overflow-hidden">
+                <div onClick={() => navigateForm()} className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-600 mt-[0.7rem] pl-[1rem] flex items-center overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-slate-100 dark:from-zinc-600 to-slate-100 dark:to-zinc-600 scale-x-0 group-hover:scale-x-100 transform origin-left transition-all duration-100"></div>
                   <div className="w-6 rounded overflow-hidden m-[1rem] relative z-10">
                     <img src={TraditionalLoginIcon} alt="emailIcon" />

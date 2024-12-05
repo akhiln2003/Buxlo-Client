@@ -14,7 +14,7 @@ function SignUpFormPage({ setIsFormVisible }: IsignUpFormPageProps) {
 
   return (
     <>
-      <div className=' dark:bg-zinc-800 min-h-screen'>
+      <div className=' dark:bg-zinc-900 min-h-screen'>
 
         <div className='w-full'>
           <div className='w-full flex justify-between items-center pt-12 px-[2rem] '>

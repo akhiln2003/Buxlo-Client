@@ -25,7 +25,7 @@ function SignIn() {
     }  });
   return (
     <>
-      <div className=' dark:bg-zinc-800  min-h-screen' >
+      <div className=' dark:bg-zinc-900  min-h-screen' >
         <div className='w-full '>
           <div className='w-full flex justify-between items-center pt-12 px-[2rem] '>
             <Link to={UserUrls.home} className="flex items-center  group">
@@ -40,7 +40,7 @@ function SignIn() {
             <Link to={UserUrls.signUp} >
               <span className="font-cabinet font-semibold text-xs relative group">
                 CREATE ACCOUNT
-                <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-black dark:bg-zinc-300 transition-all duration-300 group-hover:w-full"></span>
+                <span className="absolute  bottom-0 left-0 w-0 h-[2px] bg-black dark:bg-zinc-300 transition-all duration-300 group-hover:w-full"></span>
               </span>
             </Link>
           </div>
@@ -58,14 +58,14 @@ function SignIn() {
               < SigninForm />
             </div>
             <div className='h-full flex flex-col justify-between items-center'>
-              <div className='h-[6rem] bg-zinc-500 dark:bg-zinc-700 w-0.5'></div>
-              <span className='text-zinc-800 dark:text-zinc-500 font-cabinet font-semibold text-sm' >OR</span>
-              <div className='h-[6rem] bg-zinc-500 dark:bg-zinc-700 w-0.5'></div>
+              <div className='h-[6rem] bg-zinc-500 dark:bg-zinc-300 w-0.5'></div>
+              <span className='text-zinc-800 dark:text-zinc-400 font-cabinet font-semibold text-sm' >OR</span>
+              <div className='h-[6rem] bg-zinc-500 dark:bg-zinc-300 w-0.5'></div>
             </div>
 
             <div className='w-1/2 h-fit flex py-3'>
               <div className='w-full flex flex-col items-center  '>
-                <div className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-700 pl-[1rem] flex items-center overflow-hidden"
+                <div className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-600 pl-[1rem] flex items-center overflow-hidden"
                   onClick={() => signInWithGoogle()}>
                   <div className="absolute inset-0 bg-gradient-to-r from-slate-100 dark:from-zinc-600 to-slate-100 dark:to-zinc-600 scale-x-0 group-hover:scale-x-100 transform origin-left transition-all duration-100"></div>
                   <div className="w-5 rounded overflow-hidden ml-[1rem] relative z-10">
@@ -73,14 +73,14 @@ function SignIn() {
                   </div>
                   <p className="font-cabinet font-semibold text-sm ml-[3rem] relative z-10">Continue with Google</p>
                 </div>
-                <div className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-700 mt-[0.7rem] pl-[1rem] flex items-center overflow-hidden">
+                <div className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-600 mt-[0.7rem] pl-[1rem] flex items-center overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-slate-100 dark:from-zinc-600 to-slate-100 dark:to-zinc-600  scale-x-0 group-hover:scale-x-125 transform origin-left transition-all duration-100"></div>
                   <div className="w-10 rounded overflow-hidden m-[0.3rem] relative z-10">
                     <img src={AppleIcon} alt="appleIcon" />
                   </div>
                   <p className="font-cabinet font-semibold text-sm ml-[1.9rem] relative z-10">Continue with AppleId</p>
                 </div>
-                <div className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-700 mt-[0.7rem] pl-[1rem] flex items-center overflow-hidden">
+                <div className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-600 mt-[0.7rem] pl-[1rem] flex items-center overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-slate-100 dark:from-zinc-600 to-slate-100 dark:to-zinc-600 scale-x-0 group-hover:scale-x-100 transform origin-left transition-all duration-100"></div>
                   <div className="w-6 rounded overflow-hidden m-[0.8rem] relative z-10">
                     <img src={FbIcon} alt="fbIcon" />

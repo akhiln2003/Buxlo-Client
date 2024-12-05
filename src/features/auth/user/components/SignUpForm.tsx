@@ -169,8 +169,8 @@ export function SignUnForm() {
           //  onClick={}
           type={isFormFilled ? "submit" : "button"}
           className={`font-cabinet w-5/6 rounded-none mx-[2rem] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${!isFormFilled
-            ? "cursor-not-allowed bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-700 dark:text-zinc-700 dark:hover:bg-zinc-700"
-            : "cursor-default"
+            ? "cursor-not-allowed bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            : "cursor-default bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-black"
             }`}
         >
           Sign In

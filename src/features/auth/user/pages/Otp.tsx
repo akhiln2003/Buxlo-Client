@@ -104,7 +104,7 @@ function Otp() {
 
     }
     return (
-        <div className="dark:bg-zinc-800 min-h-screen">
+        <div className="dark:bg-zinc-900 min-h-screen">
             <div className="w-full">
                 <div className="w-full flex justify-between items-center pt-12 px-[2rem]">
                     <Link to={UserUrls.home} className="flex items-center group">
@@ -148,7 +148,7 @@ function Otp() {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Input
-                                                            className="w-14 h-12 text-center border border-zinc-950 mx-2"
+                                                            className="w-14 h-12 text-center border border-zinc-950 dark:border-zinc-300 mx-2"
                                                             maxLength={1}
                                                             {...field}
                                                         />
@@ -166,8 +166,8 @@ function Otp() {
                                     </p>
                                 )}
 
-                                <p className="text-zinc-600 dark:text-zinc-400 font-cabinet text-xs font-medium flex justify-center">
-                                    OTP will expired : <span className="text-black dark:text-zinc-700">{minutes < 10 ? `0${minutes}` : minutes}:
+                                <p className="text-zinc-600 dark:text-zinc-300 font-cabinet text-xs font-medium flex justify-center">
+                                    OTP will expired : <span className="text-black dark:text-white">{minutes < 10 ? `0${minutes}` : minutes}:
                                         {seconds < 10 ? `0${seconds}` : seconds}</span>
                                 </p>
                                 <p className="text-zinc-600 dark:text-zinc-400 font-cabinet text-xs font-medium">
@@ -183,9 +183,9 @@ function Otp() {
                                 {/* Submit Button */}
                                 <Button
                                     type={form.formState.isValid ? "submit" : "button"}
-                                    className={`font-cabinet w-full rounded-none transition-all duration-200 ${!form.formState.isValid ? "bg-zinc-400 cursor-not-allowed" : ""
-                                        }`}
-                                    disabled={!form.formState.isValid}
+                                    className={`font-cabinet w-full rounded-none transition-all duration-200 ${!form.formState.isValid   ?  "cursor-not-allowed bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                                        : "cursor-default bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-black"
+                                        }` }
                                 >
                                     Verify
                                 </Button>

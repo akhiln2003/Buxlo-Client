@@ -59,7 +59,7 @@ function UserNavbar() {
                                 <DropdownMenuTrigger asChild  >
                                     <Bell size={25} strokeWidth={1.5} color={colorTheam} />
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className=' dark:bg-zinc-900 mr-9 w-[25rem]  h-[25rem] pt-5 overflow-y-scroll  scrollbar-thin dark:scrollbar-track-zinc-900 scrollbar-thumb-gray-500 dark:scrollbar-thumb-gray-500 scrollbar-track-gray scrollbar-track-rounded-full '>
+                                <DropdownMenuContent className='  mr-9 w-[25rem]  h-[25rem] pt-5 overflow-y-scroll  scrollbar-thin dark:scrollbar-track-zinc-900 scrollbar-thumb-gray-500 dark:scrollbar-thumb-gray-500 scrollbar-track-gray scrollbar-track-rounded-full '>
 
                                     <DropdownMenuItem className='border-b h-fit py-3 px-2' > Completed a daily challenge for October LeetCoding Challenge 2024LeetCoin+10 </DropdownMenuItem>
                                     <DropdownMenuItem className='border-b h-fit py-3'>Completed a daily challenge for October LeetCoding Challenge 2024LeetCoin+10</DropdownMenuItem>
@@ -72,7 +72,7 @@ function UserNavbar() {
                                     <DropdownMenuItem className='border-b h-fit py-3 px-2' > Completed a daily challenge for October LeetCoding Challenge 2024LeetCoin+10 </DropdownMenuItem>
                                     <DropdownMenuItem className='border-b h-fit py-3 px-2' > Completed a daily challenge for October LeetCoding Challenge 2024LeetCoin+10 </DropdownMenuItem>
 
-                                    <div className="absolute pr-[2rem] flex justify-end  items-center bottom-0 left-0 w-[25rem] h-10 rounded-b-md bg-gray-100 dark:bg-zinc-900 py-3 shadow-sm shadow-gray-600 ">
+                                    <div className="absolute pr-[2rem] flex justify-end  items-center bottom-0 left-0 w-[25rem] h-10 rounded-b-md bg-gray-100 dark:bg-zinc-950 py-3 shadow-sm shadow-gray-600 ">
                                         <DropdownMenuItem className=' '>...</DropdownMenuItem>
                                     </div>
                                 </DropdownMenuContent>
