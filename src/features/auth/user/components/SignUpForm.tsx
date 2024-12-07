@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useSignUpMutation } from "@/services/apis/UserApis";
+import { useSignUpUserMutation } from "@/services/apis/AuthApis";
 import { UserUrls } from "@/@types/urlEnums/UserUrls";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { signUpFormSchema } from "../zodeSchema/authSchema";
@@ -27,7 +27,7 @@ export function SignUnForm() {
   const [passwordVisibility, setPasswordVisibility] = useState<boolean>(false);
   const [isFormFilled, setIsFormFilled] = useState<boolean>(false);
 
-  const [signUp, { isLoading }] = useSignUpMutation();
+  const [signUp, { isLoading }] = useSignUpUserMutation();
 
   const navigate = useNavigate();
 

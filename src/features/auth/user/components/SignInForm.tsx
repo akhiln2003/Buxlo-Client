@@ -14,16 +14,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { signInFormSchema } from "../zodeSchema/authSchema";
-import { useSignInMutation } from "@/services/apis/UserApis";
+import { useSignInUserMutation } from "@/services/apis/AuthApis";
 import { IaxiosResponse } from "../@types/IaxiosResponse";
 import { Loader } from "lucide-react";
-
+import { errorTost } from "@/components/ui/tosastMessage";
 
 export function SigninForm() {
   const [passwordVisibility, setPasswordVisibility] = useState<boolean>(false);
   const [isFormFilled, setIsFormFilled] = useState<boolean>(false);
 
-  const [ signIn , {isLoading} ] = useSignInMutation();
+  const [signIn, { isLoading }] = useSignInUserMutation();
 
   // Zod Schema
   const form = useForm<z.infer<typeof signInFormSchema>>({
@@ -37,22 +37,20 @@ export function SigninForm() {
   // Watch for changes in both fields
   const email = form.watch("email");
   const password = form.watch("password");
-  
 
   // Update button state when either field changes
   useEffect(() => {
     setIsFormFilled(email.length > 0 && password.length > 0);
   }, [email, password]);
 
-  const onSubmit = async(data: z.infer<typeof signInFormSchema>) => {
-    const { email, password } =  data
-    const response: IaxiosResponse = await signIn({email , password});
-    if( response.data ){
-
-    }else{
-
+  const onSubmit = async (data: z.infer<typeof signInFormSchema>) => {
+    const { email, password } = data;
+    const response: IaxiosResponse = await signIn({ email, password });
+    if (response.data) {
+      console.log(response.data);
+    } else {
+      errorTost("Something when wrong", response.error.data.error);
     }
-    
   };
 
   return (
@@ -100,15 +98,15 @@ export function SigninForm() {
 
         {/* Submit Button */}
         <Button
-          type={isFormFilled  && !isLoading ? "submit" : "button"}
-          className={`font-cabinet w-5/6 rounded-none mx-[2rem] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${!isFormFilled && isLoading
+          type={isFormFilled && !isLoading ? "submit" : "button"}
+          className={`font-cabinet w-5/6 rounded-none mx-[2rem] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+            !isFormFilled && !isLoading
               ? "cursor-not-allowed bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-800"
               : "cursor-default bg-zinc-800 hover:bg-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-black"
-            }`}
+          }`}
         >
-          
-          { isLoading ? "Loading " : "Sign In"}
-          { isLoading && <Loader className="animate-spin"/> }
+          {isLoading ? "Loading " : "Sign In"}
+          {isLoading && <Loader className="animate-spin" />}
         </Button>
       </form>
     </Form>
