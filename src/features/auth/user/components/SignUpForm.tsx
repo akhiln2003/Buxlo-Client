@@ -21,16 +21,13 @@ import { signUpFormSchema } from "../zodeSchema/authSchema";
 import { IaxiosResponse } from "../@types/IaxiosResponse";
 import { Loader } from "lucide-react";
 
-
-
-
 // Zod Schema
 
 export function SignUnForm() {
   const [passwordVisibility, setPasswordVisibility] = useState<boolean>(false);
   const [isFormFilled, setIsFormFilled] = useState<boolean>(false);
 
-  const [signUp,{ isLoading }] = useSignUpMutation();
+  const [signUp, { isLoading }] = useSignUpMutation();
 
   const navigate = useNavigate();
 
@@ -51,31 +48,37 @@ export function SignUnForm() {
   const password = form.watch("password");
   const confirmPassword = form.watch("confirmPassword");
 
-
-
   // Update button state when either field changes
   useEffect(() => {
-    setIsFormFilled(name.length > 0 && email.length > 0 && password.length > 0 && confirmPassword.length > 0);
+    setIsFormFilled(
+      name.length > 0 &&
+        email.length > 0 &&
+        password.length > 0 &&
+        confirmPassword.length > 0
+    );
   }, [name, email, password, confirmPassword]);
 
   const onSubmit = async (data: z.infer<typeof signUpFormSchema>) => {
     try {
-      const { name, email, password } = data
+      const { name, email, password } = data;
       const newUser = {
         name,
         email,
-        password
-      }
+        password,
+      };
 
-      const response: IaxiosResponse = await signUp(newUser)
+      const response: IaxiosResponse = await signUp(newUser);
 
-      if( response.data){        
-        navigate(UserUrls.otp, { state: { name, email } })
+      if (response.data) {
+        navigate(UserUrls.otp, { state: { name, email } });
+      } else {
+        errorTost(
+          "Somthing wrong",
+          response.error.data?.error
+            ? response.error.data.error[0].message
+            : "somthing wrong plese try laiter"
+        );
       }
-      else{        
-        errorTost("Somthing wrong" , response.error.data.error[0].message)
-      }
-      
     } catch (error) {
       console.log("error :", error);
     }
@@ -133,7 +136,8 @@ export function SignUnForm() {
                   type={passwordVisibility ? "text" : "password"}
                   {...field}
                   passwordVisibility={passwordVisibility}
-                  setPasswordVisibility={setPasswordVisibility} />
+                  setPasswordVisibility={setPasswordVisibility}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -152,7 +156,7 @@ export function SignUnForm() {
               <FormControl>
                 <Input
                   placeholder="ConfirmPassword"
-                  type='password'
+                  type="password"
                   {...field}
                 />
               </FormControl>
@@ -160,24 +164,30 @@ export function SignUnForm() {
             </FormItem>
           )}
         />
-        <div className='w-full flex flex-col items-center justify-center  mt-[1rem]'>
-          <p className='text-zinc-600 dark:text-zinc-400 font-cabinet text-xs font-medium' >By creating an account, you agree to our <span className=' underline '>Terms of Service</span></p>
-          <p className='text-zinc-600 dark:text-zinc-400 font-cabinet text-xs font-medium ' >and have read and understood the <span className=' underline'>Privacy Policy</span></p>
+        <div className="w-full flex flex-col items-center justify-center  mt-[1rem]">
+          <p className="text-zinc-600 dark:text-zinc-400 font-cabinet text-xs font-medium">
+            By creating an account, you agree to our{" "}
+            <span className=" underline ">Terms of Service</span>
+          </p>
+          <p className="text-zinc-600 dark:text-zinc-400 font-cabinet text-xs font-medium ">
+            and have read and understood the{" "}
+            <span className=" underline">Privacy Policy</span>
+          </p>
         </div>
 
         {/* Submit Button */}
         <Button
           //  onClick={}
           type={isFormFilled && !isLoading ? "submit" : "button"}
-          className={`font-cabinet w-5/6 rounded-none mx-[2rem] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${!isFormFilled 
-            ? "cursor-not-allowed bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-800"
-            : "cursor-default bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-black"
-            }`}
+          className={`font-cabinet w-5/6 rounded-none mx-[2rem] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+            !isFormFilled
+              ? "cursor-not-allowed bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-800"
+              : "cursor-default bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-black"
+          }`}
         >
-          { isLoading ? "Loading " : "Sign Up"}
-          { isLoading && <Loader className="animate-spin"/> }
+          {isLoading ? "Loading " : "Sign Up"}
+          {isLoading && <Loader className="animate-spin" />}
         </Button>
-
       </form>
     </Form>
   );

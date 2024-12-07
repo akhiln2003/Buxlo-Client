@@ -9,13 +9,18 @@ export const AuthUnexpectedErrorTost =  () => toast({
 });
 
 
-export const errorTost = ( title:any , description:any )=> toast({
+export const errorTost = ( title:string , description:string )=> {
+    console.log("dddd");
+    
+    toast({
+    
     title: title ,
     description: description,
     className: "text-red-700 border bg-gray-200 mb-6",
-});
+});}
 
 export const successToast = (title: string, description: string) => {
+    
     toast({
         title: (
             <div className="flex ">
