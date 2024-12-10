@@ -17,7 +17,6 @@ import { errorTost, successToast } from "@/components/ui/tosastMessage";
 import { IaxiosResponse } from "../@types/IaxiosResponse";
 import { useDispatch } from "react-redux";
 import { addUser } from "@/redux/slices/userSlice";
-import { Iuser } from "@/@types/interface/IdataBase";
 
 function Otp() {
   const [minutes, setMinutes] = useState(1);
@@ -26,7 +25,12 @@ function Otp() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { email, name } = location.state;
+  const data = location.state;
+  let email = '' , name = ''
+    if( data ){
+       email = data.email;
+       name = data.name;
+    }
   const [verifyOtp, { isLoading }] = useVerifyUserMutation();
   const [resendOtp] = useResendOtpUserMutation();
 
@@ -44,14 +48,10 @@ function Otp() {
   const onSubmit = async (data: z.infer<typeof otpFormSchema>) => {
     const otp = data.otpOne + data.otpTwo + data.otpThree + data.otpFour;
     const response: IaxiosResponse = await verifyOtp({ otp, email });
-    if (response.data) {
-      const val: Iuser = {
-        name: response.data.userVerified.name,
-        email: response.data.userVerified.email,
-        role: response.data.userVerified.role,
-      };
 
-      dispatch(addUser(val));
+    if (response.data?.user) {
+      const user  =  response.data.user;
+      dispatch(addUser(user));
 
       navigate(UserUrls.home);
     } else {
@@ -63,6 +63,10 @@ function Otp() {
   const hasErrors = !!Object.keys(form.formState.errors).length;
 
   useEffect(() => {
+
+    if( !data ){
+      navigate(UserUrls.signUp)
+    }
     const interval = setInterval(() => {
       if (seconds > 0) {
         setSeconds(seconds - 1);
@@ -86,12 +90,9 @@ function Otp() {
     setresendTimer(false);
     setTimeout(() => setresendTimer(true), 100000);
     const response: IaxiosResponse = await resendOtp({ email, name });
-    console.log(response);
     if (response.data) {
       successToast("OTP sended", response.data.message);
     } else {
-      console.log(response.error.data);
-
       errorTost("somthing wrong", response.error.data);
     }
   };
@@ -200,9 +201,9 @@ function Otp() {
                     form.formState.isValid && !isLoading ? "submit" : "button"
                   }
                   className={`font-cabinet w-full rounded-none transition-all duration-200 ${
-                    !form.formState.isValid
+                    !form.formState.isValid && !isLoading
                       ? "cursor-not-allowed bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-800"
-                      : "cursor-default bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-black"
+                      : "cursor-default bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-black"
                   }`}
                 >
                   {isLoading ? "Verifying " : "Verify"}

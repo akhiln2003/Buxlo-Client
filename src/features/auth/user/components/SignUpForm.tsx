@@ -75,12 +75,13 @@ export function SignUnForm() {
         errorTost(
           "Somthing wrong",
           response.error.data?.error
-            ? response.error.data.error[0].message
+            ? response.error.data.error
             : "somthing wrong plese try laiter"
         );
       }
     } catch (error) {
       console.log("error :", error);
+      errorTost("Somthing wrong", "somthing wrong plese try laiter");
     }
   };
 

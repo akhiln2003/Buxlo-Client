@@ -18,12 +18,19 @@ import { useSignInUserMutation } from "@/services/apis/AuthApis";
 import { IaxiosResponse } from "../@types/IaxiosResponse";
 import { Loader } from "lucide-react";
 import { errorTost } from "@/components/ui/tosastMessage";
+import { useDispatch } from "react-redux";
+import { addUser } from "@/redux/slices/userSlice";
+import { UserUrls } from "@/@types/urlEnums/UserUrls";
+import { useNavigate } from "react-router-dom";
 
 export function SigninForm() {
   const [passwordVisibility, setPasswordVisibility] = useState<boolean>(false);
   const [isFormFilled, setIsFormFilled] = useState<boolean>(false);
 
   const [signIn, { isLoading }] = useSignInUserMutation();
+  const dispatch = useDispatch();
+
+  const navigate = useNavigate()
 
   // Zod Schema
   const form = useForm<z.infer<typeof signInFormSchema>>({
@@ -46,10 +53,13 @@ export function SigninForm() {
   const onSubmit = async (data: z.infer<typeof signInFormSchema>) => {
     const { email, password } = data;
     const response: IaxiosResponse = await signIn({ email, password });
-    if (response.data) {
-      console.log(response.data);
-    } else {
-      errorTost("Something when wrong", response.error.data.error);
+    
+    if (response.data?.user) {
+      const user  =  response.data.user;
+      dispatch(addUser(user));
+      navigate(UserUrls.home);
+    } else {      
+      errorTost("Something when wrong", response.error.data.error ? response.error.data.error : `${response.error.data} please try laiter` );
     }
   };
 

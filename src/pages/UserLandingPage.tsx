@@ -1,7 +1,9 @@
 import landingPageBG from '@/assets/images/landingPageBG.jpg';
 import { Bot } from 'lucide-react';
 import { motion } from 'framer-motion';
+
 function LandingPage() {
+
   return (
     <div className="w-full ">
       <div

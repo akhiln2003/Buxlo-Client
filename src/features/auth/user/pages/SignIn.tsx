@@ -1,6 +1,6 @@
 import logoIconWhite from '@/assets/images/logoIconWhite.png';
 import logoIconBlack from '@/assets/images/logoIconBlack.png';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { UserUrls } from '@/@types/urlEnums/UserUrls';
 import { ArrowLeft, ChevronLeft } from 'lucide-react';
 import GoogleIcon from '@/assets/images/GoogleIcon.png';
@@ -15,7 +15,7 @@ import { useTheme } from '@/contexts/themeContext';
 function SignIn() {
 
   const {isDarkMode} = useTheme()
-
+  const navigate = useNavigate();
   const signInWithGoogle = useGoogleLogin({
     onSuccess: (tokenResponse) => {
       console.log(tokenResponse);
@@ -23,6 +23,10 @@ function SignIn() {
     onError: (error) => {
       console.error("Google login error: ", error);
     }  });
+
+    const handleResendPassword = () =>{
+      navigate(UserUrls.forgotPassword);
+    }
   return (
     <>
       <div className=' dark:bg-zinc-900  min-h-screen' >
@@ -93,7 +97,8 @@ function SignIn() {
           </div>
         </div>
 
-        <div className='w-full flex justify-center'>
+        <div className='w-full flex justify-center' 
+        onClick={()=>handleResendPassword()}>
           <span className="font-cabinet font-medium text-sm relative group mt-[2rem] cursor-pointer">
             Can’t log in?
             <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-black dark:bg-zinc-300 transition-all duration-300 group-hover:w-full"></span>

@@ -48,7 +48,39 @@ export const userApi = createApi({
         data: data,
       }),
     }),
-  }),
+
+    // singOut user
+    signOutUser: builder.mutation({
+      query: () => ({
+        url: UserApiEndPoints.signOut,
+        method: "POST",
+      }),
+    }),
+
+    // forgotPassword  user
+    forgotPassword: builder.mutation({
+      query: (data) => ({
+        url: UserApiEndPoints.forgotPassword,
+        method: "POST",
+        data: data,
+      }),
+    }),
+
+    // set new password user
+    setNewPassword: builder.mutation({
+      query: (data)=>({
+        url: UserApiEndPoints.setNewPassword,
+        method: "POST",
+        data: data
+      })
+    }),
+
+
+
+
+
+
+  })
 });
 
 // Export the hook directly from the API slice
@@ -57,4 +89,7 @@ export const {
   useVerifyUserMutation,
   useResendOtpUserMutation,
   useSignInUserMutation,
+  useSignOutUserMutation,
+  useForgotPasswordMutation,
+  useSetNewPasswordMutation,
 } = userApi;

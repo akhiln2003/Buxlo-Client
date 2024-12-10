@@ -4,6 +4,8 @@ export enum UserUrls  {
     signUp = '/signup',
     otp = '/otp',
     signOut = '/signout',
+    forgotPassword = '/forgotpassword',
+    setNewPassword = '/resetpassword/:token',
     profile = '/profile',
     subscription = '/subscription'
 

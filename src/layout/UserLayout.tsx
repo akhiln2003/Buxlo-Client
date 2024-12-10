@@ -4,7 +4,7 @@ import { UserUrls } from '@/@types/urlEnums/UserUrls';
 
   function UserLayout() {
     const {pathname} = useLocation();
-    const routeWithoutNav = [ UserUrls.signIn , UserUrls.signUp , UserUrls.otp ];
+    const routeWithoutNav = [ UserUrls.signIn , UserUrls.signUp , UserUrls.otp , UserUrls.forgotPassword , "/resetpassword" ];
     const higeNavbar = routeWithoutNav.some(route => pathname.startsWith(route));
   return (
     <>

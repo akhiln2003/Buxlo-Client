@@ -2,20 +2,20 @@ import { Iuser } from "@/@types/interface/IdataBase";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface IinitialState{
-    userData : null | Iuser
+    user : null | Iuser
 }
 
 
 const initialState: IinitialState = {
-   userData : null 
+   user : null 
 }
 
 const userSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-        addUser(state, { payload }: PayloadAction<Iuser>) {
-            state.userData = payload;
+        addUser(state, { payload }: PayloadAction<Iuser | null>) {
+            state.user = payload;
         }
     }
 })
