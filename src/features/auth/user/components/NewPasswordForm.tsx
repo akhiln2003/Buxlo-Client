@@ -78,7 +78,7 @@ export function NewPasswordForm() {
           control={form.control}
           name="password"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="w-4/6">
               <FormLabel className="font-cabinet font-semibold text-xs text-zinc-500 dark:text-zinc-50">
                 PASSWORD
               </FormLabel>
@@ -101,7 +101,7 @@ export function NewPasswordForm() {
           control={form.control}
           name="confirmPassword"
           render={({ field }) => (
-            <FormItem>
+            <FormItem  className="w-4/6">
               <FormLabel className="font-cabinet font-semibold text-xs text-zinc-500 dark:text-zinc-50">
                 CONFIRM PASSWORD
               </FormLabel>
@@ -120,7 +120,7 @@ export function NewPasswordForm() {
         {/* Submit Button */}
         <Button
           type={isFormFilled && !isLoading ? "submit" : "button"}
-          className={`font-cabinet w-5/6 rounded-none  transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+          className={`font-cabinet w-4/6 rounded-none  transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
             !isFormFilled && !isLoading
               ? "cursor-not-allowed bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-800"
               : "cursor-default bg-zinc-800 hover:bg-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-black"
