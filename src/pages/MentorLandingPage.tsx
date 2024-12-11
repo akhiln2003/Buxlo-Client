@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-
+import landingPageBG from "@/assets/images/MentorLandingPageBg.svg";
 function MentorLandingPage() {
   const Title = "Unlock Financial Success with Buxlo Mentors".split(" ");
   const description =
@@ -8,8 +8,13 @@ function MentorLandingPage() {
     );
 
   return (
-    <div className="w-full flex relative">
-      <div className="w-full h-screen bg-zinc-100 dark:bg-zinc-900 -mt-16 bg-cover bg-center bg-no-repeat blur-md"></div>
+    <div className="w-full flex relative  ">
+      <div
+        style={{ backgroundImage: `url(${landingPageBG})` }}
+        className="w-full h-screen  -mt-16 bg-cover bg-center bg-no-repeat    "
+      >
+        <div className="bg-white/20 dark:bg-black/80 w-full h-screen  "></div>
+      </div>
       <div className="w-full h-96 absolute top-1/2 -translate-y-1/2 flex flex-col items-center justify-center">
         <h1 className="text-5xl font-cabinet font-extrabold mb-4 drop-shadow-md  ">
           {Title.map((el, i) => (
