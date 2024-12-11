@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
-import { useForgotPasswordMutation } from "@/services/apis/AuthApis";
+import { useForgotPasswordUserMutation } from "@/services/apis/AuthApis";
 import { IaxiosResponse } from "../@types/IaxiosResponse";
 import { Loader } from "lucide-react";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
@@ -22,7 +22,7 @@ import { ForgotPasswordFormSchema } from "../../zodeSchema/authSchema";
 export function ForgotPasswordForm() {
   const [isFormFilled, setIsFormFilled] = useState<boolean>(false);
   const [ buttonStage ,setButtStage ] = useState<boolean>(true);
-  const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
+  const [forgotPassword, { isLoading }] = useForgotPasswordUserMutation();
 
 
   // Zod Schema

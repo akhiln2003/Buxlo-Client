@@ -16,7 +16,7 @@ import { NewPasswordFormSchema } from "../../zodeSchema/authSchema";
 import { IaxiosResponse } from "../@types/IaxiosResponse";
 import { Loader } from "lucide-react";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
-import { useSetNewPasswordMutation } from "@/services/apis/AuthApis";
+import { useSetNewPasswordUserMutation } from "@/services/apis/AuthApis";
 import { useNavigate, useParams } from "react-router-dom";
 import { UserUrls } from "@/@types/urlEnums/UserUrls";
 
@@ -25,7 +25,7 @@ export function NewPasswordForm() {
   const [buttonStage, setButtStage] = useState<boolean>(true);
   const [passwordVisibility, setPasswordVisibility] = useState<boolean>(false);
 
-  const [setNewPassword, { isLoading }] = useSetNewPasswordMutation();
+  const [setNewPassword, { isLoading }] = useSetNewPasswordUserMutation();
   const { token } = useParams();
   const navigate = useNavigate();
   // Zod Schema

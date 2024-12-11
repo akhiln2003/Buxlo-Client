@@ -60,8 +60,8 @@ export const userApi = createApi({
       }),
     }),
 
-    // forgotPassword  user
-    forgotPassword: builder.mutation({
+    // forgotPassword  
+    forgotPasswordUser: builder.mutation({
       query: (data) => ({
         url: UserApiEndPoints.forgotPassword,
         method: "POST",
@@ -69,8 +69,8 @@ export const userApi = createApi({
       }),
     }),
 
-    // set new password user
-    setNewPassword: builder.mutation({
+    // set new password 
+    setNewPasswordUser: builder.mutation({
       query: (data) => ({
         url: UserApiEndPoints.setNewPassword,
         method: "POST",
@@ -126,6 +126,24 @@ export const userApi = createApi({
       }),
     }),
 
+        // forgotPassword  
+        forgotPasswordMentor: builder.mutation({
+          query: (data) => ({
+            url: UserApiEndPoints.forgotPassword,
+            method: "POST",
+            data: data,
+          }),
+        }),
+    
+        // set new password 
+        setNewPasswordMentor: builder.mutation({
+          query: (data) => ({
+            url: UserApiEndPoints.setNewPassword,
+            method: "POST",
+            data: data,
+          }),
+        }),
+
     ///////////////////////////////--Mentor end--///////////////////////////
   }),
 });
@@ -138,8 +156,8 @@ export const {
   useResendOtpUserMutation,
   useSignInUserMutation,
   useSignOutUserMutation,
-  useForgotPasswordMutation,
-  useSetNewPasswordMutation,
+  useForgotPasswordUserMutation,
+  useSetNewPasswordUserMutation,
 
   // Mentor
   useSignUpMentorMutation,
@@ -147,4 +165,6 @@ export const {
   useResendOtpMentorMutation,
   useSignInMentorMutation,
   useSignOutMentorMutation,
+  useForgotPasswordMentorMutation,
+  useSetNewPasswordMentorMutation
 } = userApi;
