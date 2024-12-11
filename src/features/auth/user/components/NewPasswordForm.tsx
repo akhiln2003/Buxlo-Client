@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
-import { NewPasswordFormSchema } from "../zodeSchema/authSchema";
+import { NewPasswordFormSchema } from "../../zodeSchema/authSchema";
 import { IaxiosResponse } from "../@types/IaxiosResponse";
 import { Loader } from "lucide-react";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";

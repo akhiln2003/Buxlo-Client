@@ -12,11 +12,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
-import { ForgotPasswordFormSchema } from "../zodeSchema/authSchema";
 import { useForgotPasswordMutation } from "@/services/apis/AuthApis";
 import { IaxiosResponse } from "../@types/IaxiosResponse";
 import { Loader } from "lucide-react";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
+import { ForgotPasswordFormSchema } from "../../zodeSchema/authSchema";
 
 
 export function ForgotPasswordForm() {

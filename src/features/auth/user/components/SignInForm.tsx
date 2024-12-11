@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
-import { signInFormSchema } from "../zodeSchema/authSchema";
+import { signInFormSchema } from "../../zodeSchema/authSchema";
 import { useSignInUserMutation } from "@/services/apis/AuthApis";
 import { IaxiosResponse } from "../@types/IaxiosResponse";
 import { Loader } from "lucide-react";

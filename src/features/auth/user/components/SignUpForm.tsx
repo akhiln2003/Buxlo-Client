@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { useSignUpUserMutation } from "@/services/apis/AuthApis";
 import { UserUrls } from "@/@types/urlEnums/UserUrls";
 import { errorTost } from "@/components/ui/tosastMessage";
-import { signUpFormSchema } from "../zodeSchema/authSchema";
+import { signUpFormSchema } from "../../zodeSchema/authSchema";
 import { IaxiosResponse } from "../@types/IaxiosResponse";
 import { Loader } from "lucide-react";
 

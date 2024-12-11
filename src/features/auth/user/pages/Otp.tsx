@@ -12,11 +12,11 @@ import {
   useResendOtpUserMutation,
   useVerifyUserMutation,
 } from "@/services/apis/AuthApis";
-import { otpFormSchema } from "../zodeSchema/authSchema";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
 import { IaxiosResponse } from "../@types/IaxiosResponse";
 import { useDispatch } from "react-redux";
 import { addUser } from "@/redux/slices/userSlice";
+import { otpFormSchema } from "../../zodeSchema/authSchema";
 
 function Otp() {
   const [minutes, setMinutes] = useState(1);
