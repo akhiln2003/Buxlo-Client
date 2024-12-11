@@ -126,7 +126,7 @@ function UserNavbar() {
                 <DropdownMenuContent className="  mr-9 w-[25rem]  h-[25rem] pt-5 overflow-y-scroll  scrollbar-thin dark:scrollbar-track-zinc-900 scrollbar-thumb-gray-500 dark:scrollbar-thumb-gray-500 scrollbar-track-gray scrollbar-track-rounded-full ">
                   <DropdownMenuItem className="border-b h-fit py-3 px-2">
                     Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10{" "}
+                    2024LeetCoin+10
                   </DropdownMenuItem>
                   <DropdownMenuItem className="border-b h-fit py-3">
                     Completed a daily challenge for October LeetCoding Challenge
@@ -148,23 +148,23 @@ function UserNavbar() {
                   </DropdownMenuItem>
                   <DropdownMenuItem className="border-b h-fit py-3 px-2">
                     Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10{" "}
+                    2024LeetCoin+10
                   </DropdownMenuItem>
                   <DropdownMenuItem className="border-b h-fit py-3 px-2">
                     Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10{" "}
+                    2024LeetCoin+10
                   </DropdownMenuItem>
                   <DropdownMenuItem className="border-b h-fit py-3 px-2">
                     Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10{" "}
+                    2024LeetCoin+10
                   </DropdownMenuItem>
                   <DropdownMenuItem className="border-b h-fit py-3 px-2">
                     Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10{" "}
+                    2024LeetCoin+10
                   </DropdownMenuItem>
                   <DropdownMenuItem className="border-b h-fit py-3 px-2">
                     Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10{" "}
+                    2024LeetCoin+10
                   </DropdownMenuItem>
 
                   <div className="absolute pr-[2rem] flex justify-end  items-center bottom-0 left-0 w-[25rem] h-10 rounded-b-md bg-gray-100 dark:bg-zinc-950 py-3 shadow-sm shadow-gray-600 ">
@@ -200,9 +200,9 @@ function UserNavbar() {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
                     <Link to={UserUrls.profile} className="flex">
-                      <User size={15} />{" "}
+                      <User size={15} />
                       <span className="ml-[0.5rem]">Profile</span>
-                    </Link>{" "}
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={toggleTheme}>
                     <button className="flex">
@@ -216,7 +216,7 @@ function UserNavbar() {
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <Link to={UserUrls.subscription} className="flex">
-                      <Sparkles size={15} strokeWidth={2.5} />{" "}
+                      <Sparkles size={15} strokeWidth={2.5} />
                       <span className="ml-[0.5rem]">Subscription</span>
                     </Link>
                   </DropdownMenuItem>

@@ -24,7 +24,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useSignOutMentorMutation } from "@/services/apis/AuthApis";
 import { useTheme } from "@/contexts/themeContext";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { addUser } from "@/redux/slices/userSlice";
+import { errorTost } from "../ui/tosastMessage";
 import { MentorUrl } from "@/@types/urlEnums/MentorUrl";
 
 function MentorNavbar() {
@@ -33,8 +49,26 @@ function MentorNavbar() {
 
   const navigate = useNavigate();
 
-  const navigateLoginLogout = () => {
+  const [signOut] = useSignOutMentorMutation();
+
+  const { user } = useSelector((state: RootState) => state.userAuth);
+  const dispatch = useDispatch();
+
+  const navigateSignIn = () => {
     navigate(MentorUrl.signIn);
+  };
+
+  const handleSignOutUser = async () => {
+    const response = await signOut(user?.email);
+    if(response.data){
+
+      dispatch(addUser(null));
+      navigate(MentorUrl.signIn);
+    }else{
+      console.log(response.error);
+      
+      errorTost("Somthing whrong" , "response.error")
+    }
   };
   const colorTheam = isDarkMode ? "white" : "black";
 
@@ -90,9 +124,8 @@ function MentorNavbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="  mr-9 w-[25rem]  h-[25rem] pt-5 overflow-y-scroll  scrollbar-thin dark:scrollbar-track-zinc-900 scrollbar-thumb-gray-500 dark:scrollbar-thumb-gray-500 scrollbar-track-gray scrollbar-track-rounded-full ">
                   <DropdownMenuItem className="border-b h-fit py-3 px-2">
-                    {" "}
                     Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10{" "}
+                    2024LeetCoin+10
                   </DropdownMenuItem>
                   <DropdownMenuItem className="border-b h-fit py-3">
                     Completed a daily challenge for October LeetCoding Challenge
@@ -113,29 +146,24 @@ function MentorNavbar() {
                     2024LeetCoin+10
                   </DropdownMenuItem>
                   <DropdownMenuItem className="border-b h-fit py-3 px-2">
-                    {" "}
                     Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10{" "}
+                    2024LeetCoin+10
                   </DropdownMenuItem>
                   <DropdownMenuItem className="border-b h-fit py-3 px-2">
-                    {" "}
                     Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10{" "}
+                    2024LeetCoin+10
                   </DropdownMenuItem>
                   <DropdownMenuItem className="border-b h-fit py-3 px-2">
-                    {" "}
                     Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10{" "}
+                    2024LeetCoin+10
                   </DropdownMenuItem>
                   <DropdownMenuItem className="border-b h-fit py-3 px-2">
-                    {" "}
                     Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10{" "}
+                    2024LeetCoin+10
                   </DropdownMenuItem>
                   <DropdownMenuItem className="border-b h-fit py-3 px-2">
-                    {" "}
                     Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10{" "}
+                    2024LeetCoin+10
                   </DropdownMenuItem>
 
                   <div className="absolute pr-[2rem] flex justify-end  items-center bottom-0 left-0 w-[25rem] h-10 rounded-b-md bg-gray-100 dark:bg-zinc-950 py-3 shadow-sm shadow-gray-600 ">
@@ -163,19 +191,17 @@ function MentorNavbar() {
                         alt="User profile"
                         className="h-8 w-8 rounded-full overflow-hidden object-cover "
                       />
-                      <p className="ml-[0.5rem] font-semibold text-lg ">
-                        {" "}
-                        Akhil
+                      <p className="ml-[0.5rem] font-semibold text-lg capitalize">
+                        { user ? user.name : "User"}
                       </p>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
                     <Link to={MentorUrl.profile} className="flex">
-                      {" "}
-                      <User size={15} />{" "}
+                      <User size={15} />
                       <span className="ml-[0.5rem]">Profile</span>
-                    </Link>{" "}
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={toggleTheme}>
                     <button className="flex">
@@ -188,17 +214,48 @@ function MentorNavbar() {
                     </button>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <Link to={MentorUrl.home} className="flex">
-                      {" "}
-                      <Sparkles size={15} strokeWidth={2.5} />{" "}
+                    <Link to={MentorUrl.subscription} className="flex">
+                      <Sparkles size={15} strokeWidth={2.5} />
                       <span className="ml-[0.5rem]">Subscription</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={navigateLoginLogout}>
-                    <LogIn size={20} />
-                    <span className="ml-[0.5rem]">SignIn</span>
-                    {/* <Link to={UserUrls.signOut} className=' w-full flex text-red-700'><LogOut size={20}/><span className='ml-[0.5rem]'>SignOut</span></Link> */}
-                  </DropdownMenuItem>
+                  {!user ? (
+                    <DropdownMenuItem onClick={navigateSignIn}>
+                      <LogIn size={20} />
+                      <span className="ml-[0.5rem]">SignIn</span>
+                    </DropdownMenuItem>
+                  ) : (
+                    <AlertDialog>
+                      <DropdownMenuItem
+                        onSelect={(e) => e.preventDefault()}
+                        className="w-full flex text-red-700"
+                      >
+                        <AlertDialogTrigger asChild>
+                          <div className="flex items-center cursor-pointer">
+                            <LogOut size={20} />
+                            <span className="ml-[0.5rem]">SignOut</span>
+                          </div>
+                        </AlertDialogTrigger>
+                      </DropdownMenuItem>
+
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Are you absolutely sure?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undu. This will sign you out from buxlo.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={()=>handleSignOutUser()}>
+                            Continue
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
