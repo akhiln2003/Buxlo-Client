@@ -4,5 +4,6 @@ export enum MentorUrl{
     signUp = '/mentor/signup',
     otp = '/mentor/otp/:id',
     signOut = '/mentor/signout',
-    profile = '/mentor/profile'
+    profile = '/mentor/profile',
+    subscription = '/mentor/subscription'
 }
