@@ -23,6 +23,16 @@ const MentorLandingPage = lazy(() => import("@/pages/MentorLandingPage"));
 const MentorSignIn = lazy(() => import("@/features/auth/mentor/pages/singIn"));
 const MentorSignUp = lazy(()=> import('@/features/auth/mentor/pages/signUp'));
 const MentorOtpPage = lazy(()=> import('@/features/auth/mentor/pages/otp'));
+const MentorForgotPasswordPage = lazy(
+  () => import("@/features/auth/mentor/pages/forgotPassword")
+);
+const MentorSetNewPassword = lazy(
+  () => import("@/features/auth/user/pages/newPassword")
+);
+
+
+
+
 
 const routes = createBrowserRouter(
   [
@@ -129,6 +139,24 @@ const routes = createBrowserRouter(
             < MentorOtpPage />
           </Suspense>
           )
+        },
+        {
+          path: MentorUrl.forgotPassword,
+          element: (
+            <RedirectLoggedIn>
+              <Suspense fallback={<div>Loading...</div>}>
+                < MentorForgotPasswordPage />
+              </Suspense>
+            </RedirectLoggedIn>
+          ),
+        },
+        {
+          path: MentorUrl.setNewPassword,
+          element: (
+            <Suspense fallback={<div>Loading...</div>}>
+              < MentorSetNewPassword />
+            </Suspense>
+          ),
         }
       ],
     },
