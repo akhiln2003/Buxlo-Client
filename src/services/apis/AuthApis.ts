@@ -7,13 +7,16 @@ import {
   IsignInData,
   IverifyOtpData,
 } from "@/@types/interface/IuserApisQuery";
+import { MentorApiEndPoints } from "../endPoints/MentorEndPoints";
 
 export const userApi = createApi({
   reducerPath: "userApi",
   baseQuery: axiosBaseQuery({ baseUrl: import.meta.env.VITE_AUTH_API_URl }),
   tagTypes: ["User"],
   endpoints: (builder) => ({
-    // signUp new User
+    ///////////////////////////////--User--///////////////////////////////
+
+    // signUp new
     signUpUser: builder.mutation({
       query: (newUser: InewUserData) => ({
         url: UserApiEndPoints.signUp,
@@ -22,7 +25,7 @@ export const userApi = createApi({
       }),
     }),
 
-    // signUp new User
+    // signUp new user Otp verification
     verifyUser: builder.mutation({
       query: (data: IverifyOtpData) => ({
         url: UserApiEndPoints.verifyOtp,
@@ -40,7 +43,7 @@ export const userApi = createApi({
       }),
     }),
 
-    // signIn User
+    // signIn
     signInUser: builder.mutation({
       query: (data: IsignInData) => ({
         url: UserApiEndPoints.signIn,
@@ -49,7 +52,7 @@ export const userApi = createApi({
       }),
     }),
 
-    // singOut user
+    // singOut
     signOutUser: builder.mutation({
       query: () => ({
         url: UserApiEndPoints.signOut,
@@ -68,23 +71,68 @@ export const userApi = createApi({
 
     // set new password user
     setNewPassword: builder.mutation({
-      query: (data)=>({
+      query: (data) => ({
         url: UserApiEndPoints.setNewPassword,
         method: "POST",
-        data: data
-      })
+        data: data,
+      }),
     }),
 
+    ///////////////////////////////--User end--/////////////////////////////
 
+    ///////////////////////////////--Mentor--///////////////////////////////
 
+    // signUp
+    signUpMentor: builder.mutation({
+      query: (newUser: InewUserData) => ({
+        url: MentorApiEndPoints.signUp,
+        method: "POST",
+        data: newUser,
+      }),
+    }),
 
+    // signUp Otp verification
+    verifyMentor: builder.mutation({
+      query: (data: IverifyOtpData) => ({
+        url: MentorApiEndPoints.verifyOtp,
+        method: "POST",
+        data: data,
+      }),
+    }),
 
+    // Resend OTP
+    resendOtpMentor: builder.mutation({
+      query: (data: IresendOtpData) => ({
+        url: MentorApiEndPoints.resendOtp,
+        method: "POST",
+        data: data,
+      }),
+    }),
 
-  })
+    // singOut
+    signOutMentor: builder.mutation({
+      query: () => ({
+        url: MentorApiEndPoints.signOut,
+        method: "POST",
+      }),
+    }),
+
+    // signIn
+    signInMentor: builder.mutation({
+      query: (data: IsignInData) => ({
+        url: MentorApiEndPoints.signIn,
+        method: "POST",
+        data: data,
+      }),
+    }),
+
+    ///////////////////////////////--Mentor end--///////////////////////////
+  }),
 });
 
 // Export the hook directly from the API slice
 export const {
+  // User
   useSignUpUserMutation,
   useVerifyUserMutation,
   useResendOtpUserMutation,
@@ -92,4 +140,11 @@ export const {
   useSignOutUserMutation,
   useForgotPasswordMutation,
   useSetNewPasswordMutation,
+
+  // Mentor
+  useSignUpMentorMutation,
+  useVerifyMentorMutation,
+  useResendOtpMentorMutation,
+  useSignInMentorMutation,
+  useSignOutMentorMutation,
 } = userApi;
