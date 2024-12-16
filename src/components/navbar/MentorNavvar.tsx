@@ -42,6 +42,7 @@ import { RootState } from "@/redux/store";
 import { addUser } from "@/redux/slices/userSlice";
 import { errorTost } from "../ui/tosastMessage";
 import { MentorUrl } from "@/@types/urlEnums/MentorUrl";
+import { IaxiosResponse } from "@/features/auth/user/@types/IaxiosResponse";
 
 function MentorNavbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -59,15 +60,12 @@ function MentorNavbar() {
   };
 
   const handleSignOutUser = async () => {
-    const response = await signOut(user?.email);
-    if(response.data){
-
+    const response: IaxiosResponse = await signOut(user?.email);
+    if (response.data) {
       dispatch(addUser(null));
       navigate(MentorUrl.signIn);
-    }else{
-      console.log(response.error);
-      
-      errorTost("Somthing whrong" , "response.error")
+    } else {
+      errorTost("Somthing whrong", response.error.data.error);
     }
   };
   const colorTheam = isDarkMode ? "white" : "black";
@@ -192,7 +190,7 @@ function MentorNavbar() {
                         className="h-8 w-8 rounded-full overflow-hidden object-cover "
                       />
                       <p className="ml-[0.5rem] font-semibold text-lg capitalize">
-                        { user ? user.name : "User"}
+                        {user ? user.name : "User"}
                       </p>
                     </div>
                   </DropdownMenuLabel>
@@ -244,12 +242,15 @@ function MentorNavbar() {
                             Are you absolutely sure?
                           </AlertDialogTitle>
                           <AlertDialogDescription>
-                            This action cannot be undu. This will sign you out from buxlo.
+                            This action cannot be undu. This will sign you out
+                            from buxlo.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={()=>handleSignOutUser()}>
+                          <AlertDialogAction
+                            onClick={() => handleSignOutUser()}
+                          >
                             Continue
                           </AlertDialogAction>
                         </AlertDialogFooter>

@@ -42,6 +42,7 @@ import { useSignOutAdminMutation } from "@/services/apis/AuthApis";
 import { addUser } from "@/redux/slices/userSlice";
 import { RootState } from "@/redux/store";
 import { useState } from "react";
+import { IaxiosResponse } from "@/features/auth/user/@types/IaxiosResponse";
 
 
 function AdminNavbar() {
@@ -61,15 +62,14 @@ function AdminNavbar() {
   };
 
   const handleSignOutUser = async () => {
-    const response = await signOut(user?.email);
+    const response: IaxiosResponse = await signOut(user?.email);
     if(response.data){
 
       dispatch(addUser(null));
       navigate(AdminUrls.signIn);
     }else{
-      console.log(response.error);
       
-      errorTost("Somthing whrong" , "response.error")
+      errorTost("Somthing whrong" , response.error.data.error)
     }
   };
   const colorTheam = isDarkMode ? "white" : "black";

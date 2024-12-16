@@ -51,7 +51,6 @@ export function NewPasswordForm() {
     const { password } = data;
 
     const response: IaxiosResponse = await setNewPassword({ password, token });
-    console.log(response);
 
     if (response.data) {
       setButtStage(!buttonStage);

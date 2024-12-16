@@ -43,6 +43,7 @@ import { RootState } from "@/redux/store";
 import { addUser } from "@/redux/slices/userSlice";
 import { useSignOutUserMutation } from "@/services/apis/AuthApis";
 import { errorTost } from "../ui/tosastMessage";
+import { IaxiosResponse } from "@/features/auth/user/@types/IaxiosResponse";
 
 function UserNavbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -60,15 +61,14 @@ function UserNavbar() {
   };
 
   const handleSignOutUser = async () => {
-    const response = await signOut(user?.email);
+    const response: IaxiosResponse = await signOut(user?.email);
     if(response.data){
 
       dispatch(addUser(null));
       navigate(UserUrls.signIn);
     }else{
-      console.log(response.error);
       
-      errorTost("Somthing whrong" , "response.error")
+      errorTost("Somthing whrong" , response.error.data.error)
     }
   };
   const colorTheam = isDarkMode ? "white" : "black";
