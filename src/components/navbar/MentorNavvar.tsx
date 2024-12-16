@@ -178,22 +178,30 @@ function MentorNavbar() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <div className="flex cursor-pointer">
-                    <img
-                      src={profileImage}
+                  { user?.avatar ? <img
+                      src={user?.avatar}
                       alt="User profile"
                       className="h-8 w-8 rounded-full overflow-hidden object-cover"
-                    />
+                    />:<img
+                    src={profileImage}
+                    alt="User profile"
+                    className="h-8 w-8 rounded-full overflow-hidden object-cover"
+                  />}
                     {/* <ChevronDown color='#6e6e6e' size={25} className='mt-1' /> */}
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="mr-9 min-w-[12rem]">
                   <DropdownMenuLabel>
                     <div className="flex cursor-pointer items-center  justify-start   ">
-                      <img
-                        src={profileImage}
-                        alt="User profile"
-                        className="h-8 w-8 rounded-full overflow-hidden object-cover "
-                      />
+                    { user?.avatar ? <img
+                      src={user?.avatar}
+                      alt="User profile"
+                      className="h-8 w-8 rounded-full overflow-hidden object-cover"
+                    />:<img
+                    src={profileImage}
+                    alt="User profile"
+                    className="h-8 w-8 rounded-full overflow-hidden object-cover"
+                  />}
                       <p className="ml-[0.5rem] font-semibold text-lg capitalize">
                         {user ? user.name : "User"}
                       </p>
