@@ -44,11 +44,9 @@ import { RootState } from "@/redux/store";
 import { useState } from "react";
 import { IaxiosResponse } from "@/features/auth/user/@types/IaxiosResponse";
 
-
 function AdminNavbar() {
   const { isDarkMode, toggleTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
-
 
   const navigate = useNavigate();
 
@@ -63,13 +61,16 @@ function AdminNavbar() {
 
   const handleSignOutUser = async () => {
     const response: IaxiosResponse = await signOut(user?.email);
-    if(response.data){
-
+    if (response.data) {
       dispatch(addUser(null));
       navigate(AdminUrls.signIn);
-    }else{
-      
-      errorTost("Somthing whrong" , response.error.data.error)
+    } else {
+      errorTost(
+        "Somthing when wrong ",
+        response.error.data.error || [
+          { message: `${response.error.data} please try again laiter` },
+        ]
+      );
     }
   };
   const colorTheam = isDarkMode ? "white" : "black";
@@ -194,7 +195,7 @@ function AdminNavbar() {
                         className="h-8 w-8 rounded-full overflow-hidden object-cover "
                       />
                       <p className="ml-[0.5rem] font-semibold text-lg capitalize">
-                        { user ? user.name : "User"}
+                        {user ? user.name : "User"}
                       </p>
                     </div>
                   </DropdownMenuLabel>
@@ -246,12 +247,15 @@ function AdminNavbar() {
                             Are you absolutely sure?
                           </AlertDialogTitle>
                           <AlertDialogDescription>
-                            This action cannot be undu. This will sign you out from buxlo.
+                            This action cannot be undu. This will sign you out
+                            from buxlo.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={()=>handleSignOutUser()}>
+                          <AlertDialogAction
+                            onClick={() => handleSignOutUser()}
+                          >
                             Continue
                           </AlertDialogAction>
                         </AlertDialogFooter>
@@ -317,7 +321,7 @@ function AdminNavbar() {
         </div>
       </nav>
     </>
-  )
+  );
 }
 
-export default AdminNavbar
+export default AdminNavbar;

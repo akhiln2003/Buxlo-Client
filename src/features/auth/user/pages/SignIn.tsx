@@ -26,6 +26,7 @@ function SignIn() {
       if (respons?.credential) {
         // Call your API to handle Google login or signup        
         const response: IaxiosResponse= await googleAuth({ token: respons.credential }); 
+        
         if (response.data?.user) {
           const user = response.data.user;
           dispatch(addUser(user));
@@ -33,7 +34,7 @@ function SignIn() {
           navigate(UserUrls.home);
         } else {
           
-          errorTost("Somthing when wrong ", response.error.data.error);
+          errorTost("Somthing when wrong ", response.error.data.error || [{message: `${response.error.data} please try again laiter`}]);
         }
       }
     } catch (error) {

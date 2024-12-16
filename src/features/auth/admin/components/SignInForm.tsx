@@ -30,7 +30,7 @@ export function SigninForm() {
   const [signIn, { isLoading }] = useSignInAdminMutation();
   const dispatch = useDispatch();
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // Zod Schema
   const form = useForm<z.infer<typeof signInFormSchema>>({
@@ -53,13 +53,18 @@ export function SigninForm() {
   const onSubmit = async (data: z.infer<typeof signInFormSchema>) => {
     const { email, password } = data;
     const response: IaxiosResponse = await signIn({ email, password });
-    
+
     if (response.data?.user) {
-      const user  =  response.data.user;
+      const user = response.data.user;
       dispatch(addUser(user));
       navigate(AdminUrls.dashbord);
-    } else {      
-      errorTost("Something when wrong", response.error.data.error );
+    } else {
+      errorTost(
+        "Somthing when wrong ",
+        response.error.data.error || [
+          { message: `${response.error.data} please try again laiter` },
+        ]
+      );
     }
   };
 

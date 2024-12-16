@@ -41,7 +41,7 @@ function MentorManagement() {
               user.id === id ? { ...user, isBlocked: isBlocked } : user
             ));
     }else{
-        errorTost("SomThing wrong", response.error.data.error);
+      errorTost("Somthing when wrong ", response.error.data.error || [{message: `${response.error.data} please try again laiter`}]);
 
     }
     
@@ -54,7 +54,7 @@ function MentorManagement() {
         if( response.data ){
             setUsers(response.data.data);
         }else{
-            errorTost("SomThing wrong", response.error.data.error);
+          errorTost("Somthing when wrong ", response.error.data.error || [{message: `${response.error.data} please try again laiter`}]);
 
         }
       } catch (err) {

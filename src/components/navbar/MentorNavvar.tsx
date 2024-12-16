@@ -65,7 +65,12 @@ function MentorNavbar() {
       dispatch(addUser(null));
       navigate(MentorUrl.signIn);
     } else {
-      errorTost("Somthing whrong", response.error.data.error);
+      errorTost(
+        "Somthing when wrong ",
+        response.error.data.error || [
+          { message: `${response.error.data} please try again laiter` },
+        ]
+      );
     }
   };
   const colorTheam = isDarkMode ? "white" : "black";

@@ -25,13 +25,20 @@ function SignIn() {
   const handleGoogleSignUp = async (respons: GoogleCredentialResponse) => {
     try {
       if (respons?.credential) {
-        const response: IaxiosResponse = await googleAuth({ token: respons.credential });
+        const response: IaxiosResponse = await googleAuth({
+          token: respons.credential,
+        });
         if (response.data?.user) {
           const user = response.data.user;
           dispatch(addUser(user));
           navigate(MentorUrl.home);
         } else {
-          errorTost("Something went wrong", response.error.data.error);
+          errorTost(
+            "Somthing when wrong ",
+            response.error.data.error || [
+              { message: `${response.error.data} please try again laiter` },
+            ]
+          );
         }
       }
     } catch (error) {
@@ -40,7 +47,9 @@ function SignIn() {
   };
 
   const handleGoogleAthError = () => {
-    errorTost("Failed to sign in",[{ message:"Somting when wrong please try again"}]);
+    errorTost("Failed to sign in", [
+      { message: "Somting when wrong please try again" },
+    ]);
   };
 
   return (

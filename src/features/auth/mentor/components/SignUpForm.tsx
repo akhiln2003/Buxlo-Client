@@ -72,7 +72,12 @@ export function SignUnForm() {
       if (response.data) {
         navigate(MentorUrl.otp, { state: { name, email } });
       } else {
-        errorTost("Somthing wrong", response.error.data.error);
+        errorTost(
+          "Somthing when wrong ",
+          response.error.data.error || [
+            { message: `${response.error.data} please try again laiter` },
+          ]
+        );
       }
     } catch (error) {
       console.log("error :", error);

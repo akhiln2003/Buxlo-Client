@@ -12,7 +12,10 @@ import { IaxiosResponse } from "../@types/IaxiosResponse";
 import { useDispatch } from "react-redux";
 import { addUser } from "@/redux/slices/userSlice";
 import { otpFormSchema } from "../../zodeSchema/authSchema";
-import { useResendOtpMentorMutation, useVerifyMentorMutation } from "@/services/apis/AuthApis";
+import {
+  useResendOtpMentorMutation,
+  useVerifyMentorMutation,
+} from "@/services/apis/AuthApis";
 import { MentorUrl } from "@/@types/urlEnums/MentorUrl";
 
 function Otp() {
@@ -23,11 +26,12 @@ function Otp() {
   const navigate = useNavigate();
   const location = useLocation();
   const data = location.state;
-  let email = '' , name = ''
-    if( data ){
-       email = data.email;
-       name = data.name;
-    }
+  let email = "",
+    name = "";
+  if (data) {
+    email = data.email;
+    name = data.name;
+  }
   const [verifyOtp, { isLoading }] = useVerifyMentorMutation();
   const [resendOtp] = useResendOtpMentorMutation();
 
@@ -47,12 +51,17 @@ function Otp() {
     const response: IaxiosResponse = await verifyOtp({ otp, email });
 
     if (response.data?.user) {
-      const user  =  response.data.user;
+      const user = response.data.user;
       dispatch(addUser(user));
 
       navigate(MentorUrl.home);
     } else {
-      errorTost("Incorrect OTP ", response.error.data.error);
+      errorTost(
+        "Somthing when wrong ",
+        response.error.data.error || [
+          { message: `${response.error.data} please try again laiter` },
+        ]
+      );
     }
   };
 
@@ -60,9 +69,8 @@ function Otp() {
   const hasErrors = !!Object.keys(form.formState.errors).length;
 
   useEffect(() => {
-
-    if( !data ){
-      navigate(MentorUrl.signUp)
+    if (!data) {
+      navigate(MentorUrl.signUp);
     }
     const interval = setInterval(() => {
       if (seconds > 0) {
@@ -90,7 +98,12 @@ function Otp() {
     if (response.data) {
       successToast("OTP sended", response.data.message);
     } else {
-      errorTost("somthing wrong", response.error.data.error);
+      errorTost(
+        "Somthing when wrong ",
+        response.error.data.error || [
+          { message: `${response.error.data} please try again laiter` },
+        ]
+      );
     }
   };
   return (

@@ -48,7 +48,7 @@ export function ForgotPasswordForm() {
       setButtStage(!buttonStage);
       successToast("succesfull", response.data.message);
     } else {
-      errorTost("Something when wrong", response.error.data.error);
+      errorTost("Somthing when wrong ", response.error.data.error || [{message: `${response.error.data} please try again laiter`}]);
     }
   };
 

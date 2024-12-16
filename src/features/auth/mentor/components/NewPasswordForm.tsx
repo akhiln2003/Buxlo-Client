@@ -58,7 +58,12 @@ export function NewPasswordForm() {
       navigate(MentorUrl.signIn);
       return;
     } else {
-      errorTost("Something when wrong", response.error.data.error);
+      errorTost(
+        "Somthing when wrong ",
+        response.error.data.error || [
+          { message: `${response.error.data} please try again laiter` },
+        ]
+      );
     }
   };
 

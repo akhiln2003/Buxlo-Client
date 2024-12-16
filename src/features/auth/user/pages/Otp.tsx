@@ -26,11 +26,12 @@ function Otp() {
   const navigate = useNavigate();
   const location = useLocation();
   const data = location.state;
-  let email = '' , name = ''
-    if( data ){
-       email = data.email;
-       name = data.name;
-    }
+  let email = "",
+    name = "";
+  if (data) {
+    email = data.email;
+    name = data.name;
+  }
   const [verifyOtp, { isLoading }] = useVerifyUserMutation();
   const [resendOtp] = useResendOtpUserMutation();
 
@@ -50,12 +51,17 @@ function Otp() {
     const response: IaxiosResponse = await verifyOtp({ otp, email });
 
     if (response.data?.user) {
-      const user  =  response.data.user;
+      const user = response.data.user;
       dispatch(addUser(user));
 
       navigate(UserUrls.home);
     } else {
-      errorTost("Incorrect OTP ", response.error.data.error);
+      errorTost(
+        "Somthing when wrong ",
+        response.error.data.error || [
+          { message: `${response.error.data} please try again laiter` },
+        ]
+      );
     }
   };
 
@@ -63,9 +69,8 @@ function Otp() {
   const hasErrors = !!Object.keys(form.formState.errors).length;
 
   useEffect(() => {
-
-    if( !data ){
-      navigate(UserUrls.signUp)
+    if (!data) {
+      navigate(UserUrls.signUp);
     }
     const interval = setInterval(() => {
       if (seconds > 0) {
@@ -93,7 +98,12 @@ function Otp() {
     if (response.data) {
       successToast("OTP sended", response.data.message);
     } else {
-      errorTost("somthing wrong", response.error.data.error);
+      errorTost(
+        "Somthing when wrong ",
+        response.error.data.error || [
+          { message: `${response.error.data} please try again laiter` },
+        ]
+      );
     }
   };
   return (
