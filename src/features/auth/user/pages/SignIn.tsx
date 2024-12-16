@@ -13,6 +13,7 @@ import { useDispatch } from "react-redux";
 import { addUser } from "@/redux/slices/userSlice";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { GoogleCredentialResponse, GoogleLogin } from "@react-oauth/google";
+import { IaxiosResponse } from "../@types/IaxiosResponse";
 
 function SignIn() {
   const { isDarkMode } = useTheme();
@@ -24,7 +25,7 @@ function SignIn() {
     try {
       if (respons?.credential) {
         // Call your API to handle Google login or signup        
-        const response = await googleAuth({ token: respons.credential }); 
+        const response: IaxiosResponse= await googleAuth({ token: respons.credential }); 
         if (response.data?.user) {
           const user = response.data.user;
           dispatch(addUser(user));
@@ -33,7 +34,7 @@ function SignIn() {
         } else {
           console.log(respons);
           
-          errorTost("Somthing when wrong ", response.error.data.error); /// currect the mistake 
+          errorTost("Somthing when wrong ", response.error.data.error);
         }
       }
     } catch (error) {
@@ -41,7 +42,7 @@ function SignIn() {
     }
   };
   const handleGoogleAthError  = ()=>{
-    errorTost("Faild to sing in " , "Somting when wrong please try again")
+    errorTost("Faild to sing in " , [{ message:"Somting when wrong please try again"}])
 
   }
   const handleResendPassword = () => {

@@ -12,6 +12,7 @@ import { errorTost } from "@/components/ui/tosastMessage";
 import { GoogleCredentialResponse, GoogleLogin } from "@react-oauth/google";
 
 import BGIMG from "@/assets/images/MentorLoginPageBG.avif";
+import { IaxiosResponse } from "../@types/IaxiosResponse";
 
 function SignIn() {
   const { isDarkMode } = useTheme();
@@ -24,13 +25,13 @@ function SignIn() {
   const handleGoogleSignUp = async (respons: GoogleCredentialResponse) => {
     try {
       if (respons?.credential) {
-        const response = await googleAuth({ token: respons.credential });
+        const response: IaxiosResponse = await googleAuth({ token: respons.credential });
         if (response.data?.user) {
           const user = response.data.user;
           dispatch(addUser(user));
           navigate(MentorUrl.home);
         } else {
-          errorTost("Something went wrong", "response.error.data.message");
+          errorTost("Something went wrong", response.error.data.error);
         }
       }
     } catch (error) {
@@ -39,7 +40,7 @@ function SignIn() {
   };
 
   const handleGoogleAthError = () => {
-    errorTost("Failed to sign in", "Something went wrong. Please try again");
+    errorTost("Failed to sign in",[{ message:"Somting when wrong please try again"}]);
   };
 
   return (
