@@ -53,7 +53,7 @@ function SignIn() {
   };
 
   return (
-    <div className="relative w-full min-h-screen flex items-center justify-center overflow-hidden ">
+    <div className="relative w-full min-h-screen flex-col items-center justify-center overflow-hidden ">
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center filter brightness-50"
@@ -64,14 +64,12 @@ function SignIn() {
           backgroundSize: "cover",
         }}
       />
-
-      {/* Content Container */}
-      <div className="relative z-10 w-full max-w-4xl mx-auto px-4 ">
+      <div className="mt-[3rem] px-[2rem]">
         {/* Top Navigation */}
         <div className="w-full flex justify-between items-center mb-8 px-4">
           <Link
             to={MentorUrl.home}
-            className="flex items-center group text-white"
+            className="flex items-center group text-white "
           >
             <div className="relative w-5 h-5 mr-2">
               <ChevronLeft
@@ -84,7 +82,7 @@ function SignIn() {
                 className="absolute transition-transform duration-300 opacity-0 group-hover:opacity-100 w-full h-full"
               />
             </div>
-            <span className="font-cabinet text-sm">BACK</span>
+            <span className="font-cabinet text-sm relative ">BACK</span>
           </Link>
 
           <Link to={MentorUrl.signUp} className="text-white">
@@ -94,12 +92,24 @@ function SignIn() {
             </span>
           </Link>
         </div>
-
+      </div>
+      {/* Content Container */}
+      <div className="relative z-10 w-full max-w-4xl mx-auto px-4 ">
         {/* Main Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 bg-white dark:bg-zinc-800 rounded-lg shadow-xl overflow-hidden">
           {/* Left Side - Sign In Form */}
           <div className="p-8 flex flex-col justify-center">
             <SigninForm />
+
+            <div
+              className="w-full flex justify-center"
+              onClick={() => navigate(MentorUrl.forgotPassword)}
+            >
+              <span className="font-cabinet font-medium text-sm relative group mt-[2rem] cursor-pointer">
+                Can’t log in?
+                <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-black dark:bg-zinc-300 transition-all duration-300 group-hover:w-full"></span>
+              </span>
+            </div>
 
             {/* Google Login */}
             <div className="w-full flex justify-center mt-6">
