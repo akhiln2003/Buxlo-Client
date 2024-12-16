@@ -52,7 +52,7 @@ function Otp() {
 
       navigate(MentorUrl.home);
     } else {
-      errorTost("Incorrect OTP ", response.error.data.message);
+      errorTost("Incorrect OTP ", response.error.data.error);
     }
   };
 
@@ -90,7 +90,7 @@ function Otp() {
     if (response.data) {
       successToast("OTP sended", response.data.message);
     } else {
-      errorTost("somthing wrong", response.error.data);
+      errorTost("somthing wrong", response.error.data.error);
     }
   };
   return (

@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux';
 import { useGoogleAuthMentMutation } from '@/services/apis/AuthApis';
 import { GoogleCredentialResponse, GoogleLogin } from '@react-oauth/google';
 import { useTheme } from '@/contexts/themeContext';
+import { IaxiosResponse } from '../@types/IaxiosResponse';
 
 
 function SignUpOptions({ setIsFormVisible }: IsignUpOptionProps) {
@@ -34,22 +35,24 @@ function SignUpOptions({ setIsFormVisible }: IsignUpOptionProps) {
     try {
       if (respons?.credential) {
         // Call your API to handle Google login or signup
-        const  response  = await googleAuth({ token: respons.credential });
+        const  response: IaxiosResponse  = await googleAuth({ token: respons.credential });
         if (response.data?.user) {
           const user  =  response.data.user;
           dispatch(addUser(user));
     
           navigate(MentorUrl.home);
         } else {
-          errorTost("Somthing when wrong ", "response.error.data.message"); // currenct the mistake 
+          errorTost("Somthing when wrong ", response.error.data.error); 
         }
       }
     } catch (error) {
       console.error('Error during Google signup:', error);
+      errorTost("Failed to sign in", [{ message:"Somting when wrong please try again"}]);
+
     }
   };
   const handleGoogleAthError = () => {
-    errorTost("Failed to sign in", "Something went wrong. Please try again");
+    errorTost("Failed to sign in", [{ message:"Somting when wrong please try again"}]);
   };
   const googlTheam = isDarkMode ? "filled_black" : "outline";
 

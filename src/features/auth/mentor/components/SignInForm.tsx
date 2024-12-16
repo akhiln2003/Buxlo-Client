@@ -59,7 +59,7 @@ export function SigninForm() {
       dispatch(addUser(user));
       navigate(MentorUrl.home);
     } else {      
-      errorTost("Something when wrong", response.error.data.error ? response.error.data.error : `${response.error.data} please try laiter` );
+      errorTost("Something when wrong", response.error.data.error  );
     }
   };
 

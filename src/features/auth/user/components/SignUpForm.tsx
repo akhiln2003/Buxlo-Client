@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 import {
   Form,
   FormControl,
@@ -72,16 +71,13 @@ export function SignUnForm() {
       if (response.data) {
         navigate(UserUrls.otp, { state: { name, email } });
       } else {
-        errorTost(
-          "Somthing wrong",
-          response.error.data?.error
-            ? response.error.data.error
-            : "somthing wrong plese try laiter"
-        );
+        errorTost("Somthing wrong", response.error.data.error);
       }
     } catch (error) {
       console.log("error :", error);
-      errorTost("Somthing wrong", "somthing wrong plese try laiter");
+      errorTost("Somthing wrong", [
+        { message: "Somting when wrong please try again" },
+      ]);
     }
   };
 

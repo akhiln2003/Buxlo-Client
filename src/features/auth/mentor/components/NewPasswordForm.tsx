@@ -58,12 +58,8 @@ export function NewPasswordForm() {
       successToast("succesfull", response.data.message);
       navigate(MentorUrl.signIn);
       return;
-    }
-    if (response?.error?.data?.error) {
-      errorTost("Something when wrong", response.error.data.error);
-      return;
     } else {
-      errorTost("Something when wrong", `please try laiter`);
+      errorTost("Something when wrong", response.error.data.error);
     }
   };
 
@@ -101,7 +97,7 @@ export function NewPasswordForm() {
           control={form.control}
           name="confirmPassword"
           render={({ field }) => (
-            <FormItem  className="w-4/6">
+            <FormItem className="w-4/6">
               <FormLabel className="font-cabinet font-semibold text-xs text-zinc-500 dark:text-zinc-50">
                 CONFIRM PASSWORD
               </FormLabel>

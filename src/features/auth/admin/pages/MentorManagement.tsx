@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import {  useBlockandunblockMutation, useFetchMentorsMutation } from "@/services/apis/AuthApis";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { Button } from "@/components/ui/button";
+import { IaxiosResponse } from "../@types/IaxiosResponse";
 
 interface User {
   id: string;
@@ -33,14 +34,14 @@ function MentorManagement() {
   const [users, setUsers] = useState<User[]>([]);
 
   const handileBlock = async( id:string , isBlocked: boolean  ) =>{
-    const response = await userAction({id , isBlocked  });
+    const response: IaxiosResponse = await userAction({id , isBlocked  });
     if( response.data ){
         setUsers((prevUsers) =>
             prevUsers.map((user) =>
               user.id === id ? { ...user, isBlocked: isBlocked } : user
             ));
     }else{
-        errorTost("SomThing wrong", "Somthing when wrong please try again laiter");
+        errorTost("SomThing wrong", response.error.data.error);
 
     }
     
@@ -49,16 +50,16 @@ function MentorManagement() {
     const fetchUserData = async () => {
       try {
         const role = "mentor";
-        const response = await fetchUsers(role); // `unwrap` gets the raw response
+        const response: IaxiosResponse = await fetchUsers(role); // `unwrap` gets the raw response
         if( response.data ){
             setUsers(response.data.data);
         }else{
-            errorTost("SomThing wrong", "Somthing when wrong please try again laiter");
+            errorTost("SomThing wrong", response.error.data.error);
 
         }
       } catch (err) {
         console.log("Error fetching users:", err);
-        errorTost("SomThing wrong", "Somthing when wrong please try again laiter");
+        errorTost("SomThing wrong", [{ message:"Somting when wrong please try again"}]);
     }
     };
 

@@ -15,6 +15,7 @@ import {  useBlockandunblockMutation, useFetchUsersMutation } from "@/services/a
 import { errorTost } from "@/components/ui/tosastMessage";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
+import { IaxiosResponse } from "../@types/IaxiosResponse";
 
 interface User {
   id: string;
@@ -35,14 +36,14 @@ function UserManagement() {
   const [users, setUsers] = useState<User[]>([]);
 
   const handileBlock = async( id:string , isBlocked: boolean  ) =>{
-    const response = await userAction({id , isBlocked  });
+    const response: IaxiosResponse = await userAction({id , isBlocked  });
     if( response.data ){
         setUsers((prevUsers) =>
             prevUsers.map((user) =>
               user.id === id ? { ...user, isBlocked: isBlocked } : user
             ));
     }else{
-        errorTost("SomThing wrong", "Somthing when wrong please try again laiter");
+        errorTost("SomThing wrong", response.error.data.error);
 
     }
     
@@ -51,16 +52,16 @@ function UserManagement() {
     const fetchUserData = async () => {
       try {
         const role = "user";
-        const response = await fetchUsers(role); // `unwrap` gets the raw response
+        const response : IaxiosResponse = await fetchUsers(role); // `unwrap` gets the raw response
         if( response.data ){
             setUsers(response.data.data);
         }else{
-            errorTost("SomThing wrong", "Somthing when wrong please try again laiter");
+            errorTost("SomThing wrong", response.error.data.error);
 
         }
       } catch (err) {
         console.log("Error fetching users:", err);
-        errorTost("SomThing wrong", "Somthing when wrong please try again laiter");
+        errorTost("SomThing wrong", [{ message:"Somting when wrong please try again"}]);
     }
     };
 

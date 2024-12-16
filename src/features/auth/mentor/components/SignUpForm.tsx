@@ -72,16 +72,13 @@ export function SignUnForm() {
       if (response.data) {
         navigate(MentorUrl.otp, { state: { name, email } });
       } else {
-        errorTost(
-          "Somthing wrong",
-          response.error.data?.error
-            ? response.error.data.error
-            : "somthing wrong plese try laiter"
-        );
+        errorTost("Somthing wrong", response.error.data.error);
       }
     } catch (error) {
       console.log("error :", error);
-      errorTost("Somthing wrong", "somthing wrong plese try laiter");
+      errorTost("Somthing wrong", [
+        { message: "Somting when wrong please try again" },
+      ]);
     }
   };
 
