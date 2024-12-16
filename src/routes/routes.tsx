@@ -31,7 +31,7 @@ const MentorForgotPasswordPage = lazy(
   () => import("@/features/auth/mentor/pages/forgotPassword")
 );
 const MentorSetNewPassword = lazy(
-  () => import("@/features/auth/user/pages/newPassword")
+  () => import("@/features/auth/mentor/pages/newPassword")
 );
 
 ////////////////////////--Admin side--/////////////////////

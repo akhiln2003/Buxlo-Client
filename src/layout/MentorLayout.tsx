@@ -4,7 +4,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 
 function MentorLayout() {
     const { pathname } = useLocation();
-    const routeWithoutNav = [ MentorUrl.signIn , MentorUrl.signUp , MentorUrl.otp , MentorUrl.forgotPassword , "/resetpassword" ];
+    const routeWithoutNav = [ MentorUrl.signIn , MentorUrl.signUp , MentorUrl.otp , MentorUrl.forgotPassword , "/mentor/resetpassword" ];
     const higeNavbar = routeWithoutNav.some(route => pathname.startsWith(route));
 
   return (
