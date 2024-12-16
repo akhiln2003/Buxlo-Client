@@ -8,4 +8,5 @@ export interface Iuser {
   name: string,
   role: string,
   updatedAt: string;
+  avatar: string;
 }
