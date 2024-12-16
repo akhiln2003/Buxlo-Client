@@ -8,6 +8,7 @@ import {
   IverifyOtpData,
 } from "@/@types/interface/IuserApisQuery";
 import { MentorApiEndPoints } from "../endPoints/MentorEndPoints";
+import { AdminApiEndPoints } from "../endPoints/AdminEndPoints";
 
 export const userApi = createApi({
   reducerPath: "userApi",
@@ -60,7 +61,7 @@ export const userApi = createApi({
       }),
     }),
 
-    // forgotPassword  
+    // forgotPassword
     forgotPasswordUser: builder.mutation({
       query: (data) => ({
         url: UserApiEndPoints.forgotPassword,
@@ -69,10 +70,19 @@ export const userApi = createApi({
       }),
     }),
 
-    // set new password 
+    // set new password
     setNewPasswordUser: builder.mutation({
       query: (data) => ({
         url: UserApiEndPoints.setNewPassword,
+        method: "POST",
+        data: data,
+      }),
+    }),
+
+    // google auth
+    googleAuthUser: builder.mutation({
+      query: (data) => ({
+        url: UserApiEndPoints.googleAuth,
         method: "POST",
         data: data,
       }),
@@ -126,23 +136,80 @@ export const userApi = createApi({
       }),
     }),
 
-        // forgotPassword  
-        forgotPasswordMentor: builder.mutation({
-          query: (data) => ({
-            url: UserApiEndPoints.forgotPassword,
-            method: "POST",
-            data: data,
-          }),
-        }),
-    
-        // set new password 
-        setNewPasswordMentor: builder.mutation({
-          query: (data) => ({
-            url: UserApiEndPoints.setNewPassword,
-            method: "POST",
-            data: data,
-          }),
-        }),
+    // forgotPassword
+    forgotPasswordMentor: builder.mutation({
+      query: (data) => ({
+        url: MentorApiEndPoints.forgotPassword,
+        method: "POST",
+        data: data,
+      }),
+    }),
+
+    // set new password
+    setNewPasswordMentor: builder.mutation({
+      query: (data) => ({
+        url: MentorApiEndPoints.setNewPassword,
+        method: "POST",
+        data: data,
+      }),
+    }),
+
+    // google auth
+    googleAuthMent: builder.mutation({
+      query: (data) => ({
+        url: MentorApiEndPoints.googleAuth,
+        method: "POST",
+        data: data,
+      }),
+    }),
+
+    ///////////////////////////////--Mentor end--///////////////////////////
+
+    ///////////////////////////////--Admin--////////////////////////////////
+
+    // singOut
+    signOutAdmin: builder.mutation({
+      query: () => ({
+        url: AdminApiEndPoints.signOut,
+        method: "POST",
+      }),
+    }),
+
+    // signIn
+    signInAdmin: builder.mutation({
+      query: (data: IsignInData) => ({
+        url: AdminApiEndPoints.signIn,
+        method: "POST",
+        data: data,
+      }),
+    }),
+
+    // Fetch users
+    fetchUsers: builder.mutation({
+      query: () => ({
+        url: AdminApiEndPoints.fetchUsers,
+        method: "GET",
+      }),
+    }),
+
+    // Fetch mentors
+    fetchMentors: builder.mutation({
+      query: () => ({
+        url: AdminApiEndPoints.fetchMentors,
+        method: "GET",
+      }),
+    }),
+
+     // Block and  unblock user
+     blockandunblock: builder.mutation({
+      query: (data) => ({
+        url: AdminApiEndPoints.blockandunblock,
+        method: "PUT",
+        data:data
+      }),
+    }),
+
+
 
     ///////////////////////////////--Mentor end--///////////////////////////
   }),
@@ -158,6 +225,7 @@ export const {
   useSignOutUserMutation,
   useForgotPasswordUserMutation,
   useSetNewPasswordUserMutation,
+  useGoogleAuthUserMutation,
 
   // Mentor
   useSignUpMentorMutation,
@@ -166,5 +234,13 @@ export const {
   useSignInMentorMutation,
   useSignOutMentorMutation,
   useForgotPasswordMentorMutation,
-  useSetNewPasswordMentorMutation
+  useSetNewPasswordMentorMutation,
+  useGoogleAuthMentMutation,
+
+  // Admin
+  useSignInAdminMutation,
+  useSignOutAdminMutation,
+  useFetchUsersMutation,
+  useFetchMentorsMutation,
+  useBlockandunblockMutation,
 } = userApi;

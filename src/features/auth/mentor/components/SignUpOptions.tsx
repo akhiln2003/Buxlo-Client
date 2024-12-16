@@ -1,18 +1,27 @@
 // import logoIconWhite from '@/assets/images/logoIconWhite.png';
-import { Link } from 'react-router-dom';
+
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ChevronLeft } from 'lucide-react';
-import GoogleIcon from '@/assets/images/GoogleIcon.png';
-// import GitHubIcon from '@/assets/images/GitHubIcon.png';
 import FbIcon from '@/assets/images/fbIcon.png';
 import AppleIcon from '@/assets/images/AppleIcon.png'
 import TraditionalLoginIcon from '@/assets/images/TraditionalLoginIcon.png';
 import { useState } from 'react';
 import { IsignUpOptionProps } from '../@types/Iprops';
-import { useGoogleLogin } from '@react-oauth/google';
 import { MentorUrl } from '@/@types/urlEnums/MentorUrl';
+import { addUser } from '@/redux/slices/userSlice';
+import { errorTost } from '@/components/ui/tosastMessage';
+import { useDispatch } from 'react-redux';
+import { useGoogleAuthMentMutation } from '@/services/apis/AuthApis';
+import { GoogleCredentialResponse, GoogleLogin } from '@react-oauth/google';
+import { useTheme } from '@/contexts/themeContext';
+
+
 function SignUpOptions({ setIsFormVisible }: IsignUpOptionProps) {
   const [showMore, setShowMore] = useState<boolean>(false);
-
+  const [ googleAuth ] = useGoogleAuthMentMutation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isDarkMode } = useTheme();
   const handilShowMore = () => {
     setShowMore(true);
   }
@@ -21,18 +30,34 @@ function SignUpOptions({ setIsFormVisible }: IsignUpOptionProps) {
     setIsFormVisible(true)
   }
 
-  const signInWithGoogle = useGoogleLogin({
-    onSuccess: (tokenResponse) => {
-      console.log(tokenResponse);
-    },
-    onError: (error) => {
-      console.error("Google login error: ", error);
-    }  });
+  const handleGoogleSignUp = async (respons:GoogleCredentialResponse ) => {
+    try {
+      if (respons?.credential) {
+        // Call your API to handle Google login or signup
+        const  response  = await googleAuth({ token: respons.credential });
+        if (response.data?.user) {
+          const user  =  response.data.user;
+          dispatch(addUser(user));
+    
+          navigate(MentorUrl.home);
+        } else {
+          errorTost("Somthing when wrong ", "response.error.data.message"); // currenct the mistake 
+        }
+      }
+    } catch (error) {
+      console.error('Error during Google signup:', error);
+    }
+  };
+  const handleGoogleAthError = () => {
+    errorTost("Failed to sign in", "Something went wrong. Please try again");
+  };
+  const googlTheam = isDarkMode ? "filled_black" : "outline";
+
 
   return (
     <>
       <div className=' dark:bg-zinc-900 min-h-screen'>
-        <div className='w-full'>
+        <div className='w-full' style={{}}>
           <div className='w-full flex justify-between items-center pt-12 px-[2rem] '>
             <Link to={MentorUrl.home} className="flex items-center  group">
               <div className='relative w-5 h-5 items-start'>
@@ -60,14 +85,17 @@ function SignUpOptions({ setIsFormVisible }: IsignUpOptionProps) {
         </div>
         <div className='w-full flex flex-col items-center '>
 
-          <div className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-600 mt-[1.7rem] pl-[1rem] flex items-center overflow-hidden"
-            onClick={() => signInWithGoogle()}>
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-100 dark:from-zinc-600 to-slate-100 dark:to-zinc-600 scale-x-0 group-hover:scale-x-100 transform origin-left transition-all duration-100"></div>
-            <div className="w-5 rounded overflow-hidden ml-[1rem] relative z-10">
-              <img src={GoogleIcon} alt="googleIcon" />
-            </div>
-            <p className="font-cabinet font-semibold text-sm ml-[3rem] relative z-10">Continue with Google</p>
-          </div>
+          {/* Google Login button */}
+          <div className="w-[21.5rem] h-14  mt-[0.7rem] flex items-center overflow-hidden">
+                  <GoogleLogin
+                    onSuccess={handleGoogleSignUp}
+                    onError={handleGoogleAthError}
+                    shape="rectangular"
+                    size="large"
+                    width="350px"
+                    theme={googlTheam}
+                  />
+                </div>
 
           {
             showMore ?

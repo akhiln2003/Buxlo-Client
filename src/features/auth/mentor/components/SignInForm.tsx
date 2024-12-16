@@ -111,7 +111,7 @@ export function SigninForm() {
           type={isFormFilled && !isLoading ? "submit" : "button"}
           className={`font-cabinet w-5/6 rounded-none mx-[2rem] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
             !isFormFilled && !isLoading
-              ? "cursor-not-allowed bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-800"
+              ? "cursor-not-allowed bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-900"
               : "cursor-default bg-zinc-800 hover:bg-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-black"
           }`}
         >

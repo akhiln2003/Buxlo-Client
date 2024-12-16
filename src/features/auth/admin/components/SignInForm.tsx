@@ -14,20 +14,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { signInFormSchema } from "../../zodeSchema/authSchema";
-import { useSignInUserMutation } from "@/services/apis/AuthApis";
+import { useSignInAdminMutation } from "@/services/apis/AuthApis";
 import { IaxiosResponse } from "../@types/IaxiosResponse";
 import { Loader } from "lucide-react";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { useDispatch } from "react-redux";
 import { addUser } from "@/redux/slices/userSlice";
-import { UserUrls } from "@/@types/urlEnums/UserUrls";
 import { useNavigate } from "react-router-dom";
+import { AdminUrls } from "@/@types/urlEnums/AdminUrl";
 
 export function SigninForm() {
   const [passwordVisibility, setPasswordVisibility] = useState<boolean>(false);
   const [isFormFilled, setIsFormFilled] = useState<boolean>(false);
 
-  const [signIn, { isLoading }] = useSignInUserMutation();
+  const [signIn, { isLoading }] = useSignInAdminMutation();
   const dispatch = useDispatch();
 
   const navigate = useNavigate()
@@ -57,9 +57,9 @@ export function SigninForm() {
     if (response.data?.user) {
       const user  =  response.data.user;
       dispatch(addUser(user));
-      navigate(UserUrls.home);
+      navigate(AdminUrls.dashbord);
     } else {      
-      errorTost("Something when wrong", response.error.data.error );
+      errorTost("Something when wrong", response.error.data.error ? response.error.data.error : `${response.error.data} please try laiter` );
     }
   };
 
@@ -109,7 +109,7 @@ export function SigninForm() {
         {/* Submit Button */}
         <Button
           type={isFormFilled && !isLoading ? "submit" : "button"}
-          className={`font-cabinet w-5/6 rounded-none mx-[2rem] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+          className={`font-cabinet w-full rounded-none  transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
             !isFormFilled && !isLoading
               ? "cursor-not-allowed bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-800"
               : "cursor-default bg-zinc-800 hover:bg-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-black"

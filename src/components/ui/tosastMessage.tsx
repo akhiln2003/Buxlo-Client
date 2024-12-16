@@ -8,12 +8,18 @@ export const AuthUnexpectedErrorTost = () =>
     className: "text-red-700 border bg-gray-200 mb-6",
   });
 
-export const errorTost = (title: string, description: string) =>
-  toast({
-    title: title,
-    description: description,
-    className: "text-red-700 border bg-gray-200 mb-6",
-  });
+  export const errorTost = (title: string, description: { message: string }[]) => {
+    const formattedDescription = description
+      .map((desc) => `• ${desc.message}`)
+      .join("\n");
+  
+    toast({
+      title: title,
+      description: formattedDescription,
+      className: "text-red-700 border bg-gray-200 mb-6",
+    });
+  };
+  
 
 export const successToast = (title: string, description: string) => {
   toast({

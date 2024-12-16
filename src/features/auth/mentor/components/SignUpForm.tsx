@@ -182,7 +182,7 @@ export function SignUnForm() {
           type={isFormFilled && !isLoading ? "submit" : "button"}
           className={`font-cabinet w-5/6 rounded-none mx-[2rem] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
             !isFormFilled
-              ? "cursor-not-allowed bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-800"
+              ? "cursor-not-allowed bg-zinc-400 hover:bg-zinc-400 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-900"
               : "cursor-default bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-black"
           }`}
         >

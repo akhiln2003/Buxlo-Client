@@ -5,5 +5,7 @@ export enum MentorApiEndPoints {
     verifyOtp = '/mentor/verifyotp',
     resendOtp = '/mentor/resendotp',
     forgotPassword = '/mentor/forgotpassword',
-    setNewPassword = '/mentor/setnewpassword'
+    setNewPassword = '/mentor/setnewpassword',
+    googleAuth = '/mentor/googleauth'
+
 }
