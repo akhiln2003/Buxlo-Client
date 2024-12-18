@@ -16,7 +16,7 @@ function SignUpFormPage({ setIsFormVisible }: IsignUpFormPageProps) {
   };
 
   return (
-    <div className="relative w-full min-h-screen flex items-center justify-center overflow-hidden p-[4rem]">
+    <div className="relative w-full min-h-screen flex-col items-center justify-center overflow-hidden ">
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center filter brightness-50"
@@ -27,14 +27,12 @@ function SignUpFormPage({ setIsFormVisible }: IsignUpFormPageProps) {
           backgroundSize: "cover",
         }}
       />
-
-      {/* Content Container */}
-      <div className="relative z-10 w-full max-w-4xl mx-auto p-4">
+      <div className="mt-[3rem] px-[2rem]">
         {/* Top Navigation */}
         <div className="w-full flex justify-between items-center mb-8 px-4">
           <Link
             to={MentorUrl.home}
-            className="flex items-center group text-white"
+            className="flex items-center group text-white "
           >
             <div className="relative w-5 h-5 mr-2">
               <ChevronLeft
@@ -47,7 +45,7 @@ function SignUpFormPage({ setIsFormVisible }: IsignUpFormPageProps) {
                 className="absolute transition-transform duration-300 opacity-0 group-hover:opacity-100 w-full h-full"
               />
             </div>
-            <span className="font-cabinet text-sm">BACK</span>
+            <span className="font-cabinet text-sm relative ">BACK</span>
           </Link>
 
           <Link to={MentorUrl.signIn} className="text-white">
@@ -57,6 +55,11 @@ function SignUpFormPage({ setIsFormVisible }: IsignUpFormPageProps) {
             </span>
           </Link>
         </div>
+      </div>
+
+      {/* Content Container */}
+      <div className="relative z-10 w-full max-w-4xl mx-auto p-4">
+        {/* Top Navigation */}
 
         {/* Main Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 bg-white dark:bg-zinc-800 rounded-lg shadow-xl overflow-hidden space-x-2">
