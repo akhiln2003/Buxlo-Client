@@ -44,6 +44,7 @@ import { addUser } from "@/redux/slices/userSlice";
 import { useSignOutUserMutation } from "@/services/apis/AuthApis";
 import { errorTost } from "../ui/tosastMessage";
 import { IaxiosResponse } from "@/features/auth/user/@types/IaxiosResponse";
+import { USER_ROLE } from "@/@types/userRoleEnum";
 
 function UserNavbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -231,7 +232,7 @@ function UserNavbar() {
                       <span className="ml-[0.5rem]">Subscription</span>
                     </Link>
                   </DropdownMenuItem>
-                  {!user ? (
+                  { user?.role != USER_ROLE.USER ? (
                     <DropdownMenuItem onClick={navigateSignIn}>
                       <LogIn size={20} />
                       <span className="ml-[0.5rem]">SignIn</span>

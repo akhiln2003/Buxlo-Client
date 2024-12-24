@@ -43,6 +43,7 @@ import { addUser } from "@/redux/slices/userSlice";
 import { RootState } from "@/redux/store";
 import { useState } from "react";
 import { IaxiosResponse } from "@/features/auth/user/@types/IaxiosResponse";
+import { USER_ROLE } from "@/@types/userRoleEnum";
 
 function AdminNavbar() {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -238,7 +239,7 @@ function AdminNavbar() {
                       <span className="ml-[0.5rem]">Subscription</span>
                     </Link>
                   </DropdownMenuItem>
-                  {!user ? (
+                  { user?.role !== USER_ROLE.ADMIN ? (
                     <DropdownMenuItem onClick={navigateSignIn}>
                       <LogIn size={20} />
                       <span className="ml-[0.5rem]">SignIn</span>

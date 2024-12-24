@@ -43,6 +43,7 @@ import { addUser } from "@/redux/slices/userSlice";
 import { errorTost } from "../ui/tosastMessage";
 import { MentorUrl } from "@/@types/urlEnums/MentorUrl";
 import { IaxiosResponse } from "@/features/auth/user/@types/IaxiosResponse";
+import { USER_ROLE } from "@/@types/userRoleEnum";
 
 function MentorNavbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -230,7 +231,7 @@ function MentorNavbar() {
                       <span className="ml-[0.5rem]">Subscription</span>
                     </Link>
                   </DropdownMenuItem>
-                  {!user ? (
+                  {user?.role != USER_ROLE.MENTOR ? (
                     <DropdownMenuItem onClick={navigateSignIn}>
                       <LogIn size={20} />
                       <span className="ml-[0.5rem]">SignIn</span>

@@ -9,6 +9,7 @@ import { AdminUrls } from "@/@types/urlEnums/AdminUrl";
 import RedirectSignInAdmin from "./protected/RedirectSignInAdmin";
 import RedirectSignInUser from "./protected/RedirectSignInUser";
 import AdminProtected from "./protected/AdminProtected";
+import RedirectSignInMentor from "./protected/RedirectSignInMentor";
 
 ////////////////////////--User side--/////////////////////
 const UserLandingPage = lazy(() => import("@/pages/UserLandingPage"));
@@ -107,9 +108,11 @@ const routes = createBrowserRouter(
         {
           path: UserUrls.setNewPassword,
           element: (
-            <Suspense fallback={<div>Loading...</div>}>
-              <UserSetNewPassword />
-            </Suspense>
+            <RedirectSignInUser>
+              <Suspense fallback={<div>Loading...</div>}>
+                <UserSetNewPassword />
+              </Suspense>
+            </RedirectSignInUser>
           ),
         },
       ],
@@ -134,43 +137,51 @@ const routes = createBrowserRouter(
         {
           path: MentorUrl.signIn,
           element: (
-            <Suspense fallback={<div>Loading....</div>}>
-              <MentorSignIn />
-            </Suspense>
+            <RedirectSignInMentor>
+              <Suspense fallback={<div>Loading....</div>}>
+                <MentorSignIn />
+              </Suspense>
+            </RedirectSignInMentor>
           ),
         },
         {
           path: MentorUrl.signUp,
           element: (
-            <Suspense fallback={<div>Loading....</div>}>
-              <MentorSignUp />
-            </Suspense>
+            <RedirectSignInMentor>
+              <Suspense fallback={<div>Loading....</div>}>
+                <MentorSignUp />
+              </Suspense>
+            </RedirectSignInMentor>
           ),
         },
         {
           path: MentorUrl.otp,
           element: (
-            <Suspense fallback={<div>Loading....</div>}>
-              <MentorOtpPage />
-            </Suspense>
+            <RedirectSignInMentor>
+              <Suspense fallback={<div>Loading....</div>}>
+                <MentorOtpPage />
+              </Suspense>
+            </RedirectSignInMentor>
           ),
         },
         {
           path: MentorUrl.forgotPassword,
           element: (
-            <>
+            <RedirectSignInMentor>
               <Suspense fallback={<div>Loading...</div>}>
                 <MentorForgotPasswordPage />
               </Suspense>
-            </>
+            </RedirectSignInMentor>
           ),
         },
         {
           path: MentorUrl.setNewPassword,
           element: (
-            <Suspense fallback={<div>Loading...</div>}>
-              <MentorSetNewPassword />
-            </Suspense>
+            <RedirectSignInMentor>
+              <Suspense fallback={<div>Loading...</div>}>
+                <MentorSetNewPassword />
+              </Suspense>
+            </RedirectSignInMentor>
           ),
         },
       ],
