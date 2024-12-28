@@ -1,5 +1,5 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { axiosBaseQuery } from "../axios";
+import { axiosBaseQuery } from "../axios/axiosBaseQuery";
 import { UserApiEndPoints } from "../endPoints/UserEndPoints";
 import {
   InewUserData,
@@ -12,7 +12,7 @@ import { AdminApiEndPoints } from "../endPoints/AdminEndPoints";
 
 export const userApi = createApi({
   reducerPath: "userApi",
-  baseQuery: axiosBaseQuery({ baseUrl: import.meta.env.VITE_AUTH_API_URl }),
+  baseQuery: axiosBaseQuery(),
   tagTypes: ["User"],
   endpoints: (builder) => ({
     ///////////////////////////////--User--///////////////////////////////
