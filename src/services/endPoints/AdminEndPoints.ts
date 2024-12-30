@@ -1,9 +1,9 @@
 export enum AdminApiEndPoints {
-    signIn = '/admin/signin',
-    signOut = '/admin/signout',
-    fetchUsers = '/admin/profile/fetchusers',
-    fetchMentors = '/admin/profile/fetchmentor',
-    blockandunblock = '/admin/profile/blockandunblock',
+    signIn = '/auth/admin/signin',
+    signOut = '/auth/admin/signout',
+    fetchUsers = '/auth/admin/profile/fetchusers',
+    fetchMentors = '/auth/admin/profile/fetchmentor',
+    blockandunblock = '/auth        modified:   src/services/axios/axiosInstance.ts/admin/profile/blockandunblock',
 
 
 }
