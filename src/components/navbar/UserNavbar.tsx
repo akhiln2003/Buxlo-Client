@@ -96,7 +96,7 @@ function UserNavbar() {
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8 font-extrabold text-base">
               <a
-                href="#"
+                href={UserUrls.dashbord}
                 className="text-gray-900 dark:text-white  hover:text-gray-500"
               >
                 DASHBORD
@@ -117,7 +117,7 @@ function UserNavbar() {
                 href="#"
                 className="text-gray-500 hover:text-gray-900 dark:hover:text-white "
               >
-                Contact
+                CONTACT
               </a>
             </div>
 
@@ -303,7 +303,7 @@ function UserNavbar() {
           >
             <div className="space-y-1 px-2 pb-3 pt-2">
               <a
-                href="#"
+                href={UserUrls.dashbord}
                 className="block px-3 py-2 text-gray-500 hover:text-gray-900  "
               >
                 Dashboard
@@ -324,7 +324,7 @@ function UserNavbar() {
                 href="#"
                 className="block px-3 py-2 text-gray-500 hover:text-gray-900"
               >
-                Contact
+                CONTACT
               </a>
             </div>
           </motion.div>

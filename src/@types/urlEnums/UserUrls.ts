@@ -7,6 +7,7 @@ export enum UserUrls  {
     forgotPassword = '/forgotpassword',
     setNewPassword = '/resetpassword/:token',
     profile = '/profile',
-    subscription = '/subscription'
+    subscription = '/subscription',
+    dashbord = '/dashbord'
 
 }
