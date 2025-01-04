@@ -6,6 +6,7 @@
 //     withCredentials: true,
 //   });
 
+import { UserUrls } from "@/@types/urlEnums/UserUrls";
 import { logOut } from "@/redux/slices/userSlice";
 import { Store } from "@reduxjs/toolkit";
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
@@ -112,7 +113,7 @@ axiosInstance.interceptors.response.use(
 
 const refreshTokenApi = async () => {
   return axios.post(
-    `${import.meta.env.VITE_AUTH_API_URl}/qaswed`,
+    `${import.meta.env.VITE_AUTH_API_URl}${UserUrls.tokenGen}`,
     {},
     {
       withCredentials: true,

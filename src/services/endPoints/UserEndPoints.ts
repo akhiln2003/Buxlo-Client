@@ -6,5 +6,7 @@ export enum UserApiEndPoints {
     resendOtp = '/auth/user/resendotp',
     forgotPassword = '/auth/user/forgotpassword',
     setNewPassword = '/auth/user/setnewpassword',
-    googleAuth = '/auth/user/googleauth'
+    googleAuth = '/auth/user/googleauth',
+    tokenGen = '/auth/user/refreshtoken',
+
 }
