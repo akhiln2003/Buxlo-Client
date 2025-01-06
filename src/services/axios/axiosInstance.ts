@@ -1,15 +1,7 @@
-// import axios from "axios";
-
-// // Create axios instance
-// export const axiosInstance = axios.create({
-//     baseURL: import.meta.env.VITE_AUTH_API_URl,
-//     withCredentials: true,
-//   });
-
-import { UserUrls } from "@/@types/urlEnums/UserUrls";
 import { logOut } from "@/redux/slices/userSlice";
 import { Store } from "@reduxjs/toolkit";
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
+import { UserApiEndPoints } from "../endPoints/UserEndPoints";
 
 
 
@@ -113,7 +105,7 @@ axiosInstance.interceptors.response.use(
 
 const refreshTokenApi = async () => {
   return axios.post(
-    `${import.meta.env.VITE_AUTH_API_URl}${UserUrls.tokenGen}`,
+    `${import.meta.env.VITE_AUTH_API_URl}${UserApiEndPoints.tokenGen}`,
     {},
     {
       withCredentials: true,
