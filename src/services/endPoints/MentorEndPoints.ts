@@ -1,11 +1,11 @@
 export enum MentorApiEndPoints {
-    signIn = '/mentor/signin',
-    signOut = '/mentor/signout',
-    signUp = '/mentor/signup',
-    verifyOtp = '/mentor/verifyotp',
-    resendOtp = '/mentor/resendotp',
-    forgotPassword = '/mentor/forgotpassword',
-    setNewPassword = '/mentor/setnewpassword',
-    googleAuth = '/mentor/googleauth'
+    signIn = '/auth/mentor/signin',
+    signOut = '/auth/mentor/signout',
+    signUp = '/auth/mentor/signup',
+    verifyOtp = '/auth/mentor/verifyotp',
+    resendOtp = '/auth/mentor/resendotp',
+    forgotPassword = '/auth/mentor/forgotpassword',
+    setNewPassword = '/auth/mentor/setnewpassword',
+    googleAuth = '/auth/mentor/googleauth'
 
 }
