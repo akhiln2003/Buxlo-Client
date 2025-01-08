@@ -13,10 +13,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { useForgotPasswordUserMutation } from "@/services/apis/AuthApis";
-import { IaxiosResponse } from "../@types/IaxiosResponse";
 import { Loader } from "lucide-react";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
 import { ForgotPasswordFormSchema } from "../../zodeSchema/authSchema";
+import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 
 export function ForgotPasswordForm() {
   const [isFormFilled, setIsFormFilled] = useState<boolean>(false);

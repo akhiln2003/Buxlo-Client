@@ -12,7 +12,7 @@ import { errorTost } from "@/components/ui/tosastMessage";
 import { GoogleCredentialResponse, GoogleLogin } from "@react-oauth/google";
 
 import BGIMG from "@/assets/images/MentorLoginPageBG.avif";
-import { IaxiosResponse } from "../@types/IaxiosResponse";
+import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 
 function SignIn() {
   const { isDarkMode } = useTheme();

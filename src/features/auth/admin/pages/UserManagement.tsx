@@ -18,7 +18,7 @@ import {
 import { errorTost } from "@/components/ui/tosastMessage";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
-import { IaxiosResponse } from "../@types/IaxiosResponse";
+import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 
 interface User {
   id: string;

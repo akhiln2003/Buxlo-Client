@@ -42,8 +42,8 @@ import { useSignOutAdminMutation } from "@/services/apis/AuthApis";
 import { addUser } from "@/redux/slices/userSlice";
 import { RootState } from "@/redux/store";
 import { useState } from "react";
-import { IaxiosResponse } from "@/features/auth/user/@types/IaxiosResponse";
 import { USER_ROLE } from "@/@types/userRoleEnum";
+import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 
 function AdminNavbar() {
   const { isDarkMode, toggleTheme } = useTheme();

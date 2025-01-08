@@ -13,7 +13,7 @@ import { useDispatch } from "react-redux";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { addUser } from "@/redux/slices/userSlice";
 import { useTheme } from "@/contexts/themeContext";
-import { IaxiosResponse } from "../@types/IaxiosResponse";
+import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 function SignUpOptions({ setIsFormVisible }: IsignUpOptionProps) {
   const [showMore, setShowMore] = useState<boolean>(false);
   const [googleAuth] = useGoogleAuthUserMutation();

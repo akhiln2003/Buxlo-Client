@@ -18,8 +18,8 @@ import { errorTost } from "@/components/ui/tosastMessage";
 import { Loader } from "lucide-react";
 import { signUpFormSchema } from "../../zodeSchema/authSchema";
 import { useSignUpMentorMutation } from "@/services/apis/AuthApis";
-import { IaxiosResponse } from "../@types/IaxiosResponse";
 import { MentorUrl } from "@/@types/urlEnums/MentorUrl";
+import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 
 // Zod Schema
 

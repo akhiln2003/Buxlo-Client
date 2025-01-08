@@ -42,8 +42,8 @@ import { RootState } from "@/redux/store";
 import { addUser } from "@/redux/slices/userSlice";
 import { errorTost } from "../ui/tosastMessage";
 import { MentorUrl } from "@/@types/urlEnums/MentorUrl";
-import { IaxiosResponse } from "@/features/auth/user/@types/IaxiosResponse";
 import { USER_ROLE } from "@/@types/userRoleEnum";
+import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 
 function MentorNavbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -179,30 +179,38 @@ function MentorNavbar() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <div className="flex cursor-pointer">
-                  { user?.avatar ? <img
-                      src={user?.avatar}
-                      alt="User profile"
-                      className="h-8 w-8 rounded-full overflow-hidden object-cover"
-                    />:<img
-                    src={profileImage}
-                    alt="User profile"
-                    className="h-8 w-8 rounded-full overflow-hidden object-cover"
-                  />}
+                    {user?.avatar ? (
+                      <img
+                        src={user?.avatar}
+                        alt="User profile"
+                        className="h-8 w-8 rounded-full overflow-hidden object-cover"
+                      />
+                    ) : (
+                      <img
+                        src={profileImage}
+                        alt="User profile"
+                        className="h-8 w-8 rounded-full overflow-hidden object-cover"
+                      />
+                    )}
                     {/* <ChevronDown color='#6e6e6e' size={25} className='mt-1' /> */}
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="mr-9 min-w-[12rem]">
                   <DropdownMenuLabel>
                     <div className="flex cursor-pointer items-center  justify-start   ">
-                    { user?.avatar ? <img
-                      src={user?.avatar}
-                      alt="User profile"
-                      className="h-8 w-8 rounded-full overflow-hidden object-cover"
-                    />:<img
-                    src={profileImage}
-                    alt="User profile"
-                    className="h-8 w-8 rounded-full overflow-hidden object-cover"
-                  />}
+                      {user?.avatar ? (
+                        <img
+                          src={user?.avatar}
+                          alt="User profile"
+                          className="h-8 w-8 rounded-full overflow-hidden object-cover"
+                        />
+                      ) : (
+                        <img
+                          src={profileImage}
+                          alt="User profile"
+                          className="h-8 w-8 rounded-full overflow-hidden object-cover"
+                        />
+                      )}
                       <p className="ml-[0.5rem] font-semibold text-lg capitalize">
                         {user ? user.name : "User"}
                       </p>
@@ -210,10 +218,13 @@ function MentorNavbar() {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
-                    <Link to={MentorUrl.profile} className="flex">
+                    <div
+                      className="flex w-full"
+                      onClick={() => navigate(MentorUrl.profile)}
+                    >
                       <User size={15} />
                       <span className="ml-[0.5rem]">Profile</span>
-                    </Link>
+                    </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={toggleTheme}>
                     <button className="flex">

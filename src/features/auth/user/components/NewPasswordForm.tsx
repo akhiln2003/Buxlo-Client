@@ -13,12 +13,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { NewPasswordFormSchema } from "../../zodeSchema/authSchema";
-import { IaxiosResponse } from "../@types/IaxiosResponse";
 import { Loader } from "lucide-react";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
 import { useSetNewPasswordUserMutation } from "@/services/apis/AuthApis";
 import { useNavigate, useParams } from "react-router-dom";
 import { UserUrls } from "@/@types/urlEnums/UserUrls";
+import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 
 export function NewPasswordForm() {
   const [isFormFilled, setIsFormFilled] = useState<boolean>(false);

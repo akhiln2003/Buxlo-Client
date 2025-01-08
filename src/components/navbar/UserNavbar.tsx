@@ -43,8 +43,8 @@ import { RootState } from "@/redux/store";
 import { addUser } from "@/redux/slices/userSlice";
 import { useSignOutUserMutation } from "@/services/apis/AuthApis";
 import { errorTost } from "../ui/tosastMessage";
-import { IaxiosResponse } from "@/features/auth/user/@types/IaxiosResponse";
 import { USER_ROLE } from "@/@types/userRoleEnum";
+import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 
 function UserNavbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -79,7 +79,7 @@ function UserNavbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 bg-white/70 dark:bg-zinc-950/70 backdrop-blur-md z-50">
+      <nav className="fixed top-0 left-0 right-0 bg-white/70 dark:bg-zinc-950/70 backdrop-blur-md z-50 w-full">
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Desktop Logo */}

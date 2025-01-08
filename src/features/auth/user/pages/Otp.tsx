@@ -13,7 +13,7 @@ import {
   useVerifyUserMutation,
 } from "@/services/apis/AuthApis";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
-import { IaxiosResponse } from "../@types/IaxiosResponse";
+import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { useDispatch } from "react-redux";
 import { addUser } from "@/redux/slices/userSlice";
 import { otpFormSchema } from "../../zodeSchema/authSchema";

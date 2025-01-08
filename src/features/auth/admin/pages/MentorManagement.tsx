@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import {  useBlockandunblockMutation, useFetchMentorsMutation } from "@/services/apis/AuthApis";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { Button } from "@/components/ui/button";
-import { IaxiosResponse } from "../@types/IaxiosResponse";
+import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 
 interface User {
   id: string;

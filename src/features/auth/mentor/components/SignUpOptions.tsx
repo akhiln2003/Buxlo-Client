@@ -14,7 +14,7 @@ import { useDispatch } from "react-redux";
 import { useGoogleAuthMentMutation } from "@/services/apis/AuthApis";
 import { GoogleCredentialResponse, GoogleLogin } from "@react-oauth/google";
 import { useTheme } from "@/contexts/themeContext";
-import { IaxiosResponse } from "../@types/IaxiosResponse";
+import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 
 function SignUpOptions({ setIsFormVisible }: IsignUpOptionProps) {
   const [showMore, setShowMore] = useState<boolean>(false);

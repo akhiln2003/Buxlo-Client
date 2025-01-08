@@ -15,13 +15,13 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { signInFormSchema } from "../../zodeSchema/authSchema";
 import { useSignInUserMutation } from "@/services/apis/AuthApis";
-import { IaxiosResponse } from "../@types/IaxiosResponse";
 import { Loader } from "lucide-react";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { useDispatch } from "react-redux";
 import { addUser } from "@/redux/slices/userSlice";
 import { UserUrls } from "@/@types/urlEnums/UserUrls";
 import { useNavigate } from "react-router-dom";
+import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 
 export function SigninForm() {
   const [passwordVisibility, setPasswordVisibility] = useState<boolean>(false);

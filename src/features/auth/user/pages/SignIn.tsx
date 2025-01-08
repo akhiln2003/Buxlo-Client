@@ -13,7 +13,7 @@ import { useDispatch } from "react-redux";
 import { addUser } from "@/redux/slices/userSlice";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { GoogleCredentialResponse, GoogleLogin } from "@react-oauth/google";
-import { IaxiosResponse } from "../@types/IaxiosResponse";
+import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 
 function SignIn() {
   const { isDarkMode } = useTheme();

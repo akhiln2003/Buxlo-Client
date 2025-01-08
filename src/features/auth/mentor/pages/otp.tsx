@@ -8,7 +8,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
-import { IaxiosResponse } from "../@types/IaxiosResponse";
 import { useDispatch } from "react-redux";
 import { addUser } from "@/redux/slices/userSlice";
 import { otpFormSchema } from "../../zodeSchema/authSchema";
@@ -17,6 +16,7 @@ import {
   useVerifyMentorMutation,
 } from "@/services/apis/AuthApis";
 import { MentorUrl } from "@/@types/urlEnums/MentorUrl";
+import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 
 function Otp() {
   const [minutes, setMinutes] = useState(1);

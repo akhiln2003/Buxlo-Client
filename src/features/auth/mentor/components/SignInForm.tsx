@@ -20,8 +20,8 @@ import { useDispatch } from "react-redux";
 import { addUser } from "@/redux/slices/userSlice";
 import { useNavigate } from "react-router-dom";
 import { signInFormSchema } from "../../zodeSchema/authSchema";
-import { IaxiosResponse } from "../../user/@types/IaxiosResponse";
 import { MentorUrl } from "@/@types/urlEnums/MentorUrl";
+import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 
 export function SigninForm() {
   const [passwordVisibility, setPasswordVisibility] = useState<boolean>(false);
