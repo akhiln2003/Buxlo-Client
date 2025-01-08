@@ -211,10 +211,10 @@ function UserNavbar() {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
-                    <Link to={UserUrls.profile} className="flex">
+                    <div className="flex w-full" onClick={()=>navigate(UserUrls.profile)}>
                       <User size={15} />
                       <span className="ml-[0.5rem]">Profile</span>
-                    </Link>
+                    </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={toggleTheme}>
                     <button className="flex">
