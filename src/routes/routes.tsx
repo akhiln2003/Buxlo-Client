@@ -12,6 +12,7 @@ import AdminProtected from "./protected/AdminProtected";
 import RedirectSignInMentor from "./protected/RedirectSignInMentor";
 import ErrorPage404 from "@/components/error/ErrorPage404";
 import ErrorPage500 from "@/components/error/ErrorPage500";
+import UserProtected from "./protected/UserProtected";
 
 ////////////////////////--User side--/////////////////////
 const UserLandingPage = lazy(() => import("@/pages/UserLandingPage"));
@@ -24,10 +25,8 @@ const UserForgotPasswordPage = lazy(
 const UserSetNewPassword = lazy(
   () => import("@/features/auth/user/pages/newPassword")
 );
-const UserDashbordPage = lazy(()=> import('@/features/user/pages/dashBord'));
-
-
-
+const UserDashbordPage = lazy(() => import("@/features/user/pages/dashBord"));
+const UserProfilePage = lazy(() => import("@/features/user/pages/profile"));
 
 ////////////////////////--Mentor side--/////////////////////
 const MentorLandingPage = lazy(() => import("@/pages/MentorLandingPage"));
@@ -40,8 +39,6 @@ const MentorForgotPasswordPage = lazy(
 const MentorSetNewPassword = lazy(
   () => import("@/features/auth/mentor/pages/newPassword")
 );
-
-
 
 ////////////////////////--Admin side--/////////////////////
 const AdminSignInPage = lazy(
@@ -126,11 +123,23 @@ const routes = createBrowserRouter(
         {
           path: UserUrls.dashbord,
           element: (
-            <Suspense fallback={<div>Loading....</div>}>
-              <UserDashbordPage />
-            </Suspense>
-          )
-        }
+            <UserProtected>
+              <Suspense fallback={<div>Loading....</div>}>
+                <UserDashbordPage />
+              </Suspense>
+            </UserProtected>
+          ),
+        },
+        {
+          path: UserUrls.profile,
+          element: (
+            <UserProtected>
+              <Suspense fallback={<div>Loading.....</div>}>
+                <UserProfilePage />
+              </Suspense>
+            </UserProtected>
+          ),
+        },
       ],
     },
 
@@ -263,8 +272,8 @@ const routes = createBrowserRouter(
         },
       ],
     },
-    {path:'/servererror', element: <ErrorPage500/>},
-    { path: "*", element: < ErrorPage404 /> },
+    { path: "/servererror", element: <ErrorPage500 /> },
+    { path: "*", element: <ErrorPage404 /> },
     ////////////////--Admin end--///////////////////
   ],
   {
