@@ -3,17 +3,21 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { userReducer } from "./slices/userSlice";
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import { userApi } from "@/services/apis/AuthApis";
+import { authApi } from "@/services/apis/AuthApis";
+import { mentorApi } from "@/services/apis/MentorApis";
+import { userApi } from "@/services/apis/UserApis";
 
 const rootReducer = combineReducers({
   userAuth: userReducer,
-  [userApi.reducerPath]: userApi.reducer,
+  [authApi.reducerPath]: authApi.reducer,
+  [mentorApi.reducerPath]: mentorApi.reducer,
+  [userApi.reducerPath]: userApi.reducer
 });
 
 const persistConfig = {
   key: 'root',
   storage,
-  blacklist: [userApi.reducerPath], // Don't persist API cache
+  blacklist: [authApi.reducerPath , mentorApi.reducerPath , userApi.reducerPath ], // Don't persist API cache
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -25,7 +29,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
       },
-    }).concat(userApi.middleware),
+    }).concat(authApi.middleware , mentorApi.middleware , userApi.middleware),
   devTools: true,
 });
 

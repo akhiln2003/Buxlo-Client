@@ -10,10 +10,10 @@ import {
 import { MentorApiEndPoints } from "../endPoints/MentorEndPoints";
 import { AdminApiEndPoints } from "../endPoints/AdminEndPoints";
 
-export const userApi = createApi({
-  reducerPath: "userApi",
+export const authApi = createApi({
+  reducerPath: "authApi",
   baseQuery: axiosBaseQuery(),
-  tagTypes: ["User"],
+  tagTypes: ["Auth"],
   endpoints: (builder) => ({
     ///////////////////////////////--User--///////////////////////////////
 
@@ -243,4 +243,4 @@ export const {
   useFetchUsersMutation,
   useFetchMentorsMutation,
   useBlockandunblockMutation,
-} = userApi;
+} = authApi;

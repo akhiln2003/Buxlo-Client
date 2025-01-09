@@ -14,24 +14,14 @@ import {  useBlockandunblockMutation, useFetchMentorsMutation } from "@/services
 import { errorTost } from "@/components/ui/tosastMessage";
 import { Button } from "@/components/ui/button";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IuserDB } from "@/@types/interface/IdataBase";
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  isAdmin: boolean;
-  isBlocked: boolean;
-  isGoogle: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
 
 function MentorManagement() {
   const [fetchUsers] = useFetchMentorsMutation();
   const [ userAction ] = useBlockandunblockMutation();
 
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<IuserDB[]>([]);
 
   const handileBlock = async( id:string , isBlocked: boolean  ) =>{
     const response: IaxiosResponse = await userAction({id , isBlocked  });

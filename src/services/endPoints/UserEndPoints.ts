@@ -8,5 +8,7 @@ export enum UserApiEndPoints {
     setNewPassword = '/auth/user/setnewpassword',
     googleAuth = '/auth/user/googleauth',
     tokenGen = '/auth/user/refreshtoken',
+    fetchProfile = '/user/user/fetchprofile',
+    updateProfile = '/user/user/updateprofile'
 
-}
+    }

@@ -1,8 +1,8 @@
-import { Iuser } from "@/@types/interface/IdataBase";
+import {  IuserDB } from "@/@types/interface/IdataBase";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface IinitialState{
-    user : null | Iuser
+    user : null | IuserDB
 }
 
 
@@ -14,7 +14,7 @@ const userSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-        addUser(state, { payload }: PayloadAction<Iuser | null>) {
+        addUser(state, { payload }: PayloadAction<IuserDB | null>) {
             state.user = payload;
         },
         logOut(state) {

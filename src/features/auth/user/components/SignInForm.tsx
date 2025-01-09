@@ -53,8 +53,6 @@ export function SigninForm() {
   const onSubmit = async (data: z.infer<typeof signInFormSchema>) => {
     const { email, password } = data;
     const response: IaxiosResponse = await signIn({ email, password });
-    console.log(response);
-
     if (response.data?.user) {
       const user = response.data.user;
       dispatch(addUser(user));

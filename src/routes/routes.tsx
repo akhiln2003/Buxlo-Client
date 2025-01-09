@@ -13,6 +13,7 @@ import RedirectSignInMentor from "./protected/RedirectSignInMentor";
 import ErrorPage404 from "@/components/error/ErrorPage404";
 import ErrorPage500 from "@/components/error/ErrorPage500";
 import UserProtected from "./protected/UserProtected";
+import MentorProtected from "./protected/MentorProtected";
 
 ////////////////////////--User side--/////////////////////
 const UserLandingPage = lazy(() => import("@/pages/UserLandingPage"));
@@ -39,6 +40,7 @@ const MentorForgotPasswordPage = lazy(
 const MentorSetNewPassword = lazy(
   () => import("@/features/auth/mentor/pages/newPassword")
 );
+const MentorProfilePage = lazy(()=> import("@/features/mentor/pages/profile"));
 
 ////////////////////////--Admin side--/////////////////////
 const AdminSignInPage = lazy(
@@ -209,6 +211,16 @@ const routes = createBrowserRouter(
             </RedirectSignInMentor>
           ),
         },
+        {
+          path: MentorUrl.profile,
+          element:(
+            < MentorProtected>
+            <Suspense fallback = { <div>Loading.....</div>}>
+               <MentorProfilePage />
+            </Suspense>
+            </MentorProtected>
+          )
+        }
       ],
     },
 
