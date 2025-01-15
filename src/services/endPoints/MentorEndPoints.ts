@@ -8,7 +8,8 @@ export enum MentorApiEndPoints {
     setNewPassword = '/auth/mentor/setnewpassword',
     googleAuth = '/auth/mentor/googleauth',
     fetchProfile = '/user/mentor/fetchprofile',
-    updateProfile = '/user/mentor/updateprofile'
-
+    fetchProfileImage = '/user/mentor/fetchprofileimage',
+    updateProfile = '/user/mentor/updateprofile',
+    updateProfileImage = '/user/mentor/updateprofileimage'
 
 }

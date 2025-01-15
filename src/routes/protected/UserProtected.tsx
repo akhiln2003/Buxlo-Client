@@ -13,7 +13,7 @@ const UserProtected: React.FC<UserProtectedProps> = ({ children }) => {
     return <Navigate to={UserUrls.signIn} />;
   }
   if (user?.role !== USER_ROLE.USER) {
-    return <Navigate to={UserUrls.home} />;
+    return <Navigate to={UserUrls.signIn} />;
   }
   return children ? <>{children}</> : <Outlet />;
 };

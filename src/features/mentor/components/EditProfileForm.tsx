@@ -12,7 +12,7 @@ import { Loader } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Imentor } from "@/@types/interface/Imentor";
 
-export function EditMentorProfile({ users, setIsOpen , setUsers }:{users:Imentor , setIsOpen:(isOpen: boolean) => void ,  setUsers: React.Dispatch<React.SetStateAction<Partial<Imentor>>>; }) {
+export function EditMentorProfile({ users, setIsOpen , setUsers }:{users:Imentor , setIsOpen:(isOpen: boolean) => void ,  setUsers: React.Dispatch<React.SetStateAction<Partial<Imentor>>>}) {
   const [updateProfile, { isLoading }] = useUpdateMentorProfileMutation();
   const form = useForm<z.infer<typeof EditProfileSchema>>({
     resolver: zodResolver(EditProfileSchema),

@@ -7,28 +7,38 @@ export const mentorApi = createApi({
   baseQuery: axiosBaseQuery(),
   tagTypes: ["Mentor"],
   endpoints: (builder) => ({
-
-     // Fetch mentor profile
-     fetchMentorProfile: builder.mutation({
+    // Fetch mentor profile
+    fetchMentorProfile: builder.mutation({
       query: (id: string) => ({
         url: `${MentorApiEndPoints.fetchProfile}/${id}`,
         method: "GET",
       }),
     }),
 
-     // Update mentor profile
-     updateMentorProfile: builder.mutation({
+    // Update mentor profile
+    updateMentorProfile: builder.mutation({
       query: (data) => ({
         url: MentorApiEndPoints.updateProfile,
-        method: "POST",
-        data:data
-
+        method: "PUT",
+        headers:{
+          "Content-Type": "multipart/form-data",
+        },
+        data: data,
       }),
     }),
 
+     // Fetch mentor profileImage
+     fetchMentorProfileImage: builder.mutation({
+      query: (key: string) => ({
+        url: `${MentorApiEndPoints.fetchProfileImage}/${key}`,
+        method: "GET",
+      }),
+    }),
 
   }),
+  
 });
 
 // Export the hook directly from the API slice
-export const { useFetchMentorProfileMutation  , useUpdateMentorProfileMutation } = mentorApi;
+export const { useFetchMentorProfileMutation, useUpdateMentorProfileMutation , useFetchMentorProfileImageMutation } =
+  mentorApi;

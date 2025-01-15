@@ -44,6 +44,21 @@ const processQueue = (error: unknown = null) => {
   failedQueue = [];
 };
 
+
+// Request Interceptor
+axiosInstance.interceptors.request.use(
+  (config) => {
+    // Log the request body (data)
+    console.log('Request Body:', config);
+    return config;
+  },
+  (error) => {
+    // Log any request errors
+    console.error('Request Error:', error);
+    return Promise.reject(error);
+  }
+);
+
 // Response interceptor
 axiosInstance.interceptors.response.use(
   (response) => {

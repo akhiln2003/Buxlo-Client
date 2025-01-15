@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Star, ThumbsUp, ThumbsDown, Mail, Phone, Pencil } from "lucide-react";
+import {
+  Star,
+  ThumbsUp,
+  ThumbsDown,
+  Mail,
+  Phone,
+  Pencil,
+  Camera,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,35 +20,58 @@ import {
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { useGetUser } from "@/hooks/useGetUser";
-import { useFetchMentorProfileMutation } from "@/services/apis/MentorApis";
+import {
+  useFetchMentorProfileImageMutation,
+  useFetchMentorProfileMutation,
+} from "@/services/apis/MentorApis";
 import { Imentor } from "@/@types/interface/Imentor";
 import { EditMentorProfile } from "../components/EditProfileForm";
+import EditProfilePhoto from "../components/EditProfilePhoto";
 
 const Profile = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
   const [fetchProfileData] = useFetchMentorProfileMutation();
+  const [fetchProfileImages] = useFetchMentorProfileImageMutation();
   const [users, setUsers] = useState<Partial<Imentor>>({});
-
-  const user = useGetUser();
+  const [profileImage, setProfileImage] = useState("");
+  const storUserData = useGetUser();
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response: IaxiosResponse = await fetchProfileData(user!.id);        
+        const response: IaxiosResponse = await fetchProfileData(
+          storUserData!.id
+        );
         if (response.data) {
           setUsers(response.data.data);
+
+          const imageUrl:IaxiosResponse = await fetchProfileImages(
+            response.data.data.avatar as string
+          );
+          if (imageUrl.data) {
+            setProfileImage(imageUrl.data.imageUrl);
+          }
+          else{
+            errorTost(
+              "Something went wrong ",
+              imageUrl.error.data.error || [
+                { message: `${imageUrl.error.data} please try again later` },
+              ]
+            );
+          }
         } else {
           errorTost(
-            "Somthing when wrong ",
+            "Something went wrong ",
             response.error.data.error || [
-              { message: `${response.error.data} please try again laiter` },
+              { message: `${response.error.data} please try again later` },
             ]
           );
         }
       } catch (err) {
         console.log("Error fetching users:", err);
-        errorTost("SomThing wrong", [
-          { message: "Somting when wrong please try again" },
+        errorTost("Something wrong", [
+          { message: "Something went wrong please try again" },
         ]);
       }
     };
@@ -81,7 +112,7 @@ const Profile = () => {
     ],
   };
 
-  const renderStars = (rating:number) => {
+  const renderStars = (rating: number) => {
     return [...Array(5)].map((_, index) => (
       <Star
         key={index}
@@ -118,20 +149,50 @@ const Profile = () => {
                     Edit Profile
                   </DialogTitle>
                 </DialogHeader>
-                < EditMentorProfile users={users as Imentor} setIsOpen={setIsOpen} setUsers={setUsers}/>
+                <EditMentorProfile
+                  users={users as Imentor}
+                  setIsOpen={setIsOpen}
+                  setUsers={setUsers}
+                />
               </DialogContent>
             </Dialog>
           </div>
 
-          {/* Rest of the component remains the same but with updated background colors */}
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
-              <div className="shrink-0">
+              <div className="shrink-0 relative group">
                 <img
-                  src={users.avatar}
+                  src={profileImage}
                   alt={users.name}
                   className="rounded-full w-32 h-32 object-cover ring-4 ring-gray-100 dark:ring-zinc-800 shadow-lg"
                 />
+                <Dialog
+                  open={isPhotoDialogOpen}
+                  onOpenChange={setIsPhotoDialogOpen}
+                >
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="secondary"
+                      className="absolute bottom-0 right-0 rounded-full p-2 bg-white dark:bg-zinc-800 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Camera className="w-4 h-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[400px] bg-white dark:bg-zinc-900">
+                    <DialogHeader>
+                      <DialogTitle className="text-gray-900 dark:text-gray-100">
+                        Update Profile Photo
+                      </DialogTitle>
+                    </DialogHeader>
+                    <EditProfilePhoto
+                      id={users.id as string}
+                      profileImage={profileImage}
+                      setProfileImage={setProfileImage}
+                      setIsPhotoDialogOpen={setIsPhotoDialogOpen}
+                      setUsers={setUsers}
+                    />
+                  </DialogContent>
+                </Dialog>
               </div>
               <div className="flex-1 space-y-4 text-center md:text-left">
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -167,16 +228,15 @@ const Profile = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {
-                users.bio ? 
+              {users.bio ? (
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                {users.bio}
-              </p>
-              :
-              <p className= " w-full h-full flex justify-center items-center text-gray-600 dark:text-gray-400 leading-relaxed">
-                Bio not availavle 
-              </p>
-              }
+                  {users.bio}
+                </p>
+              ) : (
+                <p className="w-full h-full flex justify-center items-center text-gray-600 dark:text-gray-400 leading-relaxed">
+                  Bio not available
+                </p>
+              )}
             </CardContent>
           </Card>
 
@@ -188,28 +248,27 @@ const Profile = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-               {
-                 users.expertise ?
-                <>
-                <div className="flex flex-wrap gap-2">
-                  {users.expertise.split(",").map((skill) => (
-                    <span
-                      key={skill}
-                      className="bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 px-4 py-1.5 rounded-full text-sm font-medium"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                  {users.yearsOfExperience} years of experience
-                </div>
-                </>
-                :
-                <div className=" w-full h-full flex justify-center items-center text-gray-600 dark:text-gray-400 leading-relaxed ">
-                Experience not availavle 
-                </div>
-               }
+                {users.expertise ? (
+                  <>
+                    <div className="flex flex-wrap gap-2">
+                      {users.expertise.split(",").map((skill) => (
+                        <span
+                          key={skill}
+                          className="bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 px-4 py-1.5 rounded-full text-sm font-medium"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                      {users.yearsOfExperience} years of experience
+                    </div>
+                  </>
+                ) : (
+                  <div className="w-full h-full flex justify-center items-center text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Experience not available
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
