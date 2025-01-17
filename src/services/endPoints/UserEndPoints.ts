@@ -9,6 +9,8 @@ export enum UserApiEndPoints {
     googleAuth = '/auth/user/googleauth',
     tokenGen = '/auth/user/refreshtoken',
     fetchProfile = '/user/user/fetchprofile',
+    fetchProfileImage = '/user/user/fetchprofileimage',
+    deleteProfileImage = '/user/user/deleteprofileimage',
     updateProfile = '/user/user/updateprofile'
 
     }

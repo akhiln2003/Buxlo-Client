@@ -180,7 +180,7 @@ function UserNavbar() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <div className="flex cursor-pointer">
-                    { user?.avatar ? <img
+                    { user?.avatar && user.role == USER_ROLE.USER ? <img
                       src={user?.avatar}
                       alt="User profile"
                       className="h-8 w-8 rounded-full overflow-hidden object-cover"
@@ -195,7 +195,7 @@ function UserNavbar() {
                 <DropdownMenuContent className="mr-9 min-w-[12rem]">
                   <DropdownMenuLabel>
                     <div className="flex cursor-pointer items-center  justify-start   ">
-                    { user?.avatar ? <img
+                    { user?.avatar && user.role == USER_ROLE.USER ? <img
                       src={user?.avatar}
                       alt="User profile"
                       className="h-8 w-8 rounded-full overflow-hidden object-cover"

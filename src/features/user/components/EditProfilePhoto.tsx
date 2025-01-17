@@ -1,15 +1,15 @@
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
-import { Imentor } from "@/@types/interface/Imentor";
 import { Button } from "@/components/ui/button";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
-import {
-  useDeleteMentorProfileImageMutation,
-  useFetchMentorProfileImageMutation,
-  useUpdateMentorProfileMutation,
-} from "@/services/apis/MentorApis";
 import { Loader, PencilIcon, Trash2 } from "lucide-react";
 import React, { useState } from "react";
 import dummyProfileImage from "@/assets/images/dummy-profile.webp";
+import { Iuser } from "@/@types/interface/Iuser";
+import {
+  useDeleteUserProfileImageMutation,
+  useFetchUserProfileImageMutation,
+  useUpdateUserProfileMutation,
+} from "@/services/apis/UserApis";
 
 function EditProfilePhoto({
   id,
@@ -23,16 +23,16 @@ function EditProfilePhoto({
   profileImage: string;
   setProfileImage: (isPhotoDialogOpen: string) => void;
   setIsPhotoDialogOpen: (isPhotoDialogOpen: boolean) => void;
-  setUsers: React.Dispatch<React.SetStateAction<Partial<Imentor>>>;
+  setUsers: React.Dispatch<React.SetStateAction<Partial<Iuser>>>;
   avatar: string;
 }) {
   const [newProfileImage, setNewProfileImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(profileImage);
   const [updateProfile, { isLoading: isUpdatingProfile }] =
-    useUpdateMentorProfileMutation();
-  const [fetchProfileImages] = useFetchMentorProfileImageMutation();
+    useUpdateUserProfileMutation();
+  const [fetchProfileImages] = useFetchUserProfileImageMutation();
   const [deleteProfileImages, { isLoading: isDeleting }] =
-    useDeleteMentorProfileImageMutation();
+    useDeleteUserProfileImageMutation();
 
   const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const avatar = event.target.files?.[0];
@@ -53,6 +53,8 @@ function EditProfilePhoto({
     if (!newProfileImage) return;
 
     try {
+      console.log(id, newProfileImage, avatar);
+
       const response: IaxiosResponse = await updateProfile({
         id,
         newProfileImage,
@@ -71,6 +73,7 @@ function EditProfilePhoto({
         if (imageUrl.data) {
           setProfileImage(imageUrl.data.imageUrl);
           setIsPhotoDialogOpen(false);
+
           successToast("Updated", "Profile picture updated successfully");
         } else {
           errorTost(

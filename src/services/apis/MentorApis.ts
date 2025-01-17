@@ -20,25 +20,35 @@ export const mentorApi = createApi({
       query: (data) => ({
         url: MentorApiEndPoints.updateProfile,
         method: "PUT",
-        headers:{
+        headers: {
           "Content-Type": "multipart/form-data",
         },
         data: data,
       }),
     }),
 
-     // Fetch mentor profileImage
-     fetchMentorProfileImage: builder.mutation({
+    // Fetch  profileImage
+    fetchMentorProfileImage: builder.mutation({
       query: (key: string) => ({
         url: `${MentorApiEndPoints.fetchProfileImage}/${key}`,
         method: "GET",
       }),
     }),
 
+    // Delete  profileImage
+    deleteMentorProfileImage: builder.mutation({
+      query: ({ key, id }: { key: string; id: string }) => ({
+        url: `${MentorApiEndPoints.deleteProfileImage}/${id}/${key}`,
+        method: "DELETE",
+      }),
+    }),
   }),
-  
 });
 
 // Export the hook directly from the API slice
-export const { useFetchMentorProfileMutation, useUpdateMentorProfileMutation , useFetchMentorProfileImageMutation } =
-  mentorApi;
+export const {
+  useFetchMentorProfileMutation,
+  useUpdateMentorProfileMutation,
+  useFetchMentorProfileImageMutation,
+  useDeleteMentorProfileImageMutation,
+} = mentorApi;

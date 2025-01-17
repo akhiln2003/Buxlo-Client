@@ -7,10 +7,10 @@ import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { EditProfileSchema } from "../zodeSchema/EditProfileSchema";
 import { errorTost } from "@/components/ui/tosastMessage";
-import { useUpdateMentorProfileMutation } from "@/services/apis/MentorApis";
 import { Loader } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Imentor } from "@/@types/interface/Imentor";
+import { useUpdateMentorProfileMutation } from "@/services/apis/MentorApis";
 
 export function EditMentorProfile({ users, setIsOpen , setUsers }:{users:Imentor , setIsOpen:(isOpen: boolean) => void ,  setUsers: React.Dispatch<React.SetStateAction<Partial<Imentor>>>}) {
   const [updateProfile, { isLoading }] = useUpdateMentorProfileMutation();
@@ -49,7 +49,7 @@ export function EditMentorProfile({ users, setIsOpen , setUsers }:{users:Imentor
         );
       }
     } catch (error) {
-      console.log("error:", error);
+      console.error("error:", error);
       errorTost("Something wrong", [
         { message: "Something went wrong please try again" },
       ]);

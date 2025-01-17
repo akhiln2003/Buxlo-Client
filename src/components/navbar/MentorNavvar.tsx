@@ -179,7 +179,7 @@ function MentorNavbar() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <div className="flex cursor-pointer">
-                    {user?.avatar ? (
+                    {user?.avatar && user.role == USER_ROLE.MENTOR  ? (
                       <img
                         src={user?.avatar}
                         alt="User profile"
@@ -198,7 +198,7 @@ function MentorNavbar() {
                 <DropdownMenuContent className="mr-9 min-w-[12rem]">
                   <DropdownMenuLabel>
                     <div className="flex cursor-pointer items-center  justify-start   ">
-                      {user?.avatar ? (
+                      {user?.avatar && user.role == USER_ROLE.MENTOR  ? (
                         <img
                           src={user?.avatar}
                           alt="User profile"

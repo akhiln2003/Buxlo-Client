@@ -15,21 +15,40 @@ export const userApi = createApi({
       }),
     }),
 
-    
-
-     // Update mentor profile
-     updateUserProfile: builder.mutation({
+    // Update mentor profile
+    updateUserProfile: builder.mutation({
       query: (data) => ({
         url: UserApiEndPoints.updateProfile,
-        method: "POST",
-        data:data
-
+        method: "PUT",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        data: data,
       }),
     }),
 
+    // Fetch  profileImage
+    fetchUserProfileImage: builder.mutation({
+      query: (key: string) => ({
+        url: `${UserApiEndPoints.fetchProfileImage}/${key}`,
+        method: "GET",
+      }),
+    }),
 
+    // Delete  profileImage
+    deleteUserProfileImage: builder.mutation({
+      query: ({ key, id }: { key: string; id: string }) => ({
+        url: `${UserApiEndPoints.deleteProfileImage}/${id}/${key}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
 // Export the hook directly from the API slice
-export const {  useFetchUserProfileMutation , useUpdateUserProfileMutation } = userApi;
+export const {
+  useFetchUserProfileMutation,
+  useUpdateUserProfileMutation,
+  useFetchUserProfileImageMutation,
+  useDeleteUserProfileImageMutation,
+} = userApi;

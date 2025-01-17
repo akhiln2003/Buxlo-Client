@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Star,
   ThumbsUp,
@@ -20,13 +20,11 @@ import {
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { useGetUser } from "@/hooks/useGetUser";
-import {
-  useFetchMentorProfileImageMutation,
-  useFetchMentorProfileMutation,
-} from "@/services/apis/MentorApis";
+import { useFetchMentorProfileImageMutation, useFetchMentorProfileMutation } from "@/services/apis/MentorApis";
 import { Imentor } from "@/@types/interface/Imentor";
 import { EditMentorProfile } from "../components/EditProfileForm";
 import EditProfilePhoto from "../components/EditProfilePhoto";
+import dummyProfileImage from "@/assets/images/dummy-profile.webp";
 
 const Profile = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -43,33 +41,26 @@ const Profile = () => {
         const response: IaxiosResponse = await fetchProfileData(
           storUserData!.id
         );
-        if (response.data) {
+        if (response.data.data) {
           setUsers(response.data.data);
-
-          const imageUrl:IaxiosResponse = await fetchProfileImages(
-            response.data.data.avatar as string
-          );
-          if (imageUrl.data) {
-            setProfileImage(imageUrl.data.imageUrl);
-          }
-          else{
-            errorTost(
-              "Something went wrong ",
-              imageUrl.error.data.error || [
-                { message: `${imageUrl.error.data} please try again later` },
-              ]
+          if (response.data.data.avatar) {
+            const imageUrl: IaxiosResponse = await fetchProfileImages(
+              response.data.data.avatar as string
             );
+            if (imageUrl.data.imageUrl) {
+              setProfileImage(imageUrl.data.imageUrl);
+            } else {
+              errorTost(
+                "Something went wrong ",
+                imageUrl.error.data.error || [
+                  { message: `${imageUrl.error.data} please try again later` },
+                ]
+              );
+            }
           }
-        } else {
-          errorTost(
-            "Something went wrong ",
-            response.error.data.error || [
-              { message: `${response.error.data} please try again later` },
-            ]
-          );
         }
       } catch (err) {
-        console.log("Error fetching users:", err);
+        console.error("Error fetching users:", err);
         errorTost("Something wrong", [
           { message: "Something went wrong please try again" },
         ]);
@@ -162,7 +153,7 @@ const Profile = () => {
             <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
               <div className="shrink-0 relative group">
                 <img
-                  src={profileImage}
+                  src={profileImage ? profileImage : dummyProfileImage}
                   alt={users.name}
                   className="rounded-full w-32 h-32 object-cover ring-4 ring-gray-100 dark:ring-zinc-800 shadow-lg"
                 />
@@ -190,6 +181,7 @@ const Profile = () => {
                       setProfileImage={setProfileImage}
                       setIsPhotoDialogOpen={setIsPhotoDialogOpen}
                       setUsers={setUsers}
+                      avatar={users.avatar as string}
                     />
                   </DialogContent>
                 </Dialog>
