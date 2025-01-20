@@ -94,7 +94,7 @@ function UserNavbar() {
             </div>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8 font-extrabold text-base">
+            <div className="hidden md:flex items-center space-x-8 font-extrabold text-base uppercase">
               <a
                 href={UserUrls.dashbord}
                 className="text-gray-900 dark:text-white  hover:text-gray-500"
@@ -114,7 +114,7 @@ function UserNavbar() {
                 ABOUT
               </a>
               <a
-                href="#"
+                href={UserUrls.contact}
                 className="text-gray-500 hover:text-gray-900 dark:hover:text-white "
               >
                 CONTACT

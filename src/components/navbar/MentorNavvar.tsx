@@ -93,7 +93,7 @@ function MentorNavbar() {
             </div>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8 font-extrabold text-base">
+            <div className="hidden md:flex items-center space-x-8 font-extrabold text-base uppercase">
               <a
                 href="#"
                 className="text-gray-900 dark:text-white  hover:text-gray-500"
@@ -113,8 +113,8 @@ function MentorNavbar() {
                 ABOUT
               </a>
               <a
-                href="#"
-                className="text-gray-500 hover:text-gray-900 dark:hover:text-white "
+                href={MentorUrl.contact}
+                className="text-gray-500 hover:text-gray-900 dark:hover:text-white  "
               >
                 Contact
               </a>

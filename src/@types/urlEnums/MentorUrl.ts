@@ -7,5 +7,6 @@ export enum MentorUrl{
     forgotPassword = '/mentor/forgotpassword',
     setNewPassword = '/mentor/resetpassword/:token',
     profile = '/mentor/profile',
-    subscription = '/mentor/subscription'
+    subscription = '/mentor/subscription',
+    contact = '/mentor/contact'
 }

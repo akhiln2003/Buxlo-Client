@@ -40,7 +40,8 @@ const MentorForgotPasswordPage = lazy(
 const MentorSetNewPassword = lazy(
   () => import("@/features/auth/mentor/pages/newPassword")
 );
-const MentorProfilePage = lazy(()=> import("@/features/mentor/pages/profile"));
+const MentorProfilePage = lazy(() => import("@/features/mentor/pages/profile"));
+const ContactPage = lazy(() => import("@/pages/contact"));
 
 ////////////////////////--Admin side--/////////////////////
 const AdminSignInPage = lazy(
@@ -142,6 +143,16 @@ const routes = createBrowserRouter(
             </UserProtected>
           ),
         },
+        {
+          path: UserUrls.contact,
+          element: (
+            <UserProtected>
+              <Suspense fallback={<div>Loading...</div>}>
+                <ContactPage />
+              </Suspense>
+            </UserProtected>
+          ),
+        },
       ],
     },
 
@@ -213,14 +224,24 @@ const routes = createBrowserRouter(
         },
         {
           path: MentorUrl.profile,
-          element:(
-            < MentorProtected>
-            <Suspense fallback = { <div>Loading.....</div>}>
-               <MentorProfilePage />
-            </Suspense>
+          element: (
+            <MentorProtected>
+              <Suspense fallback={<div>Loading.....</div>}>
+                <MentorProfilePage />
+              </Suspense>
             </MentorProtected>
-          )
-        }
+          ),
+        },
+        {
+          path: MentorUrl.contact,
+          element: (
+            <MentorProtected>
+              <Suspense fallback={<div>Loading...</div>}>
+                <ContactPage />
+              </Suspense>
+            </MentorProtected>
+          ),
+        },
       ],
     },
 
