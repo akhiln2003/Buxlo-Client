@@ -1,4 +1,4 @@
-import ContactPageForm from "@/components/contact/ContactPageForm";
+import ContactPageForm from "@/components/common/contact/ContactPageForm";
 import { Mail, MapPin, Smartphone } from "lucide-react";
 
 function contact() {
