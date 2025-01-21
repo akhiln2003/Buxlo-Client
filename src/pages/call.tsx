@@ -20,7 +20,7 @@ const Call = () => {
 
         <div className="w-full h-1/5 flex justify-center">
           {isClicked && ( // Only show the button divs when clicked
-            <div className="min-w-2/5 w-2/5 h-16 flex justify-center items-center rounded-full space-x-5 bg-zinc-300 dark:bg-zinc-900">
+            <div className="w-fit h-16  px-5 flex justify-center items-center rounded-full space-x-5 bg-zinc-300 dark:bg-zinc-900">
               {/* Mic Button */}
               <div className="relative group">
                 <div className="w-12 h-12 rounded-full flex justify-center items-center bg-zinc-300 dark:bg-zinc-800 hover:bg-gray-400 dark:hover:bg-gray-600">
