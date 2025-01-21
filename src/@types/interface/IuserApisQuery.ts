@@ -26,4 +26,12 @@ export interface IsignInData{
 
 
 
-// userApi -- 
+// userApi -- contact us parametir
+
+export interface IcontactUsData{
+    name: string;
+    email:string;
+    subject:string;
+    message:string;
+
+}

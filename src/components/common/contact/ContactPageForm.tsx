@@ -15,8 +15,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 
 import { ContactPageFormSchema } from "../../zodeSchema/ContactPageFormSchema";
+import { useContactUsMutation } from "@/services/apis/CommonApis";
+import { errorTost, successToast } from "@/components/ui/tosastMessage";
+import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { Loader } from "lucide-react";
 
 function ContactPageForm() {
+  const [contactUs, { isLoading }] = useContactUsMutation();
+
   // Initialize the form using react-hook-form
   const form = useForm<z.infer<typeof ContactPageFormSchema>>({
     resolver: zodResolver(ContactPageFormSchema),
@@ -29,13 +35,36 @@ function ContactPageForm() {
   });
 
   const onSubmit = async (data: z.infer<typeof ContactPageFormSchema>) => {
-    console.log(data); // Handle form submission
+    try {
+      console.log(data);
+
+      const response: IaxiosResponse = await contactUs(data);
+
+      if (response.data.message) {
+      successToast("succesfull", response.data.message);        
+      } else {
+        errorTost(
+          "Somthing when wrong ",
+          response.error.data.error || [
+            { message: `${response.error.data} please try again laiter` },
+          ]
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      errorTost("Somthing wrong", [
+        { message: "Somting when wrong please try again" },
+      ]);
+    }
   };
 
   return (
     // Pass the `form` object to the Shadcn UI Form component
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full p-5">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-6 w-full p-5"
+      >
         <div className="space-y-4">
           {/* Name Field */}
           <FormField
@@ -117,9 +146,22 @@ function ContactPageForm() {
 
         {/* Submit Button */}
         <div className="flex justify-end gap-4">
-          <Button type="submit" className=" w-2/6 bg-zinc-900 text-white dark:hover:bg-zinc-800">
+          {
+            isLoading ? 
+            <Button
+            type="submit"
+            className=" w-2/6 bg-zinc-900 text-white dark:hover:bg-zinc-800"
+          >
+            < Loader className=" animate-spin" />
+          </Button>
+          :
+          <Button
+            type="submit"
+            className=" w-2/6 bg-zinc-900 text-white dark:hover:bg-zinc-800"
+          >
             Submit
           </Button>
+          }
         </div>
       </form>
     </Form>

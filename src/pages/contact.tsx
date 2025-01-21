@@ -13,15 +13,16 @@ function contact() {
           Contact Us
         </p>
         <p className="max-w-[30rem] text-center text-zinc-500 dark:text-zinc-200 ">
-        Have Questions or Need Assistance? Reach Out to Us Anytime – We're Here to Support and Guide You Every Step of the Way!
+          Have Questions or Need Assistance? Reach Out to Us Anytime – We're
+          Here to Support and Guide You Every Step of the Way!
         </p>
       </div>
 
-      <div className=" w-full flex flex-col mt-[3rem] pt-5 p-[5rem]">
+      <div className=" w-full flex items-end mt-[3rem] pt-5 p-[5rem]">
         <p className=" font-cabinet font-semibold text-3xl drop-shadow-2xl flex items-end   ">
-          Get in touch with us{" "}
-          <hr className=" w-10 mb-2 ml-3 bg-zinc-500 dark:bg-zinc-200 h-1 border-none " />
+          Get in touch with us
         </p>
+        <hr className=" w-10 mb-2 ml-3 bg-zinc-500 dark:bg-zinc-200 h-1 border-none " />
       </div>
 
       <div className=" w-full flex p-5 ">
@@ -52,8 +53,9 @@ function contact() {
             <Mail size={50} strokeWidth={1} className="mt-2" />
             <p className=" font-cabinet font-semibold text-2xl ">Email us</p>
             <p className=" text-zinc-500 font-cabinet ">
-            buxlofinance@gmail.com<br />
-            contact@gmail.com
+              buxlofinance@gmail.com
+              <br />
+              contact@gmail.com
             </p>
           </div>
         </div>

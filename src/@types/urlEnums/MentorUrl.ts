@@ -8,5 +8,9 @@ export enum MentorUrl{
     setNewPassword = '/mentor/resetpassword/:token',
     profile = '/mentor/profile',
     subscription = '/mentor/subscription',
-    contact = '/mentor/contact'
+    contact = '/mentor/contact',
+    chat = '/mentor/chat',
+    call = '/mentor/call',
+    videoCall = '/mentor/videoCall',
+    
 }

@@ -9,7 +9,8 @@ export enum UserUrls  {
     profile = '/profile',
     subscription = '/subscription',
     dashbord = '/dashbord',
-    contact = '/contact'
-
-
+    contact = '/contact',
+    chat = '/chat',
+    call = '/call',
+    videoCall = '/videocall',
 }

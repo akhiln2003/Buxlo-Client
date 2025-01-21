@@ -16,6 +16,7 @@ import UserProtected from "./protected/UserProtected";
 import MentorProtected from "./protected/MentorProtected";
 
 ////////////////////////--User side--/////////////////////
+
 const UserLandingPage = lazy(() => import("@/pages/UserLandingPage"));
 const UserSignIn = lazy(() => import("@/features/auth/user/pages/SignIn"));
 const UserSignUp = lazy(() => import("@/features/auth/user/pages/SignUp"));
@@ -29,7 +30,9 @@ const UserSetNewPassword = lazy(
 const UserDashbordPage = lazy(() => import("@/features/user/pages/dashBord"));
 const UserProfilePage = lazy(() => import("@/features/user/pages/profile"));
 
+////////////////////////--User side--///////////////////////
 ////////////////////////--Mentor side--/////////////////////
+
 const MentorLandingPage = lazy(() => import("@/pages/MentorLandingPage"));
 const MentorSignIn = lazy(() => import("@/features/auth/mentor/pages/singIn"));
 const MentorSignUp = lazy(() => import("@/features/auth/mentor/pages/signUp"));
@@ -41,9 +44,10 @@ const MentorSetNewPassword = lazy(
   () => import("@/features/auth/mentor/pages/newPassword")
 );
 const MentorProfilePage = lazy(() => import("@/features/mentor/pages/profile"));
-const ContactPage = lazy(() => import("@/pages/contact"));
 
+////////////////////////--Mentor side--/////////////////////
 ////////////////////////--Admin side--/////////////////////
+
 const AdminSignInPage = lazy(
   () => import("@/features/auth/admin/pages/SignIn")
 );
@@ -57,6 +61,16 @@ const AdminUserManagementPage = lazy(
 const AdminMentorManagementPage = lazy(
   () => import("@/features/auth/admin/pages/MentorManagement")
 );
+
+////////////////////////--Admin side--/////////////////////
+////////////////////////--Common side--////////////////////
+
+const ContactPage = lazy(() => import("@/pages/contact"));
+const Chat = lazy(() => import("@/pages/chat"));
+const Call = lazy(() => import("@/pages/call"));
+const VideoCall = lazy(() => import("@/pages/videoCall"));
+
+////////////////////////--Common side--////////////////////
 
 const routes = createBrowserRouter(
   [
@@ -153,6 +167,36 @@ const routes = createBrowserRouter(
             </UserProtected>
           ),
         },
+        {
+          path: UserUrls.chat,
+          element: (
+            <UserProtected>
+              <Suspense fallback={<div>Loading...</div>}>
+                <Chat />
+              </Suspense>
+            </UserProtected>
+          ),
+        },
+        {
+          path: UserUrls.call,
+          element: (
+            <UserProtected>
+              <Suspense fallback={<div>Loading...</div>}>
+                <Call />
+              </Suspense>
+            </UserProtected>
+          ),
+        },
+        {
+          path: UserUrls.videoCall,
+          element: (
+            <UserProtected>
+              <Suspense fallback={<div>Loading...</div>}>
+                <VideoCall />
+              </Suspense>
+            </UserProtected>
+          ),
+        },
       ],
     },
 
@@ -238,6 +282,36 @@ const routes = createBrowserRouter(
             <MentorProtected>
               <Suspense fallback={<div>Loading...</div>}>
                 <ContactPage />
+              </Suspense>
+            </MentorProtected>
+          ),
+        },
+        {
+          path: MentorUrl.chat,
+          element: (
+            <MentorProtected>
+              <Suspense fallback={<div>Loading...</div>}>
+                <Chat />
+              </Suspense>
+            </MentorProtected>
+          ),
+        },
+        {
+          path: MentorUrl.call,
+          element: (
+            <MentorProtected>
+              <Suspense fallback={<div>Loading...</div>}>
+                <Call />
+              </Suspense>
+            </MentorProtected>
+          ),
+        },
+        {
+          path: MentorUrl.videoCall,
+          element: (
+            <MentorProtected>
+              <Suspense fallback={<div>Loading...</div>}>
+                <VideoCall />
               </Suspense>
             </MentorProtected>
           ),
