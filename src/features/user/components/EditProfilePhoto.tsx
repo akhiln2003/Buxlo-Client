@@ -53,8 +53,6 @@ function EditProfilePhoto({
     if (!newProfileImage) return;
 
     try {
-      console.log(id, newProfileImage, avatar);
-
       const response: IaxiosResponse = await updateProfile({
         id,
         newProfileImage,

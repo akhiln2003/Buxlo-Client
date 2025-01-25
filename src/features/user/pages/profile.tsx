@@ -47,9 +47,7 @@ const Profile = () => {
           if (response.data.data.avatar) {            
             const imageUrl: IaxiosResponse = await fetchProfileImages(
               response.data.data.avatar as string
-            );
-            console.log(imageUrl);
-            
+            );            
             if (imageUrl.data.imageUrl) {
               setProfileImage(imageUrl.data.imageUrl);
             } else {

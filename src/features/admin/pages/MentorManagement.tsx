@@ -48,7 +48,7 @@ function MentorManagement() {
 
         }
       } catch (err) {
-        console.log("Error fetching users:", err);
+        console.error("Error fetching users:", err);
         errorTost("SomThing wrong", [{ message:"Somting when wrong please try again"}]);
     }
     };
@@ -56,7 +56,7 @@ function MentorManagement() {
     fetchUserData();
   }, []);
   return (
-    <div className="w-full h-full ">
+    <div className="w-full h-full p-5 ">
       <div className="w-full h-1/6 ">
         <p className="font-cabinet font-medium text-xl ml-[1rem]">
           UserManagement

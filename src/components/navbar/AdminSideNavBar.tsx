@@ -1,5 +1,5 @@
 import { AdminUrls } from "@/@types/urlEnums/AdminUrl";
-import { BriefcaseBusiness, House, Users } from "lucide-react";
+import { BriefcaseBusiness, House, Megaphone, Users } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 function AdminSideNavBar() {
@@ -19,6 +19,10 @@ function AdminSideNavBar() {
       <Link to={AdminUrls.mentorManagement} className="flex-col items-center h-[3rem] w-3/4 mt-6  text-center ">
       <div className={`h-5/6 mx-[0.5rem] rounded-xl flex justify-center items-center ${ pathname == AdminUrls.mentorManagement  ? 'bg-zinc-300 dark:bg-zinc-900':  'hover:bg-zinc-50 dark:hover:bg-zinc-800'} `}><BriefcaseBusiness /></div>
         <p className="text-xs font-cabinet ">Mentors</p>
+      </Link>
+      <Link to={AdminUrls.advManagement} className="flex-col items-center h-[3rem] w-3/4 mt-6  text-center ">
+      <div className={`h-5/6 mx-[0.5rem] rounded-xl flex justify-center items-center ${ pathname == AdminUrls.mentorManagement  ? 'bg-zinc-300 dark:bg-zinc-900':  'hover:bg-zinc-50 dark:hover:bg-zinc-800'} `}><Megaphone /></div>
+        <p className="text-xs font-cabinet ">ADV</p>
       </Link>
     </div>
   );

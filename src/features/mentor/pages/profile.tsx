@@ -7,6 +7,7 @@ import {
   Phone,
   Pencil,
   Camera,
+  ShieldCheck,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,14 +21,20 @@ import {
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { useGetUser } from "@/hooks/useGetUser";
-import { useFetchMentorProfileImageMutation, useFetchMentorProfileMutation } from "@/services/apis/MentorApis";
+import {
+  useFetchMentorProfileImageMutation,
+  useFetchMentorProfileMutation,
+} from "@/services/apis/MentorApis";
 import { Imentor } from "@/@types/interface/Imentor";
 import { EditMentorProfile } from "../components/EditProfileForm";
 import EditProfilePhoto from "../components/EditProfilePhoto";
 import dummyProfileImage from "@/assets/images/dummy-profile.webp";
+import KycVerificationForm from "../components/KycVerificationForm";
 
 const Profile = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [verifyIsOpen, setVerifyIsOpen] = useState(false);
+
   const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
   const [fetchProfileData] = useFetchMentorProfileMutation();
   const [fetchProfileImages] = useFetchMentorProfileImageMutation();
@@ -141,6 +148,31 @@ const Profile = () => {
                   </DialogTitle>
                 </DialogHeader>
                 <EditMentorProfile
+                  users={users as Imentor}
+                  setIsOpen={setIsOpen}
+                  setUsers={setUsers}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
+          <div className="absolute bottom-2 right-4">
+            <Dialog open={verifyIsOpen} onOpenChange={setVerifyIsOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2 bg-white hover:bg-gray-50 text-green-800 hover:text-green-800 border-gray-200 dark:bg-zinc-800  dark:hover:bg-zinc-700 dark:text-green-800 dark:border-zinc-700"
+                >
+                  <ShieldCheck className="w-4 h-4" color="green" />
+                  Verify
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-white dark:bg-zinc-900">
+                <DialogHeader>
+                  <DialogTitle className="text-gray-900 dark:text-gray-100">
+                  Verify Profile
+                  </DialogTitle>
+                </DialogHeader>
+                <KycVerificationForm
                   users={users as Imentor}
                   setIsOpen={setIsOpen}
                   setUsers={setUsers}

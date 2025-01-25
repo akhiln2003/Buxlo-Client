@@ -51,15 +51,16 @@ const MentorProfilePage = lazy(() => import("@/features/mentor/pages/profile"));
 const AdminSignInPage = lazy(
   () => import("@/features/auth/admin/pages/SignIn")
 );
-const AdminDashbordPage = lazy(
-  () => import("@/features/auth/admin/pages/Dashbord")
-);
+const AdminDashbordPage = lazy(() => import("@/features/admin/pages/Dashbord"));
 const AdminUserManagementPage = lazy(
-  () => import("@/features/auth/admin/pages/UserManagement")
+  () => import("@/features/admin/pages/UserManagement")
 );
 
 const AdminMentorManagementPage = lazy(
-  () => import("@/features/auth/admin/pages/MentorManagement")
+  () => import("@/features/admin/pages/MentorManagement")
+);
+const AdminAdvManagementPage = lazy(
+  () => import("@/features/admin/pages/AdvManagement")
 );
 
 ////////////////////////--Admin side--/////////////////////
@@ -373,6 +374,16 @@ const routes = createBrowserRouter(
             <AdminProtected>
               <Suspense fallback={<div>Loading.....</div>}>
                 <AdminMentorManagementPage />
+              </Suspense>
+            </AdminProtected>
+          ),
+        },
+        {
+          path: AdminUrls.advManagement,
+          element: (
+            <AdminProtected>
+              <Suspense fallback={<div>Loading.....</div>}>
+                <AdminAdvManagementPage />
               </Suspense>
             </AdminProtected>
           ),

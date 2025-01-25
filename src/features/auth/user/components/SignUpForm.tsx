@@ -79,7 +79,7 @@ export function SignUnForm() {
         );
       }
     } catch (error) {
-      console.log("error :", error);
+      console.error("error :", error);
       errorTost("Somthing wrong", [
         { message: "Somting when wrong please try again" },
       ]);

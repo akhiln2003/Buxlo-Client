@@ -36,7 +36,6 @@ function ContactPageForm() {
 
   const onSubmit = async (data: z.infer<typeof ContactPageFormSchema>) => {
     try {
-      console.log(data);
 
       const response: IaxiosResponse = await contactUs(data);
 
@@ -51,7 +50,7 @@ function ContactPageForm() {
         );
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       errorTost("Somthing wrong", [
         { message: "Somting when wrong please try again" },
       ]);

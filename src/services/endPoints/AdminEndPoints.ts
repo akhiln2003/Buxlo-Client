@@ -4,5 +4,16 @@ export enum AdminApiEndPoints {
     fetchUsers = '/auth/admin/profile/fetchusers',
     fetchMentors = '/auth/admin/profile/fetchmentor',
     blockandunblock = '/auth/admin/profile/blockandunblock',
+    createTrustedUs = '/user/admin/createtrustedus',
+    createAdv = '/user/admin/createadv',
+    fetchTrustedUsData = '/user/admin/fetchtrustedus',
+    fetchAdvData = '/user/admin/fetchadv',
+    fetchTrustedUsImage = '/user/admin/fetchtrustedusimage',
+    fetchAdvImage = '/user/admin/fetchadvimage',
+    deleteTrustedUsImage = '/user/admin/deletetrustedusimage',
+    deleteAdvImage = '/user/admin/deleteadvimage',
+    updateSubscriptionPlan = '/subscription/admin/updatesubscriptionplan',
+    fetchSubscriptionPlan = '/subscription/admin/fetchsubscriptionplan'
+
 
 }

@@ -69,7 +69,7 @@ function EditProfileBanner({
         }
       }
     } catch (error) {
-      console.log("error:", error);
+      console.error("error:", error);
       errorTost("Something wrong", [
         { message: "Something went wrong please try again" },
       ]);
