@@ -11,7 +11,7 @@ export const EditSubscriptionModal = ({ subscription, setPlans }:{ subscription:
   
 
   return (
-    <Dialog open={isOpen} >
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="icon" onClick={() => setIsOpen(true)}>
           <Edit className="h-4 w-4" />
