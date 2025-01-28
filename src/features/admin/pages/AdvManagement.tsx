@@ -3,19 +3,27 @@ import { CreateModal } from "../components/CreateAdv";
 import { ItrustedUs } from "@/@types/interface/ItrustedUs";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { Iadv } from "@/@types/interface/Iadv";
-import { errorTost, successToast } from "@/components/ui/tosastMessage";
+import { errorTost } from "@/components/ui/tosastMessage";
 import { Trash2 } from "lucide-react";
 import {
-  useDeleteAdvImageMutation,
-  useDeleteTrustedUsImageMutation,
   useFetchAdvImageMutation,
   useFetchAdvsDataMutation,
   useFetchtrustedUsDataMutation,
   useFetchTrustedUsImageMutation,
 } from "@/services/apis/AdminApis";
 
+import { ConfirmDeletion } from "../components/ConfirmDeletion";
+import EditAndDeleteDropdownMenu from "../components/EditAndDeleteDropdownMenu";
+
 const AdvManagement = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDeleteOpen, setDeleteIsOpen] = useState(false);
+  const [deleteData, setDeleteData] = useState<{
+    id: string;
+    key: string;
+    index: number;
+    type: string;
+  } | null>(null);
   const [trustedUsData, setTrustedUsData] = useState<ItrustedUs[]>([]);
   const [advData, setAdvData] = useState<Iadv[]>([]);
   const [trustedUsImage, setTrustedUsImage] = useState<string[]>([]);
@@ -25,8 +33,6 @@ const AdvManagement = () => {
   const [fetchAdvData] = useFetchAdvsDataMutation();
   const [fetchTrustedUsImages] = useFetchTrustedUsImageMutation();
   const [fetchAdvImages] = useFetchAdvImageMutation();
-  const [deleteTrustedUsImage] = useDeleteTrustedUsImageMutation();
-  const [deleteAdvImage] = useDeleteAdvImageMutation();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,66 +90,16 @@ const AdvManagement = () => {
     fetchData();
   }, []);
 
-  const handilDeleteTrustedUs = async (
+  const handleDeleteClick = (
+    type: "trustedUs" | "advertisement",
     id: string,
     key: string,
     index: number
   ) => {
-    try {
-      const response: IaxiosResponse = await deleteTrustedUsImage({ id, key });
-
-      if (response.data) {
-        const data = trustedUsData.filter((val) => val.id != id);
-        setTrustedUsData(data);
-        const images = trustedUsImage.filter((_, i) => i != index);
-        setTrustedUsImage(images);
-        successToast(
-          "Updated",
-          response.data.response.data
-            ? response.data.response.data
-            : "Profile picture updated successfully"
-        );
-      } else {
-        errorTost(
-          "Something went wrong ",
-          response.error.data.error || [
-            { message: `${response.error.data} please try again later` },
-          ]
-        );
-      }
-    } catch (error) {
-      console.error(error);
-    }
+    setDeleteData({ id, key, index, type });
+    setDeleteIsOpen(true);
   };
 
-  const handilDeleteAdv = async (id: string, key: string, index: number) => {
-    try {
-      const response: IaxiosResponse = await deleteAdvImage({ id, key });
-
-      if (response.data) {
-        const data = advData.filter((val) => val.id != id);
-        setAdvData(data);
-        const images = advImage.filter((_, i) => i != index);
-        setAdvImage(images);
-        successToast(
-          "Updated",
-          response.data.response.data
-            ? response.data.response.data
-            : "Profile picture updated successfully"
-        );
-      } else {
-        errorTost(
-          "Something went wrong ",
-          response.error.data.error || [
-            { message: `${response.error.data} please try again later` },
-          ]
-        );
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  
   return (
     <div className="w-full h-full p-4">
       <div className="w-full">
@@ -169,6 +125,17 @@ const AdvManagement = () => {
         setAdvImage={setAdvImage}
       />
 
+      {/* Confirmation Modal */}
+      <ConfirmDeletion
+        isDeleteOpen={isDeleteOpen}
+        setDeleteIsOpen={setDeleteIsOpen}
+        deleteData={deleteData}
+        setTrustedUsImage={setTrustedUsImage}
+        setTrustedUsData={setTrustedUsData}
+        setAdvData={setAdvData}
+        setAdvImage={setAdvImage}
+      />
+
       <div className="w-full mt-[2rem] p-4 md:p-10 ">
         <p className="font-cabinet font-semibold mb-10">TRUSTED US</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
@@ -184,9 +151,13 @@ const AdvManagement = () => {
                   className="max-w-full max-h-full object-contain shadow-lg rounded-md"
                 />
                 <Trash2
-                  // size={15}
                   onClick={() =>
-                    handilDeleteTrustedUs(item.id as string, item.image, index)
+                    handleDeleteClick(
+                      "trustedUs",
+                      item.id as string,
+                      item.image,
+                      index
+                    )
                   }
                   className="absolute top-1 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer bg-white/50 rounded-full p-1"
                 />
@@ -202,27 +173,30 @@ const AdvManagement = () => {
           {advData.map((item, index) => (
             <div
               key={item.id}
-              className="border rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 group relative"
+              className="border rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 group relative "
             >
-              <div className="w-full h-48 flex items-center justify-center relative">
+              <div className="w-full h-48 flex items-center justify-center relative ">
                 <img
                   src={advImage[index]}
                   alt={`Advertisement ${item.id}`}
                   className="w-full h-full object-cover"
                 />
-                <Trash2
-                  size={20}
-                  onClick={() =>
-                    handilDeleteAdv(item.id as string, item.image, index)
-                  }
-                  className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer bg-white/50 rounded-full p-1"
+                <EditAndDeleteDropdownMenu
+                  index={index}
+                  item={item}
+                  currentImageUrl={advImage[index]}
+                  setDeleteData={setDeleteData}
+                  setDeleteIsOpen={setDeleteIsOpen}
+                  setAdvData={setAdvData}
+                  setAdvImage={setAdvImage}
                 />
               </div>
+
               <div className="p-4">
                 <p className="font-cabinet font-bold text-center text-lg truncate mb-2 uppercase">
                   {item.title}
                 </p>
-                <p className="font-cabinet font-light text-center text-sm text-gray-600 line-clamp-2">
+                <p className="font-cabinet font-light text-center text-sm text-gray-600 dark:text-zinc-300 line-clamp-2">
                   {item.description}
                 </p>
               </div>

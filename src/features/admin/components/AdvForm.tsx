@@ -1,47 +1,85 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ImagePlus, Loader, X } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Iadv } from "@/@types/interface/Iadv";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import {
   useCreateAdvMutation,
+  useEditAdvMutation,
   useFetchAdvImageMutation,
 } from "@/services/apis/AdminApis";
-import { AdvFormSchema } from "../zodeSchema/AdvFormSchema";
+import {
+  CreateAdvFormSchema,
+  EditAdvFormSchema,
+} from "../zodeSchema/AdvFormSchema";
+import { z } from "zod";
 
+type FormInputs = z.infer<typeof CreateAdvFormSchema>;
 
-// TypeScript type inference from Zod schema
-type FormInputs = z.infer<typeof AdvFormSchema>;
+interface IeditData extends Iadv {
+  currentImageUrl: string;
+}
 
 export const AdvForm = ({
   setIsOpen,
   setAdvData,
-  setAdvImage
+  setAdvImage,
+  editMode = false,
+  editData,
 }: {
   setIsOpen: (setIsOpen: boolean) => void;
   setAdvData: React.Dispatch<React.SetStateAction<Iadv[]>>;
   setAdvImage: React.Dispatch<React.SetStateAction<string[]>>;
+  editMode?: boolean;
+  editData?: IeditData;
 }) => {
+  const [initialValues, setInitialValues] = useState<{
+    title: string;
+    description: string;
+    image?: FileList;
+  } | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const {
     register,
     handleSubmit,
     setValue,
+    reset,
+    watch,
     formState: { errors },
   } = useForm<FormInputs>({
-    resolver: zodResolver(AdvFormSchema),
+    resolver: zodResolver(editMode ? EditAdvFormSchema : CreateAdvFormSchema),
   });
 
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [uploadData, { isLoading }] = useCreateAdvMutation();
+  const [createAdv, { isLoading: isCreating }] = useCreateAdvMutation();
+  const [updateAdv, { isLoading: isUpdating }] = useEditAdvMutation();
   const [fetchAdvImages] = useFetchAdvImageMutation();
+
+  // Watch form values for change detection
+  const formValues = watch();
+
+  useEffect(() => {
+    if (editMode && editData) {
+      const initialData = {
+        title: editData.title,
+        description: editData.description,
+        image: undefined, // No initial image file
+      };
+      setInitialValues(initialData);
+      setValue("title", editData.title);
+      setValue("description", editData.description);
+      if (editData.image) {
+        setPreviewUrl(`${editData.currentImageUrl}`);
+      }
+    }
+  }, [editMode, editData, setValue]);
 
   const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -58,10 +96,28 @@ export const AdvForm = ({
     e.preventDefault();
     e.stopPropagation();
     setPreviewUrl(null);
-    setValue("image", undefined);
+
+    // Create an empty FileList-like object
+    const emptyFileList = Object.create(FileList.prototype);
+    Object.defineProperty(emptyFileList, "length", { value: 0 });
+
+    setValue("image", emptyFileList);
+
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+  };
+
+  const hasChanges = () => {
+    if (!initialValues || !editMode) return true;
+
+    const formDataChanged =
+      initialValues.title !== formValues.title ||
+      initialValues.description !== formValues.description;
+
+    const imageChanged = formValues.image && formValues.image.length > 0;
+
+    return formDataChanged || imageChanged;
   };
 
   const onSubmit = async (data: FormInputs) => {
@@ -69,37 +125,94 @@ export const AdvForm = ({
       document.activeElement.blur();
     }
 
+    // Check if there are any changes in edit mode
+    if (editMode && !hasChanges()) {
+      errorTost("No Changes", [{ message: "No changes were made" }]);
+      return;
+    }
+
     try {
       const formData = new FormData();
-      formData.append("data[title]", data.title);
-      formData.append("data[description]", data.description);
-      formData.append("image", data.image[0]);
 
-      const response: IaxiosResponse = await uploadData(formData);
+      // Append only the changed fields
+      if (data.title?.trim() !== initialValues?.title) {
+        formData.append("data[title]", data.title.trim());
+      }
+      if ( editMode && 
+        data.title?.trim() !== initialValues?.title ||
+        data.description?.trim() !== initialValues?.description ||
+        data.image?.length > 0 
+      ) {
+        formData.append("data[id]", editData?.id as string);
+        formData.append("data[currentImage]", editData?.image as string);
+
+      }
+
+      if (data.description?.trim() !== initialValues?.description) {
+        formData.append("data[description]", data.description.trim());
+      }
+
+
+      
+
+      // Only append image if it exists and has changed
+      if (data.image?.length > 0) {
+        formData.append("image", data.image[0]);
+        
+      }
+
+      // Check if FormData is empty
+      if ([...formData.entries()].length === 0) {
+        errorTost("Validation Error", [{ message: "No data to submit" }]);
+        return;
+      }
+
+      const response: IaxiosResponse =
+        editMode && editData
+          ? await updateAdv(formData)
+          : await createAdv(formData);
+
       if (response.data.responseData) {
         const value: Iadv = response.data.responseData;
 
         if (value.image) {
           const keys: string[] = [`Adv/${value.image}`];
-          const trustedUsImageUrls: IaxiosResponse = await fetchAdvImages({
+          const imageUrls: IaxiosResponse = await fetchAdvImages({
             keys: keys,
           });
-          if (trustedUsImageUrls.data.imageUrl) {
-            setAdvImage((prev) => [
-              ...prev,
-              ...trustedUsImageUrls.data.imageUrl,
-            ]);
-            setAdvData((prev) => [...prev, value]);
+
+          if (imageUrls.data.imageUrl) {
+            if (editMode) {
+              setAdvData((prev) =>
+                prev.map((item) => (item.id === editData?.id ? value : item))
+              );
+              setAdvImage((prev) => {
+                const newImages = [...prev];
+                const index = prev.findIndex((url) =>
+                  url.includes(editData?.image || "")
+                );
+                if (index !== -1) {
+                  newImages[index] = imageUrls.data.imageUrl[0];
+                }
+                return newImages;
+              });
+            } else {
+              setAdvImage((prev) => [...prev, ...imageUrls.data.imageUrl]);
+              setAdvData((prev) => [...prev, value]);
+            }
           } else {
-            errorTost(
-              "Error fetching Trusted Us Images",
-              trustedUsImageUrls.error.data.error
-            );
+            errorTost("Error fetching Images", imageUrls.error.data.error);
           }
         }
 
-        successToast("Updated", "Company picture updated successfully");
+        successToast(
+          editMode ? "Updated" : "Created",
+          `Advertisement ${editMode ? "updated" : "created"} successfully`
+        );
         setIsOpen(false);
+        if (!editMode) {
+          reset();
+        }
       } else {
         errorTost(
           "Something went wrong",
@@ -116,16 +229,18 @@ export const AdvForm = ({
     }
   };
 
+  const isLoading = isCreating || isUpdating;
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <Input
         type="file"
         accept="image/*"
         id="image"
-        ref={fileInputRef}
         className="hidden"
         {...register("image", {
           onChange: handlePhotoChange,
+          required: !editMode,
         })}
       />
       <label
@@ -186,7 +301,7 @@ export const AdvForm = ({
 
       {!isLoading ? (
         <Button type="submit" className="w-full">
-          Submit
+          {editMode ? "Update" : "Submit"}
         </Button>
       ) : (
         <Button type="button" className="w-full">

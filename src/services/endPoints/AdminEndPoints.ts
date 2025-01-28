@@ -12,6 +12,7 @@ export enum AdminApiEndPoints {
     fetchAdvImage = '/user/admin/fetchadvimage',
     deleteTrustedUsImage = '/user/admin/deletetrustedusimage',
     deleteAdvImage = '/user/admin/deleteadvimage',
+    editAdv = '/user/admin/editadv',
     updateSubscriptionPlan = '/subscription/admin/updatesubscriptionplan',
     fetchSubscriptionPlan = '/subscription/admin/fetchsubscriptionplan'
 

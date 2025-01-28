@@ -9,7 +9,56 @@ export const adminApi = createApi({
   endpoints: (builder) => ({
     ///////////////////////////////--User--///////////////////////////////
 
-    // create new trustedUs 
+    // create new adv
+    createAdv: builder.mutation({
+      query: (data) => ({
+        url: AdminApiEndPoints.createAdv,
+        method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        data: data,
+      }),
+    }),
+
+    // Fetch adv data
+    fetchAdvsData: builder.mutation({
+      query: () => ({
+        url: AdminApiEndPoints.fetchAdvData,
+        method: "GET",
+      }),
+    }),
+
+    // Fetch  advImage
+    fetchAdvImage: builder.mutation({
+      query: (data) => ({
+        url: AdminApiEndPoints.fetchAdvImage,
+        method: "POST",
+        data: data,
+      }),
+    }),
+
+    //  Delete  AdvImage
+    deleteAdvImage: builder.mutation({
+      query: ({ key, id }: { key: string; id: string }) => ({
+        url: `${AdminApiEndPoints.deleteAdvImage}/${id}/${key}`,
+        method: "DELETE",
+      }),
+    }),
+
+    // Edit Adv
+    editAdv: builder.mutation({
+      query: (data) => ({
+        url: AdminApiEndPoints.editAdv,
+        method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        data: data,
+      }),
+    }),
+
+    // create new trustedUs
     createTrustedUs: builder.mutation({
       query: (data) => ({
         url: AdminApiEndPoints.createTrustedUs,
@@ -21,30 +70,10 @@ export const adminApi = createApi({
       }),
     }),
 
-        // create new adv 
-        createAdv: builder.mutation({
-          query: (data) => ({
-            url: AdminApiEndPoints.createAdv,
-            method: "POST",
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-            data: data,
-          }),
-        }),
-
     // Fetch trustedUs data
     fetchtrustedUsData: builder.mutation({
       query: () => ({
         url: AdminApiEndPoints.fetchTrustedUsData,
-        method: "GET",
-      }),
-    }),
-
-    // Fetch adv data
-    fetchAdvsData: builder.mutation({
-      query: () => ({
-        url: AdminApiEndPoints.fetchAdvData,
         method: "GET",
       }),
     }),
@@ -58,15 +87,6 @@ export const adminApi = createApi({
       }),
     }),
 
-    // Fetch  advImage
-    fetchAdvImage: builder.mutation({
-      query: (data) => ({
-        url: AdminApiEndPoints.fetchAdvImage,
-        method: "POST",
-        data: data,
-      }),
-    }),
-
     // Delete  trustedUsImage
     deleteTrustedUsImage: builder.mutation({
       query: ({ key, id }: { key: string; id: string }) => ({
@@ -75,29 +95,20 @@ export const adminApi = createApi({
       }),
     }),
 
-    //  Delete  AdvImage
-    deleteAdvImage: builder.mutation({
-      query: ({ key, id }: { key: string; id: string }) => ({
-        url: `${AdminApiEndPoints.deleteAdvImage}/${id}/${key}`,
-        method: "DELETE",
-      }),
-    }),
-
-     //  fetch SubscriptionPlan
-     fetchSubscriptionPlan: builder.mutation({
+    //  fetch SubscriptionPlan
+    fetchSubscriptionPlan: builder.mutation({
       query: () => ({
         url: AdminApiEndPoints.fetchSubscriptionPlan,
         method: "GET",
       }),
     }),
 
-
-     //  Update SubscriptionPlan
-     UpdateSubscriptionPlan: builder.mutation({
+    //  Update SubscriptionPlan
+    UpdateSubscriptionPlan: builder.mutation({
       query: (data) => ({
         url: AdminApiEndPoints.updateSubscriptionPlan,
         method: "PUT",
-        data:data
+        data: data,
       }),
     }),
   }),
@@ -113,6 +124,7 @@ export const {
   useFetchAdvImageMutation,
   useDeleteTrustedUsImageMutation,
   useDeleteAdvImageMutation,
+  useEditAdvMutation,
   useFetchSubscriptionPlanMutation,
-  useUpdateSubscriptionPlanMutation
+  useUpdateSubscriptionPlanMutation,
 } = adminApi;

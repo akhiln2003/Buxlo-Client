@@ -49,7 +49,7 @@ const processQueue = (error: unknown = null) => {
 axiosInstance.interceptors.request.use(
   (config) => {
     // Log the request body (data)
-    console.log('Request Body:', config);
+    console.log('Request Body:', config.data);
     return config;
   },
   (error) => {
