@@ -42,6 +42,18 @@ export const mentorApi = createApi({
         method: "DELETE",
       }),
     }),
+
+      // kyc verification
+      kycVerification: builder.mutation({
+        query: (data) => ({
+          url: MentorApiEndPoints.kycVerification,
+          method: "PUT",
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          data:data
+        }),
+      }),
   }),
 });
 
@@ -51,4 +63,5 @@ export const {
   useUpdateMentorProfileMutation,
   useFetchMentorProfileImageMutation,
   useDeleteMentorProfileImageMutation,
+  useKycVerificationMutation
 } = mentorApi;

@@ -12,6 +12,5 @@ export enum UserApiEndPoints {
     fetchProfileImage = '/user/user/fetchprofileimage',
     deleteProfileImage = '/user/user/deleteprofileimage',
     updateProfile = '/user/user/updateprofile',
-    kycVerification = '/user/user/kycverify'
 
     }

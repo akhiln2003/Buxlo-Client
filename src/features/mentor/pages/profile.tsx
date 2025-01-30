@@ -155,31 +155,33 @@ const Profile = () => {
               </DialogContent>
             </Dialog>
           </div>
-          <div className="absolute bottom-2 right-4">
-            <Dialog open={verifyIsOpen} onOpenChange={setVerifyIsOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-2 bg-white hover:bg-gray-50 text-green-800 hover:text-green-800 border-gray-200 dark:bg-zinc-800  dark:hover:bg-zinc-700 dark:text-green-800 dark:border-zinc-700"
-                >
-                  <ShieldCheck className="w-4 h-4" color="green" />
-                  Verify
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-white dark:bg-zinc-900">
-                <DialogHeader>
-                  <DialogTitle className="text-gray-900 dark:text-gray-100">
-                  Verify Profile
-                  </DialogTitle>
-                </DialogHeader>
-                <KycVerificationForm
-                  users={users as Imentor}
-                  setIsOpen={setIsOpen}
-                  setUsers={setUsers}
-                />
-              </DialogContent>
-            </Dialog>
-          </div>
+          {users.verified == "applicationPending" && (
+            <div className="absolute bottom-2 right-4">
+              <Dialog open={verifyIsOpen} onOpenChange={setVerifyIsOpen}>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2 bg-white hover:bg-gray-50 text-green-800 hover:text-green-800 border-gray-200 dark:bg-zinc-800  dark:hover:bg-zinc-700 dark:text-green-700 dark:border-zinc-700"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    verify profile
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-white dark:bg-zinc-900">
+                  <DialogHeader>
+                    <DialogTitle className="text-gray-900 dark:text-gray-100">
+                      Verify Profile
+                    </DialogTitle>
+                  </DialogHeader>
+                  <KycVerificationForm
+                    id={users.id as string}
+                    setVerifyIsOpen={setVerifyIsOpen}
+                    setUsers={setUsers}
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
+          )}
 
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
@@ -219,8 +221,11 @@ const Profile = () => {
                 </Dialog>
               </div>
               <div className="flex-1 space-y-4 text-center md:text-left">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex  items-center ">
                   {users.name}
+                  {users.verified == "verified" && (
+                    <ShieldCheck color="green" size={20} className=" ml-2" />
+                  )}
                 </h1>
                 <div className="flex flex-col space-y-3 text-gray-600 dark:text-gray-400">
                   <div className="flex items-center gap-3 justify-center md:justify-start">
@@ -284,15 +289,20 @@ const Profile = () => {
                         </span>
                       ))}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                      {users.yearsOfExperience} years of experience
-                    </div>
                   </>
                 ) : (
                   <div className="w-full h-full flex justify-center items-center text-gray-600 dark:text-gray-400 leading-relaxed">
                     Experience not available
                   </div>
                 )}
+
+                <div className="text-sm text-zinc-900 dark:text-zinc-200 mt-2 font-cabinet ">
+                  {(users.yearsOfExperience as number) < 1 ? (
+                    <p>Fresher</p>
+                  ) : (
+                    <p>{users.yearsOfExperience} years of experience</p>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>

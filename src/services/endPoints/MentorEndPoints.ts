@@ -11,6 +11,8 @@ export enum MentorApiEndPoints {
     fetchProfileImage = '/user/mentor/fetchprofileimage',
     deleteProfileImage = '/user/mentor/deleteprofileimage',
     updateProfile = '/user/mentor/updateprofile',
-    updateProfileImage = '/user/mentor/updateprofileimage'
+    updateProfileImage = '/user/mentor/updateprofileimage',
+    kycVerification = '/user/mentor/verifyprofile'
+
 
 }

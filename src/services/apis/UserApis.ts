@@ -44,14 +44,7 @@ export const userApi = createApi({
     }),
 
 
-    // kyc verification
-    kycVerification: builder.mutation({
-      query: (data) => ({
-        url: UserApiEndPoints.kycVerification,
-        method: "POST",
-        data:data
-      }),
-    }),
+  
   }),
 });
 
@@ -61,5 +54,4 @@ export const {
   useUpdateUserProfileMutation,
   useFetchUserProfileImageMutation,
   useDeleteUserProfileImageMutation,
-  useKycVerificationMutation
 } = userApi;

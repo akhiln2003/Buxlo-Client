@@ -12,25 +12,26 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Loader, X, ImageIcon } from "lucide-react";
-import { errorTost } from "@/components/ui/tosastMessage";
-import { Imentor } from "@/@types/interface/Imentor";
-import { useKycVerificationMutation } from "@/services/apis/UserApis";
+import { Loader } from "lucide-react";
+import { errorTost, successToast } from "@/components/ui/tosastMessage";
 import { KycVerificationSchema } from "../zodeSchema/KycVerificationSchema";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
-
-
+import { useKycVerificationMutation } from "@/services/apis/MentorApis";
+import { KycImageUploader } from "./KycImageUploader";
+import { Imentor } from "@/@types/interface/Imentor";
 
 export function KycVerificationForm({
-  users,
-  setIsOpen,
+  id,
+  setVerifyIsOpen,
   setUsers,
 }: {
-  users: Imentor;
-  setIsOpen: (isOpen: boolean) => void;
+  id: string;
+  setVerifyIsOpen: (isOpen: boolean) => void;
   setUsers: React.Dispatch<React.SetStateAction<Partial<Imentor>>>;
 }) {
-  const [frontImagePreview, setFrontImagePreview] = useState<string | null>(null);
+  const [frontImagePreview, setFrontImagePreview] = useState<string | null>(
+    null
+  );
   const [backImagePreview, setBackImagePreview] = useState<string | null>(null);
   const [kycVerify, { isLoading }] = useKycVerificationMutation();
 
@@ -48,20 +49,30 @@ export function KycVerificationForm({
     fieldName: "frontImage" | "backImage"
   ) => {
     const file = event.target.files?.[0];
+
     if (file) {
       try {
-        // Validate file before processing
+        // Validate file using Zod schema
         KycVerificationSchema.shape[fieldName].parse(file);
 
         const reader = new FileReader();
         reader.onloadend = () => {
           setPreview(reader.result as string);
           form.setValue(fieldName, file);
+          // Clear any previous errors
+          form.clearErrors(fieldName);
         };
         reader.readAsDataURL(file);
       } catch (error) {
         if (error instanceof z.ZodError) {
-          errorTost("Image Upload Error", error.errors.map(e => ({ message: e.message })));
+          // Set the error in react-hook-form
+          form.setError(fieldName, {
+            type: "manual",
+            message: error.errors[0].message,
+          });
+          errorTost("Image Upload Error", [
+            { message: error.errors[0].message },
+          ]);
         }
       }
     }
@@ -73,23 +84,42 @@ export function KycVerificationForm({
   ) => {
     setPreview(null);
     form.setValue(fieldName, undefined);
+    // Clear the error when removing the image
+    form.clearErrors(fieldName);
   };
 
   const onSubmit = async (data: z.infer<typeof KycVerificationSchema>) => {
     try {
       const formData = new FormData();
-      formData.append('fullName', data.fullName);
-      formData.append('aadhaarNumber', data.aadhaarNumber);
-      formData.append('frontImage', data.frontImage);
-      formData.append('backImage', data.backImage);
+      formData.append("data[aadhaarName]", data.fullName);
+      formData.append("data[aadhaarNumber]", data.aadhaarNumber);
+      formData.append("data[id]", id);
+      if (data.frontImage) {
+        formData.append("frontImage", data.frontImage);
+      }
+      if (data.backImage) {
+        formData.append("backImage", data.backImage);
+      }
 
-      const response:IaxiosResponse = await kycVerify(formData);
-      
-      if (response.data) {
-        setIsOpen(false);
-        setUsers(response.data.data);
+      const response: IaxiosResponse = await kycVerify(formData);
+
+      if (response.data.responseData) {
+        setUsers((prev)=>({
+          ...prev,
+          verified:"verificationPending"
+        }))
+        setVerifyIsOpen(false);
+        successToast(
+          " Profile Verification Submitted",
+          "Your profile verification request has been successfully submitted using Aadhaar. Our admin team will review your details and update the verification status soon. You will be notified once the process is complete."
+        );
       } else {
-        errorTost("KYC Submission Error", response.error.data.error);
+        errorTost(
+          "KYC Submission Error",
+          response.error.data.error || [
+            { message: "Something went wrong, please try again later." },
+          ]
+        );
       }
     } catch (error) {
       console.error("KYC Submission Error:", error);
@@ -97,66 +127,10 @@ export function KycVerificationForm({
     }
   };
 
-  const ImageUploader = ({
-    preview,
-    onUpload,
-    onRemove,
-    label,
-  }: {
-    preview: string | null;
-    onUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    onRemove: () => void;
-    label: string;
-  }) => (
-    <div className="space-y-2">
-      <FormLabel className="text-gray-700 dark:text-gray-300">
-        {label}
-      </FormLabel>
-      <div className="relative w-full h-48 border-2 border-dashed border-gray-300 dark:border-zinc-700 rounded-lg flex items-center justify-center overflow-hidden">
-        {preview ? (
-          <>
-            <img
-              src={preview}
-              alt="Preview"
-              className="w-full h-full object-cover"
-            />
-            <Button
-              type="button"
-              variant="destructive"
-              size="icon"
-              className="absolute top-2 right-2"
-              onClick={onRemove}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </>
-        ) : (
-          <div className="flex flex-col items-center text-gray-500 dark:text-gray-400">
-            <ImageIcon className="h-12 w-12 mb-2" />
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              className="hidden"
-              id={`${label.toLowerCase().replace(" ", "-")}-upload`}
-              onChange={onUpload}
-            />
-            <label
-              htmlFor={`${label.toLowerCase().replace(" ", "-")}-upload`}
-              className="cursor-pointer text-blue-500 hover:underline"
-            >
-              Upload {label}
-            </label>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
-          {/* Full Name Field */}
           <FormField
             control={form.control}
             name="fullName"
@@ -176,7 +150,6 @@ export function KycVerificationForm({
             )}
           />
 
-          {/* Aadhaar Number Field */}
           <FormField
             control={form.control}
             name="aadhaarNumber"
@@ -196,35 +169,52 @@ export function KycVerificationForm({
             )}
           />
 
-          {/* Front Image Uploader */}
-          <ImageUploader
-            preview={frontImagePreview}
-            onUpload={(e) =>
-              handleImageUpload(e, setFrontImagePreview, "frontImage")
-            }
-            onRemove={() => removeImage(setFrontImagePreview, "frontImage")}
-            label="Front of Aadhaar"
+          <FormField
+            control={form.control}
+            name="frontImage"
+            render={({ fieldState }) => (
+              <KycImageUploader
+                preview={frontImagePreview}
+                onUpload={(e) =>
+                  handleImageUpload(e, setFrontImagePreview, "frontImage")
+                }
+                onRemove={() => removeImage(setFrontImagePreview, "frontImage")}
+                label="Front of Aadhaar"
+                error={fieldState.error?.message}
+              />
+            )}
           />
 
-          {/* Back Image Uploader */}
-          <ImageUploader
-            preview={backImagePreview}
-            onUpload={(e) =>
-              handleImageUpload(e, setBackImagePreview, "backImage")
-            }
-            onRemove={() => removeImage(setBackImagePreview, "backImage")}
-            label="Back of Aadhaar"
+          <FormField
+            control={form.control}
+            name="backImage"
+            render={({ fieldState }) => (
+              <KycImageUploader
+                preview={backImagePreview}
+                onUpload={(e) =>
+                  handleImageUpload(e, setBackImagePreview, "backImage")
+                }
+                onRemove={() => removeImage(setBackImagePreview, "backImage")}
+                label="Back of Aadhaar"
+                error={fieldState.error?.message}
+              />
+            )}
           />
         </div>
 
-        {/* Submit Button */}
         <div className="sticky bottom-0 pt-4 pb-2 bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 flex justify-end gap-4">
           <Button
             type="submit"
             disabled={isLoading}
             className="bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:hover:bg-gray-100 dark:text-gray-900"
           >
-            {isLoading && <Loader className="mr-2 h-4 w-4 animate-spin" />}
+            {isLoading ? (
+              <>
+                <Loader className="mr-2 h-4 w-4 animate-spin" /> updating
+              </>
+            ) : (
+              "Submit KYC"
+            )}
             Submit KYC
           </Button>
         </div>
