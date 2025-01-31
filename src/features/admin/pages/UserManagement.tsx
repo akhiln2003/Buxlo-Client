@@ -1,5 +1,3 @@
-import { AdminUrls } from "@/@types/urlEnums/AdminUrl";
-import { Link } from "react-router-dom";
 import profile from "@/assets/images/dummy-profile.webp";
 import {
   Table,
@@ -82,20 +80,10 @@ function UserManagement() {
   }, []);
   return (
     <div className="w-full h-full p-5">
-      <div className="w-full h-1/6 ">
-        <p className="font-cabinet font-medium text-xl ml-[1rem]">
-          UserManagement
-        </p>
-        <div className="ml-[1.5rem] mt-1">
-          <Link to={AdminUrls.dashbord}>
-            <span className="font-cabinet font-extralight text-xs mr-1">
-              Dashbord
-            </span>
-          </Link>
-          <span className="font-cabinet font-extralight text-xs">
-            / UserManagement
-          </span>
-        </div>
+      <div className="flex justify-between items-center my-4">
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-zinc-100">
+          User Management
+        </h1>
       </div>
       <div className="w-full  bg-slate-00 flex justify-end h-10 relative">
         <input

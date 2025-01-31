@@ -102,10 +102,11 @@ const AdvManagement = () => {
 
   return (
     <div className="w-full h-full p-4">
-      <div className="w-full">
-        <p className="font-cabinet font-medium text-xl">
-          Advertisement Management
-        </p>
+      <div className="flex justify-between items-center mt-4">
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-zinc-100">
+          
+          ADV Management
+        </h1>
       </div>
       <div className="w-full flex justify-end mt-2 px-2 md:px-5">
         <div
