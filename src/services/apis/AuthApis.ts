@@ -186,16 +186,16 @@ export const authApi = createApi({
 
     // Fetch users
     fetchUsers: builder.mutation({
-      query: () => ({
-        url: AdminApiEndPoints.fetchUsers,
+      query: ({page,searchData}) => ({
+        url: `${AdminApiEndPoints.fetchUsers}?page=${page}&&?searchData=${searchData}`,
         method: "GET",
       }),
     }),
 
     // Fetch mentors
     fetchMentors: builder.mutation({
-      query: () => ({
-        url: AdminApiEndPoints.fetchMentors,
+      query: ({page , searchData}) => ({
+        url:   `${AdminApiEndPoints.fetchMentors}?page=${page}&&?searchData=${searchData}`,
         method: "GET",
       }),
     }),

@@ -53,14 +53,17 @@ const AdminSignInPage = lazy(
 );
 const AdminDashbordPage = lazy(() => import("@/features/admin/pages/Dashbord"));
 const AdminUserManagementPage = lazy(
-  () => import("@/features/admin/pages/UserManagement")
+  () => import("@/features/auth/admin/pages/UserManagement")
 );
 
 const AdminMentorManagementPage = lazy(
-  () => import("@/features/admin/pages/MentorManagement")
+  () => import("@/features/auth/admin/pages/MentorManagement")
 );
 const AdminAdvManagementPage = lazy(
   () => import("@/features/admin/pages/AdvManagement")
+);
+const AdminVerifyProfilePage = lazy(
+  () => import("@/features/admin/pages/VerifyProfile")
 );
 
 ////////////////////////--Admin side--/////////////////////
@@ -388,6 +391,16 @@ const routes = createBrowserRouter(
             </AdminProtected>
           ),
         },
+        {
+          path:AdminUrls.verifyprofile,
+          element:(
+            <AdminProtected>
+            <Suspense fallback={<div>Loading.....</div>}>
+              <AdminVerifyProfilePage />
+            </Suspense>
+          </AdminProtected>
+          )
+        }
       ],
     },
     { path: "/servererror", element: <ErrorPage500 /> },

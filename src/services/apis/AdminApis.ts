@@ -23,8 +23,8 @@ export const adminApi = createApi({
 
     // Fetch adv data
     fetchAdvsData: builder.mutation({
-      query: () => ({
-        url: AdminApiEndPoints.fetchAdvData,
+      query: (page) => ({
+        url: `${AdminApiEndPoints.fetchAdvData}?page=${page}`,
         method: "GET",
       }),
     }),
@@ -72,8 +72,8 @@ export const adminApi = createApi({
 
     // Fetch trustedUs data
     fetchtrustedUsData: builder.mutation({
-      query: () => ({
-        url: AdminApiEndPoints.fetchTrustedUsData,
+      query: (page) => ({
+        url: `${AdminApiEndPoints.fetchTrustedUsData}?page=${page}`,
         method: "GET",
       }),
     }),

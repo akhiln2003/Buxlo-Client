@@ -67,10 +67,13 @@ export const TrustedUsForm = ({
           );
           if (trustedUsImageUrls.data.imageUrl) {
             setTrustedUsImage((prev) => [
-              ...prev,
               ...trustedUsImageUrls.data.imageUrl,
+              ...(prev.length >= 5 ? prev.slice(1) : prev),
             ]);
-            setTrustedUsData((prev) => [...prev, value]);
+            setTrustedUsData((prev) => [
+              response.data.data,
+              ...(prev.length >= 5 ? prev.slice(1) : prev),
+            ]);
           } else {
             errorTost(
               "Error fetching Trusted Us Images",
@@ -82,7 +85,6 @@ export const TrustedUsForm = ({
         successToast("Updated", "Company picture updated successfully");
         setIsOpen(false);
       } else {
-
         errorTost(
           "Something went wrong",
           response.error.data.error || [

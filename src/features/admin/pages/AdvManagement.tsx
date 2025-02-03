@@ -14,6 +14,7 @@ import {
 
 import { ConfirmDeletion } from "../components/ConfirmDeletion";
 import EditAndDeleteDropdownMenu from "../components/EditAndDeleteDropdownMenu";
+import { PageNation } from "@/components/ui/pageNation";
 
 const AdvManagement = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,6 +25,14 @@ const AdvManagement = () => {
     index: number;
     type: string;
   } | null>(null);
+  const [trustedUsPageNationData, setTrustedUsPageNationData] = useState({
+    pageNum: 1,
+    totalPages: 0,
+  });
+  const [advPageNationData, setAdvPageNationData] = useState({
+    pageNum: 1,
+    totalPages: 0,
+  });
   const [trustedUsData, setTrustedUsData] = useState<ItrustedUs[]>([]);
   const [advData, setAdvData] = useState<Iadv[]>([]);
   const [trustedUsImage, setTrustedUsImage] = useState<string[]>([]);
@@ -34,60 +43,82 @@ const AdvManagement = () => {
   const [fetchTrustedUsImages] = useFetchTrustedUsImageMutation();
   const [fetchAdvImages] = useFetchAdvImageMutation();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const trustedUsResponse: IaxiosResponse = await fetchTrustedUsData();
-        const advResponse: IaxiosResponse = await fetchAdvData();
-        if (trustedUsResponse.data.data) {
-          setTrustedUsData(trustedUsResponse.data.data);
-          const trustedUsKeys: string[] = trustedUsResponse.data.data.map(
-            (val: ItrustedUs) => `TrustedUs/${val.image}`
-          );
+  const fetchAdv = async (page: number = 1) => {
+    try {
+      const advResponse: IaxiosResponse = await fetchAdvData(page);
 
-          if (trustedUsKeys.length > 0) {
-            const trustedUsImageUrls: IaxiosResponse =
-              await fetchTrustedUsImages({ keys: trustedUsKeys });
-            if (trustedUsImageUrls.data.imageUrl) {
-              setTrustedUsImage(trustedUsImageUrls.data.imageUrl);
-            } else {
-              errorTost(
-                "Error fetching Trusted Us Images",
-                trustedUsImageUrls.error.data.error
-              );
-            }
+      if (advResponse.data.advs) {
+        setAdvData(advResponse.data.advs);
+        setAdvPageNationData((prev) => ({
+          ...prev,
+          totalPages: advResponse.data.totalPages,
+        }));
+        const advKeys: string[] = advResponse.data.advs.map(
+          (val: ItrustedUs) => `Adv/${val.image}`
+        );
+
+        if (advKeys.length > 0) {
+          const trustedUsImageUrls: IaxiosResponse = await fetchAdvImages({
+            keys: advKeys,
+          });
+
+          if (trustedUsImageUrls.data.imageUrl) {
+            setAdvImage(trustedUsImageUrls.data.imageUrl);
+          } else {
+            errorTost(
+              "Error fetching Adv Images",
+              trustedUsImageUrls.error.data.error
+            );
           }
         }
-        if (advResponse.data.data) {
-          setAdvData(advResponse.data.data);
-          const advKeys: string[] = advResponse.data.data.map(
-            (val: ItrustedUs) => `Adv/${val.image}`
-          );
-
-          if (advKeys.length > 0) {
-            const trustedUsImageUrls: IaxiosResponse = await fetchAdvImages({
-              keys: advKeys,
-            });
-
-            if (trustedUsImageUrls.data.imageUrl) {
-              setAdvImage(trustedUsImageUrls.data.imageUrl);
-            } else {
-              errorTost(
-                "Error fetching Adv Images",
-                trustedUsImageUrls.error.data.error
-              );
-            }
-          }
-        }
-      } catch (err) {
-        console.error("Error fetching data:", err);
-        errorTost("Something went wrong", [
-          { message: "Please try again later" },
-        ]);
       }
-    };
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      errorTost("Something went wrong", [
+        { message: "Please try again later" },
+      ]);
+    }
+  };
 
-    fetchData();
+  const fetchTrustedUs = async (page: number = 1) => {
+    try {
+      const trustedUsResponse: IaxiosResponse = await fetchTrustedUsData(page);
+
+      if (trustedUsResponse.data.trustedUs) {
+        setTrustedUsData(trustedUsResponse.data.trustedUs);
+        setTrustedUsPageNationData((prev) => ({
+          ...prev,
+          totalPages: trustedUsResponse.data.totalPages,
+        }));
+        const trustedUsKeys: string[] = trustedUsResponse.data.trustedUs.map(
+          (val: ItrustedUs) => `TrustedUs/${val.image}`
+        );
+
+        if (trustedUsKeys.length > 0) {
+          const trustedUsImageUrls: IaxiosResponse = await fetchTrustedUsImages(
+            { keys: trustedUsKeys }
+          );
+          if (trustedUsImageUrls.data.imageUrl) {
+            setTrustedUsImage(trustedUsImageUrls.data.imageUrl);
+          } else {
+            errorTost(
+              "Error fetching Trusted Us Images",
+              trustedUsImageUrls.error.data.error
+            );
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      errorTost("Something went wrong", [
+        { message: "Please try again later" },
+      ]);
+    }
+  };
+
+  useEffect(() => {
+    fetchAdv();
+    fetchTrustedUs();
   }, []);
 
   const handleDeleteClick = (
@@ -99,12 +130,12 @@ const AdvManagement = () => {
     setDeleteData({ id, key, index, type });
     setDeleteIsOpen(true);
   };
+console.log(trustedUsData);
 
   return (
     <div className="w-full h-full p-4">
       <div className="flex justify-between items-center mt-4">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-zinc-100">
-          
           ADV Management
         </h1>
       </div>
@@ -133,8 +164,11 @@ const AdvManagement = () => {
         deleteData={deleteData}
         setTrustedUsImage={setTrustedUsImage}
         setTrustedUsData={setTrustedUsData}
+        trustedUsData={trustedUsData}
         setAdvData={setAdvData}
+        advData={advData}
         setAdvImage={setAdvImage}
+        fetchFunction={deleteData?.type == 'trustedUs'? fetchTrustedUs : fetchAdv}
       />
 
       <div className="w-full mt-[2rem] p-4 md:p-10 ">
@@ -166,6 +200,15 @@ const AdvManagement = () => {
             </div>
           ))}
         </div>
+        {trustedUsPageNationData.totalPages > 1 && (
+          <div className="w-full h-8  mt-[3rem]  flex justify-end pr-[2rem]">
+            <PageNation
+              pageNationData={trustedUsPageNationData}
+              fetchUserData={fetchTrustedUs}
+              setpageNationData={setTrustedUsPageNationData}
+            />
+          </div>
+        )}
       </div>
 
       <div className="w-full mt-[2rem] p-4 md:p-10">
@@ -205,6 +248,15 @@ const AdvManagement = () => {
           ))}
         </div>
       </div>
+      {advPageNationData.totalPages > 1 && (
+        <div className="w-full h-14  py-2  flex justify-end pr-[2rem]">
+          <PageNation
+            pageNationData={advPageNationData}
+            fetchUserData={fetchAdv}
+            setpageNationData={setAdvPageNationData}
+          />
+        </div>
+      )}
     </div>
   );
 };

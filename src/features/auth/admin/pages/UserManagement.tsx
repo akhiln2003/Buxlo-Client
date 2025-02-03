@@ -17,6 +17,7 @@ import { errorTost } from "@/components/ui/tosastMessage";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { PageNation } from "@/components/ui/pageNation";
 
 interface User {
   id: string;
@@ -35,6 +36,10 @@ function UserManagement() {
   const [userAction] = useBlockandunblockMutation();
 
   const [users, setUsers] = useState<User[]>([]);
+  const [pageNationData, setPageNationData] = useState({
+    pageNum: 1,
+    totalPages: 0,
+  });
 
   const handileBlock = async (id: string, isBlocked: boolean) => {
     const response: IaxiosResponse = await userAction({ id, isBlocked });
@@ -53,31 +58,36 @@ function UserManagement() {
       );
     }
   };
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const role = "user";
-        const response: IaxiosResponse = await fetchUsers(role); // `unwrap` gets the raw response
-        if (response.data) {
-          setUsers(response.data.data);
-        } else {
-          errorTost(
-            "Somthing when wrong ",
-            response.error.data.error || [
-              { message: `${response.error.data} please try again laiter` },
-            ]
-          );
-        }
-      } catch (err) {
-        console.error("Error fetching users:", err);
-        errorTost("SomThing wrong", [
-          { message: "Somting when wrong please try again" },
-        ]);
-      }
-    };
+  const fetchUserData = async (page = 1, searchData = undefined) => {
+    try {
+      const response: IaxiosResponse = await fetchUsers({ page, searchData }); // `unwrap` gets the raw response
+      console.log(response);
 
-    fetchUserData();
+      if (response.data) {
+        setUsers(response.data.data.users);
+        setPageNationData((prev) => ({
+          ...prev,
+          totalPages: response.data.data.totalPages,
+        }));
+      } else {
+        errorTost(
+          "Somthing when wrong ",
+          response.error.data.error || [
+            { message: `${response.error.data} please try again laiter` },
+          ]
+        );
+      }
+    } catch (err) {
+      console.error("Error fetching users:", err);
+      errorTost("SomThing wrong", [
+        { message: "Somting when wrong please try again" },
+      ]);
+    }
+  };
+  useEffect(() => {
+    fetchUserData(pageNationData.pageNum);
   }, []);
+
   return (
     <div className="w-full h-full p-5">
       <div className="flex justify-between items-center my-4">
@@ -146,18 +156,15 @@ function UserManagement() {
             ))}
           </TableBody>
         </Table>
-        <div className="w-full  my-[3rem]  flex justify-end pb-[1rem] ">
-          <div className="w-2/12 min-h-full max-h-full   flex justify-between items-center rounded-s">
-            <Button className=" p-[0.5rem] bg-zinc-600 rounded-sm">Prev</Button>
-            <h3>1</h3>
-            <h3>1</h3>
-            <h3>1</h3>
-            <p>..</p>
-            <Button className=" p-[0.5rem]  bg-zinc-600 rounded-sm">
-              Next
-            </Button>
+        {pageNationData.totalPages > 1 && (
+          <div className="w-full my-[3rem] flex justify-end pb-[1rem]">
+            <PageNation
+              pageNationData={pageNationData}
+              fetchUserData={fetchUserData}
+              setpageNationData={setPageNationData}
+            />
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

@@ -4,5 +4,6 @@ export enum AdminUrls{
     signIn = '/admin/signin',
     userManagement = '/admin/usermanagement',
     mentorManagement = '/admin/mentormanagement',
-    advManagement = '/admin/advmanagement'
+    advManagement = '/admin/advmanagement',
+    verifyprofile = '/admin/verifyprofile'
 }

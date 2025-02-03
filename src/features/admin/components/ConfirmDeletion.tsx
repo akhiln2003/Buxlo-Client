@@ -22,16 +22,22 @@ import {
     deleteData,
     setTrustedUsImage,
     setTrustedUsData,
+    trustedUsData,
     setAdvData,
+    advData,
     setAdvImage,
+    fetchFunction
   }: {
     isDeleteOpen: boolean;
     setDeleteIsOpen: (value: boolean) => void;
     deleteData: { id: string; key: string; index: number; type: string } | null;
     setTrustedUsImage: React.Dispatch<React.SetStateAction<string[]>>;
     setTrustedUsData: React.Dispatch<React.SetStateAction<ItrustedUs[]>>;
+    trustedUsData:ItrustedUs[];
     setAdvData: React.Dispatch<React.SetStateAction<Iadv[]>>;
+    advData:Iadv[];
     setAdvImage: React.Dispatch<React.SetStateAction<string[]>>;
+    fetchFunction:() => Promise<void>
   }) => {
     const [deleteTrustedUsImage, { isLoading: isDeletingTrustedUs }] =
       useDeleteTrustedUsImageMutation();
@@ -54,6 +60,9 @@ import {
           setTrustedUsImage((prevImages) =>
             prevImages.filter((_, index) => index !== deleteData.index)
           );
+          if( trustedUsData.length <= 1){
+            fetchFunction()
+          }
         } else {
           setAdvData((prevData) =>
             prevData.filter((item) => item.id !== deleteData.id)
@@ -61,6 +70,10 @@ import {
           setAdvImage((prevImages) =>
             prevImages.filter((_, index) => index !== deleteData.index)
           );
+
+          if( advData.length <= 1){
+            fetchFunction()
+          }
         }
   
         successToast(

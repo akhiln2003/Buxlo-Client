@@ -197,8 +197,10 @@ export const AdvForm = ({
                 return newImages;
               });
             } else {
-              setAdvImage((prev) => [...prev, ...imageUrls.data.imageUrl]);
-              setAdvData((prev) => [...prev, value]);
+              
+
+              setAdvImage((prev) => [ ...imageUrls.data.imageUrl , ...(prev.length >= 5 ? prev.slice(1) : prev),]);
+              setAdvData((prev) => [ value, ...(prev.length >= 5 ? prev.slice(1) : prev),]);
             }
           } else {
             errorTost("Error fetching Images", imageUrls.error.data.error);
