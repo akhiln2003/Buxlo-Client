@@ -61,7 +61,6 @@ function UserManagement() {
   const fetchUserData = async (page = 1, searchData = undefined) => {
     try {
       const response: IaxiosResponse = await fetchUsers({ page, searchData }); // `unwrap` gets the raw response
-      console.log(response);
 
       if (response.data) {
         setUsers(response.data.data.users);

@@ -111,6 +111,31 @@ export const adminApi = createApi({
         data: data,
       }),
     }),
+    // Fetch verify profile data
+    fetchVerifyProfileData: builder.mutation({
+      query: ({ page, verified }) => ({
+        url: `${AdminApiEndPoints.fetchVerifyProfileData}?page=${page}&&verified=${verified}`,
+        method: "GET",
+      }),
+    }),
+
+    // Fetch verify profile Image
+    fethAadhaarImages: builder.mutation({
+      query: (keys) => ({
+        url: AdminApiEndPoints.fethAadhaarImages,
+        method: "POST",
+        data: keys,
+      }),
+    }),
+
+    // Update profile verification
+    adminUpdateVerifyProfile: builder.mutation({
+      query: ({ id, verified , unsetData}) => ({
+        url: AdminApiEndPoints.verifyprofile,
+        method: "PUT",
+        data: { id, verified , unsetData },
+      }),
+    }),
   }),
 });
 
@@ -127,4 +152,7 @@ export const {
   useEditAdvMutation,
   useFetchSubscriptionPlanMutation,
   useUpdateSubscriptionPlanMutation,
+  useFetchVerifyProfileDataMutation,
+  useFethAadhaarImagesMutation,
+  useAdminUpdateVerifyProfileMutation,
 } = adminApi;

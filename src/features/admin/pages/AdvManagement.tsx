@@ -130,7 +130,6 @@ const AdvManagement = () => {
     setDeleteData({ id, key, index, type });
     setDeleteIsOpen(true);
   };
-console.log(trustedUsData);
 
   return (
     <div className="w-full h-full p-4">
