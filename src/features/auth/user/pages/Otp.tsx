@@ -17,6 +17,7 @@ import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { useDispatch } from "react-redux";
 import { addUser } from "@/redux/slices/userSlice";
 import { otpFormSchema } from "../../zodeSchema/authSchema";
+import { useRef } from "react";
 
 function Otp() {
   const [minutes, setMinutes] = useState(1);
@@ -45,6 +46,13 @@ function Otp() {
       otpFour: "",
     },
   });
+  // Create refs for the inputs
+  const inputRefs = [
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+  ];
 
   const onSubmit = async (data: z.infer<typeof otpFormSchema>) => {
     const otp = data.otpOne + data.otpTwo + data.otpThree + data.otpFour;
@@ -151,7 +159,7 @@ function Otp() {
                 {/* OTP Fields */}
                 <div className="flex gap-2 justify-center">
                   {["otpOne", "otpTwo", "otpThree", "otpFour"].map(
-                    (otpField) => (
+                    (otpField, index) => (
                       <FormField
                         key={otpField}
                         control={form.control}
@@ -163,6 +171,27 @@ function Otp() {
                                 className="w-14 h-12 text-center border border-zinc-950 dark:border-zinc-300 mx-2"
                                 maxLength={1}
                                 {...field}
+                                ref={inputRefs[index]}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  // Only allow digits
+                                  if (/^\d?$/.test(value)) {
+                                    field.onChange(value);
+                                    if (value && index < inputRefs.length - 1) {
+                                      inputRefs[index + 1].current?.focus(); // Move to next input
+                                    }
+                                  }
+                                }}
+                                onKeyDown={(e) => {
+                                  // Optional: Handle Backspace to move focus back
+                                  if (
+                                    e.key === "Backspace" &&
+                                    !field.value &&
+                                    index > 0
+                                  ) {
+                                    inputRefs[index - 1].current?.focus();
+                                  }
+                                }}
                               />
                             </FormControl>
                           </FormItem>
