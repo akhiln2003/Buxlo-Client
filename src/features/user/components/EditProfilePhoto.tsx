@@ -65,11 +65,11 @@ function EditProfilePhoto({
           avatar: response.data.data.avatar,
         }));
         const imageUrl: IaxiosResponse = await fetchProfileImages(
-          response.data.data.avatar as string
+        [`UserProfiles/${response.data.data.avatar }`]
         );
 
         if (imageUrl.data) {
-          setProfileImage(imageUrl.data.imageUrl);
+          setProfileImage(imageUrl.data.imageUrl[0]);
           setIsPhotoDialogOpen(false);
 
           successToast("Updated", "Profile picture updated successfully");

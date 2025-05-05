@@ -8,9 +8,11 @@ export enum UserUrls  {
     setNewPassword = '/resetpassword/:token',
     profile = '/profile',
     subscription = '/subscription',
-    dashbord = '/dashbord',
+    dashboard = '/dashboard',
     contact = '/contact',
     chat = '/chat',
     call = '/call',
     videoCall = '/videocall',
+    listMentors = '/listmentors',
+    mentorProfile = '/mentorprofile'
 }

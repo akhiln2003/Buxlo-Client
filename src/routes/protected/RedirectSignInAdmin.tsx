@@ -13,7 +13,7 @@ const RedirectSignInAdmin: React.FC<UserProtectedProps> = ({ children }) => {
 
   // If the user is logged in, stick to the current URL
   if (user?.role == USER_ROLE.ADMIN ) {
-    return < Navigate to={AdminUrls.dashbord} />
+    return < Navigate to={AdminUrls.dashboard} />
     
   }
 

@@ -29,9 +29,10 @@ export const userApi = createApi({
 
     // Fetch  profileImage
     fetchUserProfileImage: builder.mutation({
-      query: (key: string) => ({
-        url: `${UserApiEndPoints.fetchProfileImage}/${key}`,
-        method: "GET",
+      query: (keys: string[]) => ({
+        url: UserApiEndPoints.fetchProfileImage,
+        method: "POST",
+        data: { keys },
       }),
     }),
 
@@ -43,8 +44,63 @@ export const userApi = createApi({
       }),
     }),
 
+    // createlinktoken
+    createlinktoken: builder.mutation({
+      query: ({
+        id,
+        name,
+      }: {
+        id: string | undefined;
+        name: string | undefined;
+      }) => ({
+        url: UserApiEndPoints.createlinktoken,
+        method: "POST",
+        data: {
+          id,
+          name,
+        },
+      }),
+    }),
 
-  
+    //Exchange public token
+    exchangePublicToken: builder.mutation({
+      query: ({
+        publicToken,
+        user,
+      }: {
+        publicToken: string;
+        user: unknown;
+      }) => ({
+        url: UserApiEndPoints.exchangePublicToken,
+        method: "POST",
+        data: { publicToken, user },
+      }),
+    }),
+
+    // Fetching Mentors
+    fetchMentorsList: builder.mutation({
+      query: ({ page, availability }) => ({
+        url: `${UserApiEndPoints.fetchMentorsList}?page=${page}&&availability=${availability}`,
+        method: "GET",
+      }),
+    }),
+
+    // Contact mentor
+    connectMentor: builder.mutation({
+      query: ({ userId, mentorId }) => ({
+        url: UserApiEndPoints.connectMentor,
+        method: "POST",
+        data: { userId, mentorId },
+      }),
+    }),
+
+    // Fetch contacts
+    fetchContacts: builder.mutation({
+      query: (id) => ({
+        url: `${UserApiEndPoints.fetchContacts}?id=${id}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -54,4 +110,9 @@ export const {
   useUpdateUserProfileMutation,
   useFetchUserProfileImageMutation,
   useDeleteUserProfileImageMutation,
+  useCreatelinktokenMutation,
+  useExchangePublicTokenMutation,
+  useFetchMentorsListMutation,
+  useConnectMentorMutation,
+  useFetchContactsMutation,
 } = userApi;

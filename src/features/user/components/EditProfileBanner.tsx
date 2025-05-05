@@ -2,8 +2,8 @@ import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { Imentor } from "@/@types/interface/Imentor";
 import { Button } from "@/components/ui/button";
 import { errorTost } from "@/components/ui/tosastMessage";
-import { useFetchProfileImageMutation } from "@/services/apis/CommonApis";
 import { useUpdateMentorProfileMutation } from "@/services/apis/MentorApis";
+import { useFetchUserProfileImageMutation } from "@/services/apis/UserApis";
 import { PencilIcon, Trash2 } from "lucide-react";
 import React, { useState } from "react";
 
@@ -23,7 +23,7 @@ function EditProfileBanner({
   const [newProfileImage, setNewProfileImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(profileImage);
   const [updateProfile, { isLoading }] = useUpdateMentorProfileMutation();
-  const [fetchProfileImages] = useFetchProfileImageMutation();
+  const [fetchProfileImages] = useFetchUserProfileImageMutation();
 
   const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const avatar = event.target.files?.[0];
@@ -54,10 +54,10 @@ function EditProfileBanner({
           avatar: response.data.data.avatar,
         }));
         const imageUrl: IaxiosResponse = await fetchProfileImages(
-          response.data.data.avatar as string
+         [`UserProfiles/${ response.data.data.avatar}`]
         );
         if (imageUrl.data) {
-          setProfileImage(imageUrl.data.imageUrl);
+          setProfileImage(imageUrl.data.imageUrl[0]);
           setIsPhotoDialogOpen(false);
         } else {
           errorTost(

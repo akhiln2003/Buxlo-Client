@@ -27,9 +27,10 @@ const UserForgotPasswordPage = lazy(
 const UserSetNewPassword = lazy(
   () => import("@/features/auth/user/pages/newPassword")
 );
-const UserDashbordPage = lazy(() => import("@/features/user/pages/dashBord"));
+const UserDashboardPage = lazy(() => import("@/features/user/pages/dashBord"));
 const UserProfilePage = lazy(() => import("@/features/user/pages/profile"));
-
+const ListMentors = lazy(() => import("@/features/user/pages/listMentors"));
+const UserMentorProfile = lazy(()=> import("@/features/user/pages/mentorProfileDetails"))
 ////////////////////////--User side--///////////////////////
 ////////////////////////--Mentor side--/////////////////////
 
@@ -51,7 +52,9 @@ const MentorProfilePage = lazy(() => import("@/features/mentor/pages/profile"));
 const AdminSignInPage = lazy(
   () => import("@/features/auth/admin/pages/SignIn")
 );
-const AdminDashbordPage = lazy(() => import("@/features/admin/pages/Dashbord"));
+const AdminDashboardPage = lazy(
+  () => import("@/features/admin/pages/Dashbord")
+);
 const AdminUserManagementPage = lazy(
   () => import("@/features/auth/admin/pages/UserManagement")
 );
@@ -142,11 +145,11 @@ const routes = createBrowserRouter(
           ),
         },
         {
-          path: UserUrls.dashbord,
+          path: UserUrls.dashboard,
           element: (
             <UserProtected>
               <Suspense fallback={<div>Loading....</div>}>
-                <UserDashbordPage />
+                <UserDashboardPage />
               </Suspense>
             </UserProtected>
           ),
@@ -197,6 +200,26 @@ const routes = createBrowserRouter(
             <UserProtected>
               <Suspense fallback={<div>Loading...</div>}>
                 <VideoCall />
+              </Suspense>
+            </UserProtected>
+          ),
+        },
+        {
+          path: UserUrls.listMentors,
+          element: (
+            <UserProtected>
+              <Suspense fallback={<div>Loading ....</div>}>
+                <ListMentors />
+              </Suspense>
+            </UserProtected>
+          ),
+        },
+        {
+          path:`${ UserUrls.mentorProfile}/:mentorId`,
+          element: (
+            <UserProtected>
+              <Suspense fallback={<div>Loading ....</div>}>
+                <UserMentorProfile />
               </Suspense>
             </UserProtected>
           ),
@@ -336,7 +359,7 @@ const routes = createBrowserRouter(
           element: (
             <AdminProtected>
               <Suspense fallback={<div>Loading....</div>}>
-                <AdminDashbordPage />
+                <AdminDashboardPage />
               </Suspense>
             </AdminProtected>
           ),
@@ -352,11 +375,11 @@ const routes = createBrowserRouter(
           ),
         },
         {
-          path: AdminUrls.dashbord,
+          path: AdminUrls.dashboard,
           element: (
             <AdminProtected>
               <Suspense fallback={<div>Loading....</div>}>
-                <AdminDashbordPage />
+                <AdminDashboardPage />
               </Suspense>
             </AdminProtected>
           ),
@@ -392,15 +415,15 @@ const routes = createBrowserRouter(
           ),
         },
         {
-          path:AdminUrls.verifyprofile,
-          element:(
+          path: AdminUrls.verifyprofile,
+          element: (
             <AdminProtected>
-            <Suspense fallback={<div>Loading.....</div>}>
-              <AdminVerifyProfilePage />
-            </Suspense>
-          </AdminProtected>
-          )
-        }
+              <Suspense fallback={<div>Loading.....</div>}>
+                <AdminVerifyProfilePage />
+              </Suspense>
+            </AdminProtected>
+          ),
+        },
       ],
     },
     { path: "/servererror", element: <ErrorPage500 /> },

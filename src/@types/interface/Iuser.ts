@@ -1,7 +1,3 @@
-
-
-
-
 export class Iuser {
   constructor(
     public name: string,

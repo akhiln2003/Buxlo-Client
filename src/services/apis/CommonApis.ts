@@ -18,8 +18,38 @@ export const commonApi = createApi({
         data: data,
       }),
     }),
+
+    // Send message
+    sendMessage: builder.mutation({
+      query: (formData: FormData) => ({
+        url: CommonApiEndPoints.sendMessage,
+        method: "POST",
+        data: formData,
+      }),
+    }),
+
+    // Fetch  messages
+    fetchMessage: builder.mutation({
+      query: (id) => ({
+        url: `${CommonApiEndPoints.fetchMessages}?id=${id}`,
+        method: "GET",
+      }),
+    }),
+
+    // Fetch images , video and audio
+    fetchMessageFromS3: builder.mutation({
+      query: (keys: string[]) => ({
+        url: CommonApiEndPoints.fetchMessageFromS3,
+        method: "POST",
+        data: { keys },
+      }),
+    }),
   }),
 });
 
-// Export the hook directly from the API slice
-export const { useContactUsMutation } = commonApi;
+export const {
+  useContactUsMutation,
+  useFetchMessageMutation,
+  useSendMessageMutation,
+  useFetchMessageFromS3Mutation
+} = commonApi;

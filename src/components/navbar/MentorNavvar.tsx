@@ -98,7 +98,7 @@ function MentorNavbar() {
                 href="#"
                 className="text-gray-900 dark:text-white  hover:text-gray-500"
               >
-                DASHBORD
+                DASHBOARD
               </a>
               <a
                 href="#"

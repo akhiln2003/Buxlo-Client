@@ -29,9 +29,10 @@ export const mentorApi = createApi({
 
     // Fetch  profileImage
     fetchMentorProfileImage: builder.mutation({
-      query: (key: string) => ({
-        url: `${MentorApiEndPoints.fetchProfileImage}/${key}`,
-        method: "GET",
+      query: (keys: string[]) => ({
+        url: MentorApiEndPoints.fetchProfileImage,
+        method: "POST",
+        data:{keys}
       }),
     }),
 

@@ -52,10 +52,10 @@ const Profile = () => {
           setUsers(response.data.data);
           if (response.data.data.avatar) {
             const imageUrl: IaxiosResponse = await fetchProfileImages(
-              response.data.data.avatar as string
+              [`MentorProfiles/${response.data.data.avatar}`]
             );
             if (imageUrl.data.imageUrl) {
-              setProfileImage(imageUrl.data.imageUrl);
+              setProfileImage(imageUrl.data.imageUrl[0]);
             } else {
               errorTost(
                 "Something went wrong ",

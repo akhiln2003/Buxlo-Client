@@ -57,7 +57,7 @@ export function SigninForm() {
     if (response.data?.user) {
       const user = response.data.user;
       dispatch(addUser(user));
-      navigate(AdminUrls.dashbord);
+      navigate(AdminUrls.dashboard);
     } else {
       errorTost(
         "Somthing when wrong ",

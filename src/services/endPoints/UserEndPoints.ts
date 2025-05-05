@@ -12,5 +12,10 @@ export enum UserApiEndPoints {
     fetchProfileImage = '/user/user/fetchprofileimage',
     deleteProfileImage = '/user/user/deleteprofileimage',
     updateProfile = '/user/user/updateprofile',
+    createlinktoken = '/payment/user/createlinktoken',
+    exchangePublicToken = '/payment/user/exchangepublictoken',
+    fetchMentorsList = '/user/user/fetchmentors',
+    connectMentor = '/chat/user/connectmentor',
+    fetchContacts = '/chat/user/fetchcontacts',
 
     }

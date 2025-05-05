@@ -1,6 +1,6 @@
 export enum AdminUrls{
     home = '/admin',
-    dashbord = '/admin/dashbord',
+    dashboard = '/admin/dashboard',
     signIn = '/admin/signin',
     userManagement = '/admin/usermanagement',
     mentorManagement = '/admin/mentormanagement',
