@@ -1,8 +1,8 @@
-import { Iuser } from "@/@types/interface/Iuser";
+import { IuserDB } from "@/@types/interface/IdataBase";
 import { RootState } from "@/redux/store"
 import { useSelector } from "react-redux"
 
 export const useGetUser=()=>{
-    const { user }:{user:Iuser | null} = useSelector((state: RootState) => state.userAuth);
+    const { user }:{user:IuserDB | null} = useSelector((state: RootState) => state.userAuth);
     return user
 }

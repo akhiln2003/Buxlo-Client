@@ -10,6 +10,9 @@ import {
   useFetchUserProfileImageMutation,
   useUpdateUserProfileMutation,
 } from "@/services/apis/UserApis";
+import { useGetUser } from "@/hooks/useGetUser";
+import { useDispatch } from "react-redux";
+import { addUser } from "@/redux/slices/userSlice";
 
 function EditProfilePhoto({
   id,
@@ -33,6 +36,8 @@ function EditProfilePhoto({
   const [fetchProfileImages] = useFetchUserProfileImageMutation();
   const [deleteProfileImages, { isLoading: isDeleting }] =
     useDeleteUserProfileImageMutation();
+  const user = useGetUser();
+  const dispatch = useDispatch();
 
   const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const avatar = event.target.files?.[0];
@@ -64,6 +69,9 @@ function EditProfilePhoto({
           ...prev,
           avatar: response.data.data.avatar,
         }));
+        if(user){
+          dispatch(addUser({...user, avatar: response.data.data.avatar }));
+        }
         const imageUrl: IaxiosResponse = await fetchProfileImages(
         [`UserProfiles/${response.data.data.avatar }`]
         );
@@ -99,7 +107,11 @@ function EditProfilePhoto({
     if (response.data) {
       setIsPhotoDialogOpen(false);
       setProfileImage("");
-
+      if (user) {
+        const updatedUser = { ...user };
+        delete updatedUser.avatar;
+        dispatch(addUser(updatedUser));
+      }
       successToast("Removed", "Profile picture removed successfully");
     } else {
       errorTost(

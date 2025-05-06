@@ -8,5 +8,5 @@ export interface IuserDB {
   name: string,
   role: string,
   updatedAt: string;
-  avatar: string;
+  avatar?: string;
 }
