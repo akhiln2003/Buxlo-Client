@@ -10,6 +10,9 @@ import {
 import { Loader, PencilIcon, Trash2 } from "lucide-react";
 import React, { useState } from "react";
 import dummyProfileImage from "@/assets/images/dummy-profile.webp";
+import { useGetUser } from "@/hooks/useGetUser";
+import { useDispatch } from "react-redux";
+import { addUser } from "@/redux/slices/userSlice";
 
 function EditProfilePhoto({
   id,
@@ -33,7 +36,8 @@ function EditProfilePhoto({
   const [fetchProfileImages] = useFetchMentorProfileImageMutation();
   const [deleteProfileImages, { isLoading: isDeleting }] =
     useDeleteMentorProfileImageMutation();
-
+  const mentor = useGetUser();
+  const dispatch = useDispatch();
   const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const avatar = event.target.files?.[0];
 
@@ -64,9 +68,13 @@ function EditProfilePhoto({
           ...prev,
           avatar: response.data.data.avatar,
         }));
-        const imageUrl: IaxiosResponse = await fetchProfileImages(
-         [ `MentorProfiles/${response.data.data.avatar}` ]
-        );
+        if (mentor) {
+          dispatch(addUser({ ...mentor, avatar: response.data.data.avatar }));
+        }
+
+        const imageUrl: IaxiosResponse = await fetchProfileImages([
+          `MentorProfiles/${response.data.data.avatar}`,
+        ]);
 
         if (imageUrl.data) {
           setProfileImage(imageUrl.data.imageUrl[0]);
@@ -98,7 +106,11 @@ function EditProfilePhoto({
     if (response.data) {
       setIsPhotoDialogOpen(false);
       setProfileImage("");
-
+      if (mentor) {
+        const updatedUser = { ...mentor };
+        delete updatedUser.avatar;
+        dispatch(addUser(updatedUser));
+      }
       successToast("Removed", "Profile picture removed successfully");
     } else {
       errorTost(
