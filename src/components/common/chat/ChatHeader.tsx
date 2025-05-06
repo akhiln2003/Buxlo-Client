@@ -19,11 +19,10 @@ export function ChatHeader({
     setShowSidebar(true);
     setActiveChat(null);
   };
-  console.log(profileImage);
-  
+
   return (
-    <div className="flex items-center justify-between px-3 sm:px-4 md:px-6 py-3 md:py-4 bg-white dark:bg-zinc-900 border-b dark:border-zinc-800">
-      <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4">
+    <div className="flex items-center justify-between px-3 sm:px-4 py-3 sm:py-4 bg-white dark:bg-zinc-900 border-b dark:border-zinc-800 sticky top-0 z-10">
+      <div className="flex items-center space-x-2 sm:space-x-3">
         <button
           onClick={handleBackButton}
           className="md:hidden text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300 p-1"
@@ -33,20 +32,20 @@ export function ChatHeader({
         </button>
         <div className="relative flex-shrink-0">
           <img
-            src={ typeof profileImage == 'string' ? profileImage : dummyProfileImage}
+            src={typeof profileImage === "string" ? profileImage : dummyProfileImage}
             alt="Contact profile"
             className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
           />
           <div
             className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-zinc-900 ${
-              activeChat?.participantDetails[0].status 
-                ? "bg-green-500" 
+              activeChat?.participantDetails[0].status
+                ? "bg-green-500"
                 : "bg-gray-400"
             }`}
           ></div>
         </div>
         <div className="min-w-0">
-          <h2 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white truncate max-w-[150px] sm:max-w-[200px] md:max-w-xs">
+          <h2 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white truncate max-w-[120px] sm:max-w-[180px] md:max-w-[250px]">
             {activeChat?.participantDetails[0].name}
           </h2>
           <span className="text-xs sm:text-sm text-gray-500 dark:text-zinc-400">
@@ -54,7 +53,7 @@ export function ChatHeader({
           </span>
         </div>
       </div>
-      <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-6">
+      <div className="flex items-center space-x-2 sm:space-x-3">
         <button className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-500 dark:text-zinc-400 transition-colors hidden sm:flex">
           <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>

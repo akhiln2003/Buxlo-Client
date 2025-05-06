@@ -24,20 +24,20 @@ export function ChatSidebar({
 }: ChatSidebarProps) {
   return (
     <div
-      className={`${
-        showSidebar ? "flex" : "hidden"
-      } md:flex flex-col h-full w-full md:w-80 lg:w-96 bg-white dark:bg-zinc-900 border-r dark:border-zinc-800 absolute md:relative z-20 transition-all duration-300`}
+      className={`flex flex-col h-full w-full sm:w-64 lg:w-80 bg-white dark:bg-zinc-900 border-r dark:border-zinc-800 fixed md:static z-20 transition-transform duration-300 ${
+        showSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+      }`}
     >
-      <div className="p-3 md:p-4 border-b dark:border-zinc-800">
+      <div className="p-3 sm:p-4 border-b dark:border-zinc-800">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2 md:space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             <img
               src={myProfile || dummyProfileImage}
               alt="Your Profile"
               className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
             />
             <div>
-              <h2 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white truncate max-w-[200px]">
+              <h2 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white truncate max-w-[150px] sm:max-w-[200px]">
                 {user?.name}
               </h2>
               <span className="text-xs sm:text-sm text-gray-500 dark:text-zinc-400">
@@ -48,14 +48,14 @@ export function ChatSidebar({
         </div>
       </div>
 
-      <div className="p-3 md:p-4 border-b dark:border-zinc-800">
+      <div className="p-3 sm:p-4 border-b dark:border-zinc-800">
         <div className="relative">
           <input
             type="text"
             placeholder="Search conversations..."
             className="w-full pl-9 pr-3 py-2 text-sm border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white focus:outline-none focus:border-zinc-700 dark:focus:border-zinc-600"
           />
-          <Search className="w-4 h-4 md:w-5 md:h-5 text-gray-500 dark:text-zinc-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+          <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 dark:text-zinc-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
         </div>
       </div>
 
@@ -70,11 +70,11 @@ export function ChatSidebar({
             </p>
           </div>
         ) : (
-          contacts.map((contact, i) => (                                                                                                                                                    
+          contacts.map((contact, i) => (
             <div
               key={contact.id}
               onClick={() => handleChatSelect(contact)}
-              className={`flex items-center p-3 md:p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-800 transition ${
+              className={`flex items-center p-3 sm:p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-800 transition ${
                 activeChat?.id === contact.id ? "bg-blue-50 dark:bg-zinc-800" : ""
               }`}
             >
@@ -82,19 +82,19 @@ export function ChatSidebar({
                 <img
                   src={typeof profileImage[i] == 'string' ? profileImage[i] : dummyProfileImage}
                   alt={contact.participantDetails[0].name}
-                  className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover"
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
                 />
                 <div
-                  className={`absolute bottom-0 right-0 w-2.5 h-2.5 md:w-3 md:h-3 rounded-full border-2 border-white dark:border-zinc-900 ${
+                  className={`absolute bottom-0 right-0 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full border-2 border-white dark:border-zinc-900 ${
                     contact.participantDetails[0].status
                       ? "bg-green-500"
                       : "bg-gray-400"
                   }`}
                 ></div>
               </div>
-              <div className="ml-3 md:ml-4 flex-1 min-w-0">
+              <div className="ml-3 sm:ml-4 flex-1 min-w-0">
                 <div className="flex justify-between items-start">
-                  <h3 className="font-semibold text-xs md:text-sm text-gray-900 dark:text-white truncate max-w-[70%]">
+                  <h3 className="font-semibold text-xs sm:text-sm text-gray-900 dark:text-white truncate max-w-[70%]">
                     {contact.participantDetails[0].name}
                   </h3>
                   {(contact.unreadCount ?? 0) > 0 && (

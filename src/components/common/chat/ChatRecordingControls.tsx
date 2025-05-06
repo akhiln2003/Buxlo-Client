@@ -26,7 +26,7 @@ export function ChatRecordingControls({
   };
 
   return (
-    <div className="flex items-center justify-between w-full p-2 bg-white dark:bg-zinc-700 rounded-lg shadow-md animate-slide-up">
+    <div className="flex items-center justify-between w-full  bg-white dark:bg-zinc-700 rounded-lg shadow-md animate-slide-up">
       <div className="flex items-center space-x-2">
         <Mic size={20} className="text-red-500 animate-pulse" />
         <span className="text-sm font-semibold dark:text-white">

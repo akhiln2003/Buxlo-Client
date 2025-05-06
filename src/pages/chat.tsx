@@ -15,7 +15,7 @@ import { ChatInputContainer } from "@/components/common/chat/ChatInput";
 import { useFetchMessageMutation } from "@/services/apis/CommonApis";
 import { MessageCircle } from "lucide-react";
 
-
+// Interfaces remain unchanged
 export interface IparticipantDetails {
   avatar: string;
   createdAt: string;
@@ -33,6 +33,7 @@ export interface Icontacts {
   lastMessage: string;
   unreadCount?: number;
 }
+
 export interface InewMessage {
   chatId: string;
   senderId: string;
@@ -60,30 +61,28 @@ export default function Chat() {
 
   const fetchContacts = async (id: string) => {
     try {
-      
       const response: IaxiosResponse = await getContacts(id);
       if (response.data) {
-        setContacts(response.data.constats);        
+        setContacts(response.data.constats);
         const avatars: string[] = response.data.constats.flatMap(
           (contact: Icontacts) =>
             contact.participantDetails.map(
               (participant: IparticipantDetails) =>
-
-              participant.avatar  ?  participant.role == USER_ROLE.MENTOR ? `MentorProfiles/${participant.avatar}`: `UserProfiles/${participant.avatar}`  : ""
+                participant.avatar
+                  ? participant.role == USER_ROLE.MENTOR
+                    ? `MentorProfiles/${participant.avatar}`
+                    : `UserProfiles/${participant.avatar}`
+                  : ""
             )
         );
         if (avatars.length) {
-          const imageUrl: IaxiosResponse = await fetchMentorProfileImages(
-            avatars
-          );
+          const imageUrl: IaxiosResponse = await fetchMentorProfileImages(avatars);
           if (imageUrl.data) {
             setProfileImage(imageUrl.data.imageUrl);
           } else {
             errorTost(
               "Something went wrong",
-              imageUrl.error.data.error || [
-                { message: "Please try again later" },
-              ]
+              imageUrl.error.data.error || [{ message: "Please try again later" }]
             );
           }
         }
@@ -100,7 +99,7 @@ export default function Chat() {
   };
 
   const fetchMyProfile = async () => {
-    try {      
+    try {
       const imageUrl: IaxiosResponse =
         user?.role === USER_ROLE.MENTOR
           ? await fetchMentorProfileImages([`MentorProfiles/${user?.avatar}`])
@@ -123,7 +122,7 @@ export default function Chat() {
   useEffect(() => {
     if (user) {
       fetchContacts(user.id as string);
-      if( user.avatar) {
+      if (user.avatar) {
         fetchMyProfile();
       }
     }
@@ -132,7 +131,6 @@ export default function Chat() {
   const handleChatSelect = async (contact: Icontacts) => {
     try {
       setActiveChat(contact);
-
       const response: IaxiosResponse = await getMessages(contact.id);
       if (response.data) {
         setMessages(response.data.messages);
@@ -142,18 +140,17 @@ export default function Chat() {
           response.error.data.error || [{ message: "Please try again later" }]
         );
       }
-
       if (window.innerWidth < 768) {
         setShowSidebar(false);
       }
     } catch (err) {
-      console.error("Error selecting chatfddsfdd:", err);
+      console.error("Error selecting chat:", err);
       errorTost("Something went wrong", [{ message: "Please try again" }]);
     }
   };
 
   return (
-    <div className="flex h-screen -mt-16 pt-16 bg-gray-100 dark:bg-zinc-900">
+    <div className="flex h-[calc(100vh-64px)] bg-gray-100 dark:bg-zinc-900">
       <ChatSidebar
         showSidebar={showSidebar}
         contacts={contacts}
@@ -164,12 +161,12 @@ export default function Chat() {
         user={user}
       />
       <div
-        className={`${
-          !showSidebar ? "flex" : "hidden"
-        } md:flex flex-1 flex-col`}
+        className={`flex-1 flex flex-col w-full transition-all duration-300 ${
+          showSidebar ? "hidden md:flex" : "flex"
+        }`}
       >
         {activeChat ? (
-          <>
+          <div className="flex flex-col h-full">
             <ChatHeader
               activeChat={activeChat}
               setActiveChat={setActiveChat}
@@ -180,26 +177,28 @@ export default function Chat() {
                 ]
               }
             />
-            <ChatMessages messages={messages} userId={user?.id as string} />
+            <div className="flex-1 overflow-y-auto">
+              <ChatMessages messages={messages} userId={user?.id as string} />
+            </div>
             <ChatInputContainer
               setMessages={setMessages}
               chatId={activeChat.id}
               receiverId={activeChat.participantDetails[0].id}
               senderId={user?.id as string}
             />
-          </>
+          </div>
         ) : (
-          <div className="flex-1 overflow-y-auto p-4 bg-gray-150 dark:bg-zinc-950 flex flex-col items-center justify-center">
+          <div className="flex-1 flex flex-col items-center justify-center p-4 bg-gray-150 dark:bg-zinc-950">
             <div className="rounded-full bg-gray-200 dark:bg-zinc-800 p-4 mb-4">
               <MessageCircle
                 size={32}
                 className="text-gray-400 dark:text-zinc-500"
               />
             </div>
-            <p className="text-gray-500 dark:text-zinc-400 text-lg font-medium">
+            <p className="text-gray-500 dark:text-zinc-400 text-base sm:text-lg font-medium">
               No messages yet
             </p>
-            <p className="text-gray-400 dark:text-zinc-500 text-sm mt-2 text-center max-w-xs">
+            <p className="text-gray-400 dark:text-zinc-500 text-xs sm:text-sm mt-2 text-center max-w-xs">
               Start the conversation by sending a message below
             </p>
           </div>

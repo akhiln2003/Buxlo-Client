@@ -20,21 +20,20 @@ export function ChatAttachmentPreview({ file, onSend, onClose }: AttachmentPrevi
 
   const renderPreview = () => {
     if (!previewUrl) return null;
-
     switch (file.type.split('/')[0]) {
       case 'image':
-        return <img src={previewUrl} alt="Preview" className="max-w-full h-64 object-contain" />;
+        return <img src={previewUrl} alt="Preview" className="max-w-full max-h-48 sm:max-h-64 object-contain" />;
       case 'video':
         return (
-          <video controls className="max-w-full h-64">
+          <video controls className="max-w-full max-h-48 sm:max-h-64">
             <source src={previewUrl} type={file.type} />
           </video>
         );
       default:
         return (
-          <div className="flex flex-col items-center justify-center h-64">
-            <File size={48} className="text-gray-500" />
-            <span className="mt-2 text-sm text-gray-700 dark:text-gray-300">{file.name}</span>
+          <div className="flex flex-col items-center justify-center h-48 sm:h-64">
+            <File size={32} className="text-gray-500" />
+            <span className="mt-2 text-xs sm:text-sm text-gray-700 dark:text-gray-300">{file.name}</span>
           </div>
         );
     }

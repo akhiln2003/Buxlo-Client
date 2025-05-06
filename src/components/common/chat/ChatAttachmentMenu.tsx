@@ -21,7 +21,6 @@ export function ChatAttachmentMenu({
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const docInputRef = useRef<HTMLInputElement>(null);
-
   const [previewFile, setPreviewFile] = useState<{
     type: "text" | "image" | "video" | "audio" | "document";
     url: string;
@@ -36,19 +35,16 @@ export function ChatAttachmentMenu({
     if (files && files.length > 0) {
       const file = files[0];
       let fileUrl = "";
-
       if (type === "image" || type === "video") {
         fileUrl = URL.createObjectURL(file);
       } else if (type === "document") {
         fileUrl = URL.createObjectURL(new Blob([file], { type: file.type }));
       }
-
       setPreviewFile({
         type,
         url: fileUrl,
         file,
       });
-
       e.target.value = "";
     }
   };
@@ -60,9 +56,7 @@ export function ChatAttachmentMenu({
           files: [previewFile.file],
         },
       } as unknown as ChangeEvent<HTMLInputElement>;
-
       handleFileUpload(syntheticEvent, previewFile.type);
-
       URL.revokeObjectURL(previewFile.url);
       setPreviewFile(null);
     }
@@ -77,13 +71,12 @@ export function ChatAttachmentMenu({
 
   const renderPreview = () => {
     if (!previewFile) return null;
-
     return (
       <Dialog open={!!previewFile} onOpenChange={handleFileCancel}>
-        <DialogContent className="max-w-4xl w-[95vw] h-[90vh] p-0 overflow-hidden">
+        <DialogContent className="w-[95vw] max-w-3xl h-[90vh] p-0 overflow-hidden">
           <div className="relative w-full h-full bg-black flex items-center justify-center">
             {previewFile.type === "image" && (
-              <div className="w-[600px] h-[400px] flex items-center justify-center">
+              <div className="w-full max-w-[600px] h-[400px] flex items-center justify-center">
                 <img
                   src={previewFile.url}
                   alt="Image Preview"
@@ -91,7 +84,6 @@ export function ChatAttachmentMenu({
                 />
               </div>
             )}
-
             {previewFile.type === "video" && (
               <div className="w-full h-full flex flex-col items-center justify-center relative">
                 <video
@@ -111,9 +103,8 @@ export function ChatAttachmentMenu({
                 </div>
               </div>
             )}
-
             {previewFile.type === "document" && (
-              <div className="w-full max-w- operación-4xl h-[70vh] flex flex-col items-center justify-center">
+              <div className="w-full max-w-4xl h-[70vh] flex flex-col items-center justify-center">
                 <iframe
                   src={previewFile.url}
                   className="w-full h-full"
@@ -125,7 +116,6 @@ export function ChatAttachmentMenu({
                 </div>
               </div>
             )}
-
             <div className="absolute top-4 right-4">
               <Button
                 variant="ghost"
@@ -136,7 +126,6 @@ export function ChatAttachmentMenu({
                 <X className="w-6 h-6" />
               </Button>
             </div>
-
             {(previewFile.type === "image" || previewFile.type === "document") && (
               <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
                 <Button
@@ -158,7 +147,7 @@ export function ChatAttachmentMenu({
   return (
     <>
       {showAttachmentMenu && (
-        <div className="absolute bottom-14 left-1 mb-2 z-10 bg-white dark:bg-zinc-700 rounded-lg shadow-lg p-3 w-48 animate-fade-in">
+        <div className="absolute bottom-14 left-1 mb-2 z-10 bg-white dark:bg-zinc-700 rounded-lg shadow-lg p-3 w-40 sm:w-48 animate-fade-in">
           <Button
             variant="ghost"
             className="flex items-center w-full justify-start p-2 hover:bg-gray-100 dark:hover:bg-zinc-600"
@@ -167,7 +156,6 @@ export function ChatAttachmentMenu({
             <Camera size={20} className="text-blue-500 mr-2" />
             <span className="text-sm dark:text-white">Camera</span>
           </Button>
-
           <Button
             variant="ghost"
             className="flex items-center w-full justify-start p-2 hover:bg-gray-100 dark:hover:bg-zinc-600"
@@ -183,7 +171,6 @@ export function ChatAttachmentMenu({
               className="hidden"
             />
           </Button>
-
           <Button
             variant="ghost"
             className="flex items-center w-full justify-start p-2 hover:bg-gray-100 dark:hover:bg-zinc-600"
@@ -199,7 +186,6 @@ export function ChatAttachmentMenu({
               className="hidden"
             />
           </Button>
-
           <Button
             variant="ghost"
             className="flex items-center w-full justify-start p-2 hover:bg-gray-100 dark:hover:bg-zinc-600"
@@ -217,7 +203,6 @@ export function ChatAttachmentMenu({
           </Button>
         </div>
       )}
-
       {renderPreview()}
     </>
   );

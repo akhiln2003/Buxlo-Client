@@ -29,8 +29,8 @@ export function ChatTextInput({
     if (textarea) {
       // Reset height to auto to get the correct scrollHeight
       textarea.style.height = "auto";
-      // Set new height based on scroll height (with a min of 40px and max of 120px)
-      const newHeight = Math.min(Math.max(textarea.scrollHeight, 40), 120);
+      // Set new height based on scroll height (with a min of 28px and max of 56px)
+      const newHeight = Math.min(Math.max(textarea.scrollHeight, 28), 56);
       textarea.style.height = `${newHeight}px`;
     }
   }, [newMessage]);
@@ -54,47 +54,40 @@ export function ChatTextInput({
   const emojiTheme: Theme = isDarkMode ? ("dark" as Theme) : ("light" as Theme);
 
   return (
-    <>
+    <div className="relative flex items-end w-full">
       {showEmojiPicker && (
         <div className="absolute bottom-14 left-0 mb-2 z-10 animate-fade-in">
           <EmojiPicker
             theme={emojiTheme}
             onEmojiClick={handleEmojiClick}
-            width={350}
+            width={isMobile ? 300 : 350}
             height={isMobile ? 300 : 400}
+            className="border dark:border-zinc-700 rounded-lg"
           />
         </div>
       )}
-      <div className="relative flex-grow flex items-center bg-white dark:bg-zinc-700 rounded-lg">
-        <button
-          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-          className="absolute left-2 top-1/2 transform -translate-y-1/2 p-1 text-gray-600 dark:text-zinc-400 hover:text-gray-800 dark:hover:text-zinc-200 transition-colors"
-        >
-          {showEmojiPicker ? <X size={20} /> : <Smile size={20} />}
-        </button>
-        <textarea
-          ref={textareaRef}
-          value={newMessage}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          onFocus={() => setShowEmojiPicker(false)}
-          placeholder="Type a message..."
-          rows={1}
-          className="w-full px-10 py-2 resize-none overflow-hidden rounded-lg border-none focus:outline-none focus:ring-0 dark:text-white bg-transparent"
-          style={{
-            maxHeight: "120px",
-            minHeight: "40px",
-          }}
-        />
-      </div>
+      <button
+        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+        className="p-2 text-gray-600 dark:text-zinc-400 hover:text-gray-800 dark:hover:text-zinc-200 transition-colors"
+      >
+        <Smile size={18} className="sm:w-5 sm:h-5" />
+      </button>
+      <textarea
+        ref={textareaRef}
+        value={newMessage}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        placeholder="Type a message..."
+        className="flex-1 resize-none rounded-lg border dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm sm:text-base text-gray-900 dark:text-white px-2 sm:px-3 py-1.5 sm:py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 min-h-[25px] max-h-[45px] w-full"
+      />
       {newMessage.trim() && (
         <button
           onClick={handleSend}
-          className="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors"
+          className="p-2 text-white bg-blue-500 hover:bg-blue-600 dark:hover:bg-blue-400 transition-colors rounded-md ml-2"
         >
-          <Send size={20} />
+          <Send size={18} className="sm:w-5 sm:h-5" />
         </button>
       )}
-    </>
+    </div>
   );
-};
+}

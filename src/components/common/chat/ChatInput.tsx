@@ -7,7 +7,6 @@ import { ChatAttachmentPreview } from "./ChatAttachmentPreview";
 import { ChatCameraPreview } from "./ChatCameraPreview";
 import { useSendMessageMutation } from "@/services/apis/CommonApis";
 
-// Define the updated InewMessage interface
 interface InewMessage {
   chatId: string;
   senderId: string;
@@ -37,7 +36,7 @@ export function ChatInputContainer({
     receiverId,
     content: "",
     contentType: "text",
-    status: "sent", // Default status
+    status: "sent",
   });
   const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
   const [showAttachmentMenu, setShowAttachmentMenu] = useState<boolean>(false);
@@ -52,7 +51,6 @@ export function ChatInputContainer({
   const [previewFile, setPreviewFile] = useState<File | null>(null);
   const [sendMsg] = useSendMessageMutation();
 
-  // Close attachment menu when emoji picker, recording, or typing starts
   useEffect(() => {
     if (showEmojiPicker || isRecording || (typeof newMessage.content === "string" && newMessage.content.trim())) {
       setShowAttachmentMenu(false);
@@ -80,7 +78,6 @@ export function ChatInputContainer({
     if (message.replyTo) {
       formData.append("replyTo", message.replyTo);
     }
-
     try {
       const response = await sendMsg(formData).unwrap();
       return response;
@@ -265,7 +262,7 @@ export function ChatInputContainer({
   };
 
   return (
-    <div className="relative flex items-center space-x-2 p-2 bg-gray-100 dark:bg-zinc-800 border-t dark:border-zinc-700">
+    <div className="relative flex items-center space-x-2 p-2 sm:p-3 bg-gray-100 dark:bg-zinc-800 border-t dark:border-zinc-700 sticky bottom-0 z-10">
       <button
         onClick={() => {
           setShowAttachmentMenu(!showAttachmentMenu);
@@ -273,7 +270,7 @@ export function ChatInputContainer({
         }}
         className="p-2 text-gray-600 dark:text-zinc-400 hover:text-gray-800 dark:hover:text-zinc-200 transition-colors"
       >
-        <Paperclip size={24} />
+        <Paperclip size={20} />
       </button>
       <ChatAttachmentMenu
         showAttachmentMenu={showAttachmentMenu}
@@ -323,7 +320,7 @@ export function ChatInputContainer({
               onClick={handleVoiceRecording}
               className="p-2 text-white dark:text-zinc-400 bg-blue-500 hover:bg-blue-600 dark:hover:text-zinc-200 transition-colors rounded-md"
             >
-              <Mic size={24} />
+              <Mic size={20} />
             </button>
           )}
         </>
