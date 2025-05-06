@@ -15,6 +15,7 @@ import { ChatInputContainer } from "@/components/common/chat/ChatInput";
 import { useFetchMessageMutation } from "@/services/apis/CommonApis";
 import { MessageCircle } from "lucide-react";
 
+
 export interface IparticipantDetails {
   avatar: string;
   createdAt: string;
@@ -59,14 +60,16 @@ export default function Chat() {
 
   const fetchContacts = async (id: string) => {
     try {
+      
       const response: IaxiosResponse = await getContacts(id);
       if (response.data) {
-        setContacts(response.data.constats);
+        setContacts(response.data.constats);        
         const avatars: string[] = response.data.constats.flatMap(
           (contact: Icontacts) =>
             contact.participantDetails.map(
               (participant: IparticipantDetails) =>
-              participant.avatar ?  `MentorProfiles/${participant.avatar}` : ""
+
+              participant.avatar  ?  participant.role == USER_ROLE.MENTOR ? `MentorProfiles/${participant.avatar}`: `UserProfiles/${participant.avatar}`  : ""
             )
         );
         if (avatars.length) {
@@ -97,7 +100,7 @@ export default function Chat() {
   };
 
   const fetchMyProfile = async () => {
-    try {
+    try {      
       const imageUrl: IaxiosResponse =
         user?.role === USER_ROLE.MENTOR
           ? await fetchMentorProfileImages([`MentorProfiles/${user?.avatar}`])
@@ -120,7 +123,9 @@ export default function Chat() {
   useEffect(() => {
     if (user) {
       fetchContacts(user.id as string);
-      fetchMyProfile();
+      if( user.avatar) {
+        fetchMyProfile();
+      }
     }
   }, [user?.id]);
 

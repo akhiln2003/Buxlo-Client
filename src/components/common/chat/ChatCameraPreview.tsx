@@ -90,7 +90,7 @@ export function ChatCameraPreview({
           const file = new File([blob], "captured-photo.jpg", {
             type: "image/jpeg",
           });
-          onSend(file);
+          onSend(file); // Directly call onSend to send the file
           onClose();
         });
     }
@@ -108,12 +108,9 @@ export function ChatCameraPreview({
     >
       <DialogContent
         className="max-w-4xl w-[95vw] h-[90vh] p-0 overflow-hidden"
-        // Prevent closing on outside click
         onPointerDownOutside={(e) => e.preventDefault()}
-        // Prevent closing on escape key
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        {/* Custom Close Button */}
         <DialogClose asChild>
           <Button
             variant="ghost"
@@ -126,19 +123,15 @@ export function ChatCameraPreview({
         </DialogClose>
 
         <div className="relative w-full h-full bg-black">
-          {/* Hidden canvas for capturing photo */}
           <canvas ref={canvasRef} className="hidden" />
 
           {!previewUrl ? (
             <>
-              {/* Live Camera View */}
               <video
                 ref={videoRef}
                 className="w-full h-full object-cover"
                 playsInline
               />
-
-              {/* Capture Button */}
               <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
                 <Button
                   variant="outline"
@@ -152,14 +145,11 @@ export function ChatCameraPreview({
             </>
           ) : (
             <>
-              {/* Photo Preview */}
               <img
                 src={previewUrl}
                 alt="Captured"
                 className="w-full h-full object-cover"
               />
-
-              {/* Action Buttons */}
               <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-4">
                 <Button
                   variant="destructive"
@@ -171,7 +161,7 @@ export function ChatCameraPreview({
                 </Button>
                 <Button
                   variant="default"
-                  className="rounded-md  bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 flex items-center space-x-2"
+                  className="rounded-md bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 flex items-center space-x-2"
                   onClick={sendPhoto}
                 >
                   <Send className="w-5 h-5 mr-2" />

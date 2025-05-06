@@ -22,7 +22,6 @@ export function ChatSidebar({
   profileImage,
   user,
 }: ChatSidebarProps) {
-
   return (
     <div
       className={`${
