@@ -230,7 +230,7 @@ function AdminNavbar() {
                       ) : (
                         <SunMoon strokeWidth={1.5} />
                       )}
-                      <span className="ml-[0.5rem]">Team</span>
+                      <span className="ml-[0.5rem]">Theme</span>
                     </button>
                   </DropdownMenuItem>
                   <DropdownMenuItem>

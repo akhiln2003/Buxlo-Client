@@ -317,7 +317,7 @@ function UserNavbar() {
                       ) : (
                         <SunMoon strokeWidth={1.5} />
                       )}
-                      <span className="ml-[0.5rem]">Team</span>
+                      <span className="ml-[0.5rem]">Ttheme</span>
                     </button>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
