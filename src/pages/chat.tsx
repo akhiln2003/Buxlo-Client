@@ -66,7 +66,7 @@ export default function Chat() {
           (contact: Icontacts) =>
             contact.participantDetails.map(
               (participant: IparticipantDetails) =>
-                `MentorProfiles/${participant.avatar}`
+              participant.avatar ?  `MentorProfiles/${participant.avatar}` : ""
             )
         );
         if (avatars.length) {

@@ -22,6 +22,7 @@ export function ChatSidebar({
   profileImage,
   user,
 }: ChatSidebarProps) {
+
   return (
     <div
       className={`${
@@ -70,7 +71,7 @@ export function ChatSidebar({
             </p>
           </div>
         ) : (
-          contacts.map((contact, i) => (
+          contacts.map((contact, i) => (                                                                                                                                                    
             <div
               key={contact.id}
               onClick={() => handleChatSelect(contact)}
@@ -80,7 +81,7 @@ export function ChatSidebar({
             >
               <div className="relative flex-shrink-0">
                 <img
-                  src={profileImage[i] || dummyProfileImage}
+                  src={typeof profileImage[i] == 'string' ? profileImage[i] : dummyProfileImage}
                   alt={contact.participantDetails[0].name}
                   className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover"
                 />
