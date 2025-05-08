@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, ChangeEvent } from "react";
+import { useState, useRef, useEffect, ChangeEvent, useContext } from "react";
 import { Paperclip, Mic } from "lucide-react";
 import { ChatAttachmentMenu } from "./ChatAttachmentMenu";
 import { ChatRecordingControls } from "./ChatRecordingControls";
@@ -6,6 +6,7 @@ import { ChatTextInput } from "./ChatTextInput";
 import { ChatAttachmentPreview } from "./ChatAttachmentPreview";
 import { ChatCameraPreview } from "./ChatCameraPreview";
 import { useSendMessageMutation } from "@/services/apis/CommonApis";
+import { SocketContext } from "@/contexts/socketContext";
 
 interface InewMessage {
   chatId: string;
@@ -15,6 +16,7 @@ interface InewMessage {
   contentType: "text" | "image" | "video" | "audio" | "document";
   status: string;
   replyTo?: string;
+  createdAt: string;
 }
 
 interface ChatInputProps {
@@ -37,6 +39,7 @@ export function ChatInputContainer({
     content: "",
     contentType: "text",
     status: "sent",
+    createdAt: new Date().toISOString(),
   });
   const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
   const [showAttachmentMenu, setShowAttachmentMenu] = useState<boolean>(false);
@@ -50,9 +53,14 @@ export function ChatInputContainer({
   const [showCameraPreview, setShowCameraPreview] = useState<boolean>(false);
   const [previewFile, setPreviewFile] = useState<File | null>(null);
   const [sendMsg] = useSendMessageMutation();
+const socketContext = useContext(SocketContext);
 
   useEffect(() => {
-    if (showEmojiPicker || isRecording || (typeof newMessage.content === "string" && newMessage.content.trim())) {
+    if (
+      showEmojiPicker ||
+      isRecording ||
+      (typeof newMessage.content === "string" && newMessage.content.trim())
+    ) {
       setShowAttachmentMenu(false);
     }
   }, [showEmojiPicker, isRecording, newMessage.content]);
@@ -68,7 +76,7 @@ export function ChatInputContainer({
     const formData = new FormData();
     formData.append("chatId", message.chatId);
     formData.append("senderId", message.senderId);
-    formData.append("receiverId", message.receiverId);
+    formData.append("receiverId", receiverId);
     formData.append("contentType", message.contentType);
     if (message.contentType === "text") {
       formData.append("content", message.content as string);
@@ -80,6 +88,15 @@ export function ChatInputContainer({
     }
     try {
       const response = await sendMsg(formData).unwrap();
+
+      setMessages(prev => {
+         const array = [...prev];
+         array.pop();
+
+          return [...array, {...message, ...response.message}];
+      });
+
+      socketContext?.socket?.emit("direct_message", {...message , ...response.message})
       return response;
     } catch (error) {
       console.error("Error sending message:", error);
@@ -91,21 +108,24 @@ export function ChatInputContainer({
   const handleSend = async () => {
     if (
       newMessage.content &&
-      (typeof newMessage.content === "string"
-        ? newMessage.content.trim()
+      (newMessage.contentType === "text"
+        ? newMessage.content
         : newMessage.content)
     ) {
       const messagePayload: InewMessage = {
         ...newMessage,
         content:
-          typeof newMessage.content === "string"
-            ? newMessage.content.trim()
+          newMessage.contentType === "text"
+            ? newMessage.content
             : newMessage.content,
         status: "sent",
+        createdAt: new Date().toISOString(),
       };
       try {
         setMessages((prevMessages) => [...prevMessages, messagePayload]);
+       
         await sendMessage(messagePayload);
+
         resetInput();
       } catch (error) {
         console.error("Failed to send message:", error);
@@ -129,6 +149,7 @@ export function ChatInputContainer({
         content: file,
         contentType: type,
         status: "sent",
+        createdAt: new Date().toISOString(),
       };
       try {
         setMessages((prevMessages) => [...prevMessages, messagePayload]);
@@ -200,6 +221,7 @@ export function ChatInputContainer({
           content: audioBlob,
           contentType: "audio",
           status: "sent",
+          createdAt: new Date().toISOString(),
         };
         setMessages((prevMessages) => [...prevMessages, messagePayload]);
         sendMessage(messagePayload);
@@ -231,6 +253,7 @@ export function ChatInputContainer({
       content: "",
       contentType: "text",
       status: "sent",
+      createdAt: new Date().toISOString(),
     });
     setShowEmojiPicker(false);
     setShowAttachmentMenu(false);
@@ -254,6 +277,7 @@ export function ChatInputContainer({
         ? "video"
         : "document",
       status: "sent",
+      createdAt: new Date().toISOString(),
     };
     setMessages((prevMessages) => [...prevMessages, messagePayload]);
     sendMessage(messagePayload);

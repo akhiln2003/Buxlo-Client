@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useGetUser } from "@/hooks/useGetUser";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { errorTost } from "@/components/ui/tosastMessage";
@@ -14,6 +14,7 @@ import { ChatMessages } from "@/components/common/chat/ChatMessages";
 import { ChatInputContainer } from "@/components/common/chat/ChatInput";
 import { useFetchMessageMutation } from "@/services/apis/CommonApis";
 import { MessageCircle } from "lucide-react";
+import { SocketContext } from "@/contexts/socketContext";
 
 // Interfaces remain unchanged
 export interface IparticipantDetails {
@@ -24,7 +25,7 @@ export interface IparticipantDetails {
   role: "mentor" | "user";
   status: boolean;
   updatedAt: string;
-  id: string;
+  _id: string;
 }
 
 export interface Icontacts {
@@ -35,6 +36,7 @@ export interface Icontacts {
 }
 
 export interface InewMessage {
+  createdAt: string | number | Date;
   chatId: string;
   senderId: string;
   receiverId: string;
@@ -58,6 +60,7 @@ export default function Chat() {
   const [myProfile, setMyProfile] = useState("");
   const [getMessages] = useFetchMessageMutation();
   const user = useGetUser();
+  const socketContext = useContext(SocketContext);
 
   const fetchContacts = async (id: string) => {
     try {
@@ -66,23 +69,26 @@ export default function Chat() {
         setContacts(response.data.constats);
         const avatars: string[] = response.data.constats.flatMap(
           (contact: Icontacts) =>
-            contact.participantDetails.map(
-              (participant: IparticipantDetails) =>
-                participant.avatar
-                  ? participant.role == USER_ROLE.MENTOR
-                    ? `MentorProfiles/${participant.avatar}`
-                    : `UserProfiles/${participant.avatar}`
-                  : ""
+            contact.participantDetails.map((participant: IparticipantDetails) =>
+              participant.avatar
+                ? participant.role == USER_ROLE.MENTOR
+                  ? `MentorProfiles/${participant.avatar}`
+                  : `UserProfiles/${participant.avatar}`
+                : ""
             )
         );
         if (avatars.length) {
-          const imageUrl: IaxiosResponse = await fetchMentorProfileImages(avatars);
+          const imageUrl: IaxiosResponse = await fetchMentorProfileImages(
+            avatars
+          );
           if (imageUrl.data) {
             setProfileImage(imageUrl.data.imageUrl);
           } else {
             errorTost(
               "Something went wrong",
-              imageUrl.error.data.error || [{ message: "Please try again later" }]
+              imageUrl.error.data.error || [
+                { message: "Please try again later" },
+              ]
             );
           }
         }
@@ -128,8 +134,15 @@ export default function Chat() {
     }
   }, [user?.id]);
 
+  useEffect(() => {
+    socketContext?.socket?.on("direct_message", (data) => {
+      console.log("Received direct message:", data);
+    });
+  }, [ socketContext?.socket?.connected]);
+
   const handleChatSelect = async (contact: Icontacts) => {
     try {
+
       setActiveChat(contact);
       const response: IaxiosResponse = await getMessages(contact.id);
       if (response.data) {
@@ -178,12 +191,17 @@ export default function Chat() {
               }
             />
             <div className="flex-1 overflow-y-auto">
-              <ChatMessages messages={messages} userId={user?.id as string} />
+              <ChatMessages
+                messages={messages}
+                setMessages={setMessages}
+                userId={user?.id as string}
+                receiverId={activeChat.participantDetails[0]._id}
+              />
             </div>
             <ChatInputContainer
               setMessages={setMessages}
               chatId={activeChat.id}
-              receiverId={activeChat.participantDetails[0].id}
+              receiverId={activeChat.participantDetails[0]._id}
               senderId={user?.id as string}
             />
           </div>

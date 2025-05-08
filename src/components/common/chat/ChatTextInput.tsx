@@ -1,5 +1,5 @@
 import { KeyboardEvent, useRef, useEffect, ChangeEvent } from "react";
-import { Send, Smile, X } from "lucide-react";
+import { Send, Smile } from "lucide-react";
 import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
 import { useTheme } from "@/contexts/themeContext";
 
@@ -78,7 +78,7 @@ export function ChatTextInput({
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder="Type a message..."
-        className="flex-1 resize-none rounded-lg border dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm sm:text-base text-gray-900 dark:text-white px-2 sm:px-3 py-1.5 sm:py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 min-h-[25px] max-h-[45px] w-full"
+        className="flex-1 resize-none rounded-lg border dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm sm:text-base text-gray-900 dark:text-white px-2 sm:px-3 py-1.5 sm:py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 min-h-[45px] max-h-[45px] w-full"
       />
       {newMessage.trim() && (
         <button

@@ -1,510 +1,396 @@
-import { useEffect, useRef, useState } from "react";
-import { InewMessage } from "./Chat";
+import { useRef, useEffect, useState, useContext } from "react";
+import { format } from "date-fns";
 import {
-  Image,
-  FileText,
-  Video,
-  Mic,
-  Check,
   CheckCheck,
+  Check,
   Clock,
-  Download,
-  Reply,
-  Trash,
-  X,
-  ChevronDown,
+  Video,
+  Image,
+  File,
+  Mic,
+  Play,
+  Pause,
 } from "lucide-react";
 import { useFetchMessageFromS3Mutation } from "@/services/apis/CommonApis";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { errorTost } from "@/components/ui/tosastMessage";
+import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { SocketContext } from "@/contexts/socketContext";
+import { InewMessage } from "@/pages/chat";
 
-export function ChatMessages({
-  messages,
-  userId,
-  onReply,
-  onDelete,
-}: {
+interface ChatMessagesProps {
   messages: InewMessage[];
+  setMessages: React.Dispatch<React.SetStateAction<InewMessage[]>>;
   userId: string;
-  onReply?: (message: InewMessage) => void;
-  onDelete?: (message: InewMessage, deleteFor: "me" | "everyone") => void;
-}) {
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [showTimeForMessage, setShowTimeForMessage] = useState<string | null>(null);
-  const [fetchMessageFromS3] = useFetchMessageFromS3Mutation();
-  const [mediaContent, setMediaContent] = useState<Record<string, string>>({});
-  const [loadingMedia, setLoadingMedia] = useState<Record<string, boolean>>({});
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
-  const [messageToDelete, setMessageToDelete] = useState<InewMessage | null>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  receiverId: string;
+}
+
+// Audio Message Component
+export const AudioMessage = ({ src }: { src: string }) => {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (openDropdown && !(event.target as Element).closest(".message-dropdown")) {
-        setOpenDropdown(null);
-      }
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const handleLoadedData = () => {
+      setDuration(audio.duration);
+      setIsLoaded(true);
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [openDropdown]);
+    const handleEnded = () => {
+      setIsPlaying(false);
+      setCurrentTime(0);
+      audio.currentTime = 0;
+    };
 
-  useEffect(() => {
-    if (messages.length > 0) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("loadeddata", handleLoadedData);
+    audio.addEventListener("ended", handleEnded);
+
+    return () => {
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("loadeddata", handleLoadedData);
+      audio.removeEventListener("ended", handleEnded);
+    };
+  }, []);
+
+  const togglePlayPause = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isPlaying) {
+      audio.pause();
+    } else {
+      audio.play();
     }
-  }, [messages]);
+    setIsPlaying(!isPlaying);
+  };
 
-  const groupedMessages = messages.reduce(
-    (groups: Record<string, InewMessage[]>, message) => {
-      const date = new Date().toLocaleDateString();
-      if (!groups[date]) {
-        groups[date] = [];
-      }
-      groups[date].push(message);
-      return groups;
-    },
-    {}
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
+  const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
+
+  return (
+    <div className="flex items-center bg-gray-100 dark:bg-zinc-800 p-2 rounded-lg w-full">
+      <audio ref={audioRef} src={src} preload="metadata" className="hidden" />
+      <button
+        onClick={togglePlayPause}
+        className="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500 text-white mr-3 flex-shrink-0"
+      >
+        {isLoaded ? (
+          isPlaying ? (
+            <Pause className="h-5 w-5" />
+          ) : (
+            <Play className="h-5 w-5 ml-0.5" />
+          )
+        ) : (
+          <Mic className="h-5 w-5" />
+        )}
+      </button>
+      <div className="flex-1 flex flex-col">
+        <div className="relative h-1 w-full bg-gray-300 dark:bg-zinc-600 rounded-full overflow-hidden">
+          <div
+            className="absolute top-0 left-0 h-full bg-emerald-500 transition-all duration-100"
+            style={{ width: `${progressPercentage}%` }}
+          />
+        </div>
+        <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <span>{formatTime(currentTime)}</span>
+          <span>{isLoaded ? formatTime(duration) : "--:--"}</span>
+        </div>
+      </div>
+    </div>
   );
+};
 
-  const handleFetchMedia = async (message: InewMessage, messageId: string) => {
-    if (mediaContent[messageId] || loadingMedia[messageId]) return;
-    try {
-      setLoadingMedia((prev) => ({ ...prev, [messageId]: true }));
-      const response: IaxiosResponse = await fetchMessageFromS3([message.content as string]);
-      if (response.data && response.data.imageUrl && response.data.imageUrl.length > 0) {
-        setMediaContent((prev) => ({ ...prev, [messageId]: response.data.imageUrl[0] }));
-      } else {
-        errorTost("Failed to load media", response.error?.data?.error || [{ message: "Could not retrieve media content" }]);
-      }
-    } catch (err) {
-      console.error("Error fetching media:", err);
-      errorTost("Error loading media", [{ message: "Please try again" }]);
-    } finally {
-      setLoadingMedia((prev) => ({ ...prev, [messageId]: false }));
-    }
-  };
+// Message Status Component
+export const MessageStatus = ({ status }: { status: string }) => {
+  switch (status) {
+    case "read":
+      return <CheckCheck className="h-4 w-4 text-blue-500" />;
+    case "delivered":
+      return <CheckCheck className="h-4 w-4 text-gray-400" />;
+    case "received":
+    case "sent":
+      return <Check className="h-4 w-4 text-gray-400" />;
+    default:
+      return <Clock className="h-4 w-4 text-gray-400" />;
+  }
+};
 
-  const handleDownload = (url: string, fileName: string) => {
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = fileName;
-    link.click();
-  };
+// Media Content Component
+export const MediaContent = ({
+  message,
+  mediaUrl,
+}: {
+  message: InewMessage;
+  mediaUrl: string | null;
+}) => {
+  if (!mediaUrl) {
+    const icons = {
+      image: <Image className="h-6 w-6 text-gray-500" />,
+      video: <Video className="h-6 w-6 text-gray-500" />,
+      audio: <Mic className="h-6 w-6 text-gray-500" />,
+      document: <File className="h-6 w-6 text-gray-500" />,
+    };
 
-  const handleReply = (message: InewMessage) => {
-    if (onReply) {
-      onReply(message);
-    }
-    setOpenDropdown(null);
-  };
-
-  const handleOpenDeleteModal = (message: InewMessage) => {
-    setMessageToDelete(message);
-    setDeleteModalOpen(true);
-    setOpenDropdown(null);
-  };
-
-  const handleDelete = (deleteFor: "me" | "everyone") => {
-    if (onDelete && messageToDelete) {
-      onDelete(messageToDelete, deleteFor);
-    }
-    setDeleteModalOpen(false);
-    setMessageToDelete(null);
-  };
-
-  const toggleDropdown = (e: React.MouseEvent, messageId: string) => {
-    e.stopPropagation();
-    setOpenDropdown(openDropdown === messageId ? null : messageId);
-  };
-
-  const getFileName = (url: string) => {
-    return url.split("/").pop() || "Document";
-  };
-
-  const getContentIcon = (contentType: string) => {
-    switch (contentType) {
-      case "image":
-        return <Image size={16} />;
-      case "document":
-        return <FileText size={16} />;
-      case "video":
-        return <Video size={16} />;
-      case "audio":
-        return <Mic size={16} />;
-      default:
-        return null;
-    }
-  };
-
-  const renderMediaContent = (message: InewMessage, messageId: string) => {
-    const url = mediaContent[messageId];
-    const isLoading = loadingMedia[messageId];
-    const fileName = getFileName(message.content as string);
-
-    if (!url && !isLoading) {
-      return (
-        <div
-          className="flex items-center gap-2 py-1 cursor-pointer hover:underline"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleFetchMedia(message, messageId);
-          }}
-        >
-          {getContentIcon(message.contentType)}
-          <span className="text-xs sm:text-sm">
-            {message.contentType.charAt(0).toUpperCase() + message.contentType.slice(1)}
-          </span>
-          <Download size={16} className="text-blue-500" />
-        </div>
-      );
-    }
-    if (isLoading) {
-      return (
-        <div className="flex items-center gap-2 py-1">
-          {getContentIcon(message.contentType)}
-          <span className="text-xs sm:text-sm">Loading {message.contentType}...</span>
-        </div>
-      );
-    }
-
-    switch (message.contentType) {
-      case "image":
-        return (
-          <div className="max-w-[150px] sm:max-w-[200px]">
-            <img
-              src={url}
-              alt="Image message"
-              className="max-w-full rounded-lg object-contain shadow-sm cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.open(url, "_blank");
-              }}
-            />
-            <button
-              className="flex items-center gap-1 mt-1 text-xs text-blue-400 hover:text-blue-500"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDownload(url, fileName);
-              }}
-            >
-              <Download size={14} />
-              Download
-            </button>
-          </div>
-        );
-      case "video":
-        return (
-          <div className="max-w-[150px] sm:max-w-[200px]">
-            <div
-              className="relative rounded-lg cursor-pointer shadow-sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.open(url, "_blank");
-              }}
-            >
-              <video src={url} className="max-w-full rounded-lg" muted poster={url} />
-              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 rounded-lg">
-                <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <polygon points="9 6 9 18 18 12" />
-                </svg>
-              </div>
-            </div>
-            <button
-              className="flex items-center gap-1 mt-1 text-xs text-blue-400 hover:text-blue-500"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDownload(url, fileName);
-              }}
-            >
-              <Download size={14} />
-              Download
-            </button>
-          </div>
-        );
-      case "audio":
-        return (
-          <div className="flex items-center space-x-2 w-full max-w-[150px] sm:max-w-[200px]">
-            <button
-              className="p-1.5 bg-blue-600 rounded-full"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.open(url, "_blank");
-              }}
-            >
-              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <polygon points="9 6 9 18 18 12" />
-              </svg>
-            </button>
-            <div className="flex-1 h-1.5 bg-gray-300 dark:bg-zinc-600 rounded-full overflow-hidden">
-              <div className="w-1/3 h-full bg-blue-500"></div>
-            </div>
-            <span className="text-xs text-gray-500 dark:text-zinc-400">0:30</span>
-            <button
-              className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-500"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDownload(url, fileName);
-              }}
-            >
-              <Download size={14} />
-            </button>
-          </div>
-        );
-      case "document":
-        return (
-          <div className="flex items-center space-x-2 max-w-[150px] sm:max-w-[200px]">
-            <FileText size={18} className="text-gray-500 dark:text-zinc-400" />
-            <span className="text-xs sm:text-sm truncate text-gray-700 dark:text-zinc-300">
-              {fileName}
-            </span>
-            <button
-              className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-500"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDownload(url, fileName);
-              }}
-            >
-              <Download size={14} />
-            </button>
-          </div>
-        );
-      default:
-        return (
-          <div className="flex items-center gap-2">
-            {getContentIcon(message.contentType)}
-            <button
-              className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-500"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDownload(url, fileName);
-              }}
-            >
-              <Download size={14} />
-              Download attachment
-            </button>
-          </div>
-        );
-    }
-  };
-
-  const renderMessageStatus = (message: InewMessage) => {
-    switch (message.status) {
-      case "sent":
-        return <Check size={12} />;
-      case "delivered":
-        return <CheckCheck size={12} />;
-      case "read":
-        return <CheckCheck size={12} className="text-green-400" />;
-      default:
-        return <Clock size={12} />;
-    }
-  };
-
-  if (!messages || messages.length === 0) {
     return (
-      <div className="flex-1 p-3 sm:p-4 bg-gray-50 dark:bg-zinc-900 flex flex-col items-center justify-center">
-        <p className="text-gray-500 dark:text-zinc-400 text-base sm:text-lg font-medium">
-          No messages yet
-        </p>
-        <p className="text-gray-400 dark:text-zinc-500 text-xs sm:text-sm mt-2 text-center max-w-xs">
-          Start the conversation by sending a message below
-        </p>
+      <div className="flex items-center justify-center p-4 bg-gray-100 dark:bg-zinc-800 rounded-lg">
+        {icons[message.contentType as keyof typeof icons]}
+        <span className="ml-2 text-sm text-gray-500">
+          Loading {message.contentType}...
+        </span>
       </div>
     );
   }
 
-  return (
-    <>
-      <div className="p-3 sm:p-4 bg-gray-50 dark:bg-zinc-900">
-        {Object.keys(groupedMessages).map((date) => (
-          <div key={date} className="space-y-2">
-            <div className="flex justify-center">
-              <div className="bg-gray-200 dark:bg-zinc-800 rounded-full px-3 py-1 text-xs text-gray-600 dark:text-zinc-400">
-                {date === new Date().toLocaleDateString() ? "Today" : date}
-              </div>
-            </div>
-            {groupedMessages[date].map((message: InewMessage, index: number) => {
-              const isCurrentUser = message.senderId === userId;
-              const messageId = `msg-${message.senderId}-${index}`;
-              const isShowingTime = showTimeForMessage === messageId;
-              const showTail =
-                index === 0 ||
-                groupedMessages[date][index - 1]?.senderId !== message.senderId;
-              return (
-                <div key={index} className="space-y-1">
-                  {showTail && !isCurrentUser && (
-                    <div className="ml-12 text-xs font-medium text-gray-500 dark:text-zinc-500">
-                      {message.senderId === message.receiverId ? "You" : "Sender"}
-                    </div>
-                  )}
-                  <div
-                    className={`flex items-end gap-2 ${
-                      isCurrentUser ? "justify-end" : "justify-start"
-                    }`}
-                  >
-                    {!isCurrentUser && showTail && (
-                      <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-zinc-700 flex-shrink-0 flex items-center justify-center overflow-hidden">
-                        <span className="text-xs font-medium text-gray-600 dark:text-zinc-300">
-                          {message.senderId.substring(0, 2).toUpperCase()}
-                        </span>
-                      </div>
-                    )}
-                    <div className="relative max-w-[90%] sm:max-w-[70%] md:max-w-lg group">
-                      <button
-                        onClick={(e) => toggleDropdown(e, messageId)}
-                        className={`
-                          absolute -left-6 top-2
-                          opacity-0 group-hover:opacity-100 transition-opacity duration-200
-                          hover:text-gray-900 dark:hover:text-white
-                          flex items-center justify-center z-10
-                          focus:outline-none
-                          text-gray-500 dark:text-gray-400
-                          message-dropdown
-                        `}
-                        aria-label="Message actions"
-                      >
-                        <ChevronDown size={16} />
-                      </button>
-                      <div
-                        onClick={() =>
-                          setShowTimeForMessage(isShowingTime ? null : messageId)
-                        }
-                        className={`
-                          relative
-                          px-3 sm:px-4 py-2 sm:py-3 
-                          rounded-lg text-sm
-                          transition-all duration-200 hover:shadow-md
-                          cursor-pointer
-                          ${
-                            isCurrentUser
-                              ? "bg-blue-500 text-white rounded-br-none hover:bg-blue-600"
-                              : "bg-gray-200 dark:bg-zinc-800 text-gray-800 dark:text-white rounded-bl-none"
-                          }
-                        `}
-                      >
-                        {message.contentType === "text" ? (
-                          <p className="whitespace-pre-wrap break-words text-xs sm:text-sm">
-                            {message.content as string}
-                          </p>
-                        ) : (
-                          renderMediaContent(message, messageId)
-                        )}
-                        <div
-                          className={`
-                            flex items-center gap-2 justify-between mt-1
-                            text-[10px] sm:text-xs
-                            ${
-                              isCurrentUser
-                                ? "text-blue-100"
-                                : "text-gray-500 dark:text-zinc-400"
-                            }
-                          `}
-                        >
-                          <span className="text-[10px] opacity-75">
-                            {new Date().toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </span>
-                          {isCurrentUser && (
-                            <span className="ml-1">
-                              {renderMessageStatus(message)}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      {openDropdown === messageId && (
-                        <div
-                          ref={dropdownRef}
-                          className={`
-                            absolute z-50
-                            w-36 rounded-md shadow-lg
-                            bg-white dark:bg-zinc-800
-                            ring-1 ring-black ring-opacity-5
-                            divide-y divide-gray-100 dark:divide-zinc-700
-                            message-dropdown
-                            ${isCurrentUser ? "right-0" : "left-0"}
-                            mt-2 top-full
-                          `}
-                        >
-                          <div className="py-1" role="menu" aria-orientation="vertical">
-                            <button
-                              onClick={() => handleReply(message)}
-                              className="flex items-center w-full px-4 py-2 text-xs sm:text-sm text-gray-700 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-700"
-                              role="menuitem"
-                            >
-                              <Reply size={16} className="mr-2" />
-                              Reply
-                            </button>
-                            <button
-                              onClick={() => handleOpenDeleteModal(message)}
-                              className="flex items-center w-full px-4 py-2 text-xs sm:text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-zinc-700"
-                              role="menuitem"
-                            >
-                              <Trash size={16} className="mr-2" />
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+  switch (message.contentType) {
+    case "image":
+      return (
+        <img
+          src={mediaUrl}
+          alt="Image"
+          className="rounded-lg max-h-72 max-w-full object-contain cursor-pointer"
+        />
+      );
+    case "video":
+      return (
+        <video
+          src={mediaUrl}
+          controls
+          className="rounded-lg max-h-72 max-w-full"
+        />
+      );
+    case "audio":
+      return <AudioMessage src={mediaUrl} />;
+    case "document":
+      return (
+        <div className="flex items-center justify-between bg-gray-100 dark:bg-zinc-800 p-3 rounded-lg">
+          <div className="flex items-center">
+            <File className="h-6 w-6 text-blue-500 mr-2" />
+            <span className="text-sm font-medium truncate max-w-xs">
+              {message.content.split("/").pop() || "Document"}
+            </span>
           </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-      {deleteModalOpen && messageToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl w-full max-w-sm sm:max-w-md mx-4 p-4 sm:p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">
-                Delete Message
-              </h3>
-              <button
-                onClick={() => setDeleteModalOpen(false)}
-                className="text-gray-400 hover:text-gray-500 focus:outline-none"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <p className="text-xs sm:text-sm text-gray-500 dark:text-zinc-400 mb-4">
-              Are you sure you want to delete this message?
-            </p>
-            <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-end">
-              <button
-                onClick={() => setDeleteModalOpen(false)}
-                className="inline-flex justify-center px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-zinc-300 
-                  bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-md shadow-sm 
-                  hover:bg-gray-50 dark:hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleDelete("me")}
-                className="inline-flex justify-center px-4 py-2 text-xs sm:text-sm font-medium text-white 
-                  bg-red-600 border border-transparent rounded-md shadow-sm 
-                  hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-              >
-                Delete for me
-              </button>
-              {messageToDelete.senderId === userId && (
-                <button
-                  onClick={() => handleDelete("everyone")}
-                  className="inline-flex justify-center px-4 py-2 text-xs sm:text-sm font-medium text-white 
-                    bg-red-800 border border-transparent rounded-md shadow-sm 
-                    hover:bg-red-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                >
-                  Delete for everyone
-                </button>
-              )}
-            </div>
-          </div>
+          <a
+            href={mediaUrl}
+            download
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 text-xs"
+          >
+            Download
+          </a>
         </div>
-      )}
-    </>
+      );
+    default:
+      return <div>Unsupported media type</div>;
+  }
+};
+
+// Message Component
+export const Message = ({
+  message,
+  isMine,
+  mediaUrls,
+}: {
+  message: InewMessage;
+  isMine: boolean;
+  mediaUrls: Record<string, string>;
+}) => {
+  const formatMessageDate = (timestamp: string | number | Date) => {
+    try {
+      return format(new Date(timestamp), "h:mm a");
+    } catch {
+      return "";
+    }
+  };
+
+  return (
+    <div className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
+      <div
+        className={`max-w-xs md:max-w-md lg:max-w-lg relative px-3 py-2 rounded-lg shadow-sm ${
+          isMine
+            ? "bg-emerald-100 dark:bg-emerald-900 text-gray-800 dark:text-gray-100 rounded-tr-none"
+            : "bg-white dark:bg-zinc-800 text-gray-800 dark:text-gray-100 rounded-tl-none"
+        }`}
+      >
+        {message.deleted === "everyone" ? (
+          <div className="italic text-gray-500 text-sm">
+            This message was deleted
+          </div>
+        ) : message.contentType === "text" ? (
+          <div className="whitespace-pre-wrap break-words">
+            {message.content}
+          </div>
+        ) : (
+          <MediaContent
+            message={message}
+            mediaUrl={message.id ? mediaUrls[message.id] : null}
+          />
+        )}
+        <div className="flex items-center justify-end mt-1 space-x-1 text-gray-500 text-xs">
+          <span>{formatMessageDate(message.createdAt)}</span>
+          {isMine && <MessageStatus status={message.status} />}
+        </div>
+        <div
+          className={`absolute top-0 ${
+            isMine ? "right-0 -mr-2" : "left-0 -ml-2"
+          }`}
+          style={{
+            width: 0,
+            height: 0,
+            borderTop: isMine ? "8px solid #d1fae5" : "8px solid #ffffff",
+            borderRight: isMine ? "8px solid transparent" : "0",
+            borderLeft: isMine ? "0" : "8px solid transparent",
+          }}
+        />
+      </div>
+    </div>
   );
-}
+};
+
+// Date Group Component
+export const DateGroup = ({
+  date,
+  messages,
+  userId,
+  mediaUrls,
+}: {
+  date: string;
+  messages: InewMessage[];
+  userId: string;
+  mediaUrls: Record<string, string>;
+}) => (
+  <div className="flex flex-col space-y-3">
+    <div className="flex justify-center">
+      <div className="bg-gray-200 dark:bg-zinc-700 text-gray-600 dark:text-gray-300 text-xs px-3 py-1 rounded-full">
+        {date}
+      </div>
+    </div>
+    {messages.map((message, index) => (
+      <Message
+        key={message.id || index}
+        message={message}
+        isMine={message.senderId === userId}
+        mediaUrls={mediaUrls}
+      />
+    ))}
+  </div>
+);
+
+// Main ChatMessages Component
+export const ChatMessages = ({
+  messages,
+  userId,
+  receiverId,
+  setMessages,
+}: ChatMessagesProps) => {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [mediaUrls, setMediaUrls] = useState<Record<string, string>>({});
+  const [fetchMedia] = useFetchMessageFromS3Mutation();
+
+  const socketContext = useContext(SocketContext);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  useEffect(() => {
+    if (socketContext?.socket?.connected) {
+      socketContext?.socket.emit("join", { userId, receiverId });
+    }
+
+    socketContext?.socket?.on("direct_message", (data: InewMessage) => {
+      setMessages((prev) => [
+        ...prev,
+        ...(Array.isArray(data) ? data : [data]),
+      ]);
+    });
+  }, [ socketContext?.socket?.connected]);
+
+  useEffect(() => {
+    const mediaMessages = messages.filter(
+      (msg) => msg.contentType !== "text" && !mediaUrls[msg.id || ""]
+    );
+    if (mediaMessages.length === 0) return;
+
+    const fetchMediaFiles = async () => {
+      try {
+        const mediaKeys = mediaMessages.map(
+          (msg) => `${msg.contentType}/${msg.content}`
+        );
+        const response: IaxiosResponse = await fetchMedia(mediaKeys);
+        if (response.data?.imageUrl) {
+          setMediaUrls((prev) => ({
+            ...prev,
+            ...mediaMessages.reduce((acc, msg, index) => {
+              if (msg.id && response.data.imageUrl[index]) {
+                acc[msg.id] = response.data.imageUrl[index];
+              }
+              return acc;
+            }, {} as Record<string, string>),
+          }));
+        } else {
+          errorTost(
+            "Failed to load media",
+            response.error?.data?.error || [{ message: "Please try again" }]
+          );
+        }
+      } catch (err) {
+        console.error("Error fetching media:", err);
+        errorTost("Failed to load media", [{ message: "Please try again" }]);
+      }
+    };
+
+    fetchMediaFiles();
+  }, [messages, fetchMedia]);
+
+  const groupMessagesByDate = () => {
+    const groups: Record<string, InewMessage[]> = {};
+    messages.forEach((message) => {
+      const dateStr = format(new Date(message.createdAt), "MMMM d, yyyy");
+      groups[dateStr] = groups[dateStr]
+        ? [...groups[dateStr], message]
+        : [message];
+    });
+    return Object.entries(groups).map(([date, messages]) => ({
+      date,
+      messages,
+    }));
+  };
+
+  const messageGroups = groupMessagesByDate();
+
+  return (
+    <div className="flex flex-col p-4 space-y-3 bg-gray-50 dark:bg-zinc-900">
+      <div
+        className="absolute inset-0 bg-repeat opacity-5 dark:opacity-2 pointer-events-none"
+        style={{
+          backgroundImage:
+            "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QAAKqNIzIAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAAHdElNRQfkBQoLDDf2IqZsAAAA7klEQVQ4y5XUzU3DQBCG4ScR90gF0A6ECpJjJJIKYtMBdBDS0EWcU4QKAhVACUmOIFmWD57Pdlw1h13p1czO/kn2QsuFhla3aqngXGfAEJIlBwbJdgFnlnxLrp1AEp8s8UiuoLEy0NpBV8uLlp6e1sqAVwMXziz5MVKz4XTvRK+7NuCkVNR5UxtLJpITtTH8y/gVMZlIpqI+2OjYWXKVXLIzSO4c+JIcyqcuGUre5Yfs5JIXeZQnhaTvp91XspFsypXXXe7EJ5+OVdzZ6Gg4sLLUscS5X7XhVxNJ09FIg1Lj78yKN2lZkHxI3v4AfOB6hzq7UYEAAAAldEVYdGRhdGU6Y3JlYXRlADIwMjAtMDUtMTBUMTE6MTI6NTUrMDA6MDAi+wQ6AAAAJXRFWHRkYXRlOm1vZGlmyQAyMDIwLTA1LTEwVDExOjEyOjU1KzAwOjAwU6a8hgAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAAASUVORK5CYII=')",
+        }}
+      />
+      <div className="flex flex-col space-y-6 z-10">
+        {messageGroups.map((group, index) => (
+          <DateGroup
+            key={index}
+            date={group.date}
+            messages={group.messages}
+            userId={userId}
+            mediaUrls={mediaUrls}
+          />
+        ))}
+      </div>
+      <div ref={messagesEndRef} />
+    </div>
+  );
+};
