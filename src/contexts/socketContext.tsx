@@ -1,3 +1,4 @@
+import { useGetUser } from '@/hooks/useGetUser';
 import React, { createContext, useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
@@ -9,6 +10,7 @@ export const SocketContext = createContext<SocketContextType | undefined>(undefi
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [socket, setSocket] = useState<Socket | null>(null);
+    const user = useGetUser();
     useEffect(() => {
         const newSocket = io('http://localhost:4004');
 
@@ -18,6 +20,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
        if (socket) {
          socket.on('connect', () => {
             console.log('Socket connected:', socket.id);    
+            socket.emit('online',  user?.id as string); // Replace 'userId' with the actual user ID
          });
        }
 

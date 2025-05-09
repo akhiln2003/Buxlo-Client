@@ -5,6 +5,7 @@ import { Iuser } from "@/@types/interface/Iuser";
 
 interface ChatSidebarProps {
   showSidebar: boolean;
+  onlineUsers: Set<string>;
   contacts: Icontacts[];
   activeChat: Icontacts | null;
   handleChatSelect: (contact: Icontacts) => void;
@@ -15,6 +16,7 @@ interface ChatSidebarProps {
 
 export function ChatSidebar({
   showSidebar,
+  onlineUsers,
   contacts,
   activeChat,
   handleChatSelect,
@@ -22,6 +24,8 @@ export function ChatSidebar({
   profileImage,
   user,
 }: ChatSidebarProps) {
+  console.log("Online users in sidebar:", onlineUsers);
+  
   return (
     <div
       className={`flex flex-col h-full w-full sm:w-64 lg:w-80 bg-white dark:bg-zinc-900 border-r dark:border-zinc-800 fixed md:static z-20 transition-transform duration-300 ${
@@ -86,7 +90,7 @@ export function ChatSidebar({
                 />
                 <div
                   className={`absolute bottom-0 right-0 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full border-2 border-white dark:border-zinc-900 ${
-                    contact.participantDetails[0].status
+                   onlineUsers.has(contact.participantDetails[0]._id)
                       ? "bg-green-500"
                       : "bg-gray-400"
                   }`}

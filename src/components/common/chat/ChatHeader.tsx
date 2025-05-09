@@ -4,6 +4,7 @@ import { Icontacts } from "@/pages/chat";
 
 interface ChatHeaderProps {
   activeChat: Icontacts | null;
+  onlineUsers: Set<string>;
   setActiveChat: (activeChat: Icontacts | null) => void;
   setShowSidebar: (value: boolean) => void;
   profileImage: string;
@@ -11,6 +12,7 @@ interface ChatHeaderProps {
 
 export function ChatHeader({
   activeChat,
+  onlineUsers,
   setActiveChat,
   setShowSidebar,
   profileImage,
@@ -38,7 +40,7 @@ export function ChatHeader({
           />
           <div
             className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-zinc-900 ${
-              activeChat?.participantDetails[0].status
+              onlineUsers.has(activeChat?.participantDetails[0]._id as string)
                 ? "bg-green-500"
                 : "bg-gray-400"
             }`}
@@ -49,7 +51,7 @@ export function ChatHeader({
             {activeChat?.participantDetails[0].name}
           </h2>
           <span className="text-xs sm:text-sm text-gray-500 dark:text-zinc-400">
-            {activeChat?.participantDetails[0].status ? "Online" : "Offline"}
+            { onlineUsers.has(activeChat?.participantDetails[0]._id as string) ? "Online" : "Offline"}
           </span>
         </div>
       </div>

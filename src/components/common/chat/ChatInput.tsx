@@ -7,17 +7,10 @@ import { ChatAttachmentPreview } from "./ChatAttachmentPreview";
 import { ChatCameraPreview } from "./ChatCameraPreview";
 import { useSendMessageMutation } from "@/services/apis/CommonApis";
 import { SocketContext } from "@/contexts/socketContext";
+import { InewMessage } from "@/pages/chat";
 
-interface InewMessage {
-  chatId: string;
-  senderId: string;
-  receiverId: string;
-  content: string | File | Blob;
-  contentType: "text" | "image" | "video" | "audio" | "document";
-  status: string;
-  replyTo?: string;
-  createdAt: string;
-}
+
+
 
 interface ChatInputProps {
   setMessages: React.Dispatch<React.SetStateAction<InewMessage[]>>;

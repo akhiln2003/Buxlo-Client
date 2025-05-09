@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useContext } from "react";
-import { format } from "date-fns";
+import { format, isToday } from "date-fns";
 import {
   CheckCheck,
   Check,
@@ -356,12 +356,18 @@ export const ChatMessages = ({
 
   const groupMessagesByDate = () => {
     const groups: Record<string, InewMessage[]> = {};
+  
     messages.forEach((message) => {
-      const dateStr = format(new Date(message.createdAt), "MMMM d, yyyy");
+      const dateObj = new Date(message.createdAt);
+      const dateStr = isToday(dateObj)
+        ? "Today"
+        : format(dateObj, "MMMM d, yyyy");
+  
       groups[dateStr] = groups[dateStr]
         ? [...groups[dateStr], message]
         : [message];
     });
+  
     return Object.entries(groups).map(([date, messages]) => ({
       date,
       messages,

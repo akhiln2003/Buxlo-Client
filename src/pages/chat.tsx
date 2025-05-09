@@ -35,12 +35,13 @@ export interface Icontacts {
   unreadCount?: number;
 }
 
+// src/@types/InewMessage.ts
 export interface InewMessage {
   createdAt: string | number | Date;
   chatId: string;
   senderId: string;
   receiverId: string;
-  content: string;
+  content: string | File | Blob;
   contentType: "text" | "image" | "video" | "audio" | "document";
   status: "sent" | "delivered" | "received" | "read";
   deleted?: "me" | "everyone";
@@ -57,6 +58,7 @@ export default function Chat() {
   const [fetchMentorProfileImages] = useFetchMentorProfileImageMutation();
   const [fetchUserProfileImages] = useFetchUserProfileImageMutation();
   const [profileImage, setProfileImage] = useState<string[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
   const [myProfile, setMyProfile] = useState("");
   const [getMessages] = useFetchMessageMutation();
   const user = useGetUser();
@@ -134,7 +136,20 @@ export default function Chat() {
     }
   }, [user?.id]);
 
+
+
+
+
   useEffect(() => {
+    socketContext?.socket?.on("activeUsers", (data) => {
+      console.log("Active users:", data);
+      setOnlineUsers(new Set(data));
+    }
+    );
+    socketContext?.socket?.on("online", ({ userId }) => {
+      console.log("User online:", userId);
+      setOnlineUsers((prev) => new Set(prev).add(userId));
+    });
     socketContext?.socket?.on("direct_message", (data) => {
       console.log("Received direct message:", data);
     });
@@ -166,6 +181,7 @@ export default function Chat() {
     <div className="flex h-[calc(100vh-64px)] bg-gray-100 dark:bg-zinc-900">
       <ChatSidebar
         showSidebar={showSidebar}
+        onlineUsers={onlineUsers}
         contacts={contacts}
         activeChat={activeChat}
         handleChatSelect={handleChatSelect}
@@ -182,6 +198,8 @@ export default function Chat() {
           <div className="flex flex-col h-full">
             <ChatHeader
               activeChat={activeChat}
+              onlineUsers={onlineUsers}
+
               setActiveChat={setActiveChat}
               setShowSidebar={setShowSidebar}
               profileImage={
