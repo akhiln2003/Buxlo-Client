@@ -17,7 +17,7 @@ export enum UserApiEndPoints {
     fetchMentorsList = '/user/user/fetchmentors',
     connectMentor = '/chat/user/connectmentor',
     fetchContacts = '/chat/user/fetchcontacts',
-    moneyCategorize = '/chat/user/moneycategorize',
+    moneyCategorize = '/user/user/moneycategorize',
 
 
     }
