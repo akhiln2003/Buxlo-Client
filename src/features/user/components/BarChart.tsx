@@ -1,8 +1,7 @@
-"use client"
+"use client";
 
-import { TrendingUp } from "lucide-react"
-import { Bar, BarChart, XAxis, YAxis } from "recharts"
-
+import { TrendingUp } from "lucide-react";
+import { Bar, BarChart, XAxis, YAxis } from "recharts";
 import {
   Card,
   CardContent,
@@ -10,20 +9,21 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
+
 const chartData = [
   { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
   { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
   { browser: "firefox", visitors: 187, fill: "var(--color-firefox)" },
   { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
   { browser: "other", visitors: 90, fill: "var(--color-other)" },
-]
+];
 
 const chartConfig = {
   visitors: {
@@ -49,17 +49,21 @@ const chartConfig = {
     label: "Other",
     color: "hsl(var(--chart-5))",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
-export function Barchart() {
+interface BarchartProps {
+  title?: string;
+}
+
+export function Barchart({ title = "Bar Chart - Mixed" }: BarchartProps) {
   return (
-    <Card>
+    <Card className="flex flex-col h-full">
       <CardHeader>
-        <CardTitle>Bar Chart - Mixed</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle className="text-base sm:text-lg">{title}</CardTitle>
+        <CardDescription className="text-sm">January - June 2024</CardDescription>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
+      <CardContent className="flex-1">
+        <ChartContainer config={chartConfig} className="h-[200px] sm:h-[250px] w-full">
           <BarChart
             accessibilityLayer
             data={chartData}
@@ -77,6 +81,7 @@ export function Barchart() {
               tickFormatter={(value) =>
                 chartConfig[value as keyof typeof chartConfig]?.label
               }
+              className="text-xs sm:text-sm"
             />
             <XAxis dataKey="visitors" type="number" hide />
             <ChartTooltip
@@ -87,14 +92,14 @@ export function Barchart() {
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
+      <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex gap-2 font-medium leading-none">
           Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
         </div>
-        <div className="leading-none text-muted-foreground">
+        <div className="leading-none text-muted-foreground text-center">
           Showing total visitors for the last 6 months
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }

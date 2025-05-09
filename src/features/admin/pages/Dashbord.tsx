@@ -65,7 +65,7 @@ const Dashboard = () => {
       try {
         const planResponse: IaxiosResponse = await fetchPlan();
 
-        if (planResponse.data.data) {          
+        if (planResponse.data.data) {
           setPlans(planResponse.data.data);
         }
       } catch (err) {
@@ -211,32 +211,54 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {plans.map((subscription) => (
-                <div
-                  key={subscription.id}
-                  className="flex items-center justify-between p-4 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-gray-800 rounded-lg hover:shadow-sm transition-shadow"
-                >
-                  <div>
-                    <h3 className=" font-cabinet font-semibold text-gray-800 dark:text-zinc-100">
-                      {subscription.type}
-                    </h3>
-                    <div className="text-sm text-gray-600 dark:text-zinc-300 flex">
-                      <p className="font-cabinet font-semibold">
-                        Price: ₹{subscription.price}
-                      </p>
-                      <p className="mx-1"> / </p>
-                      <p className="text-green-600">
-                        Offer:&nbsp;
-                        {subscription.offer}%
-                      </p>
+              {plans.map((subscription) => {
+                const hasOffer = subscription.offer && subscription.offer > 0;
+                const offerPrice = hasOffer
+                  ? Math.round(
+                      subscription.price * (1 - subscription.offer / 100)
+                    )
+                  : null;
+
+                return (
+                  <div
+                    key={subscription.id}
+                    className="flex items-center justify-between p-4 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-gray-800 rounded-lg hover:shadow-sm transition-shadow"
+                  >
+                    <div>
+                      <h3 className="font-cabinet font-semibold text-gray-800 dark:text-zinc-100">
+                        {subscription.type}
+                      </h3>
+
+                      <div className="text-sm text-gray-600 dark:text-zinc-300">
+                        {hasOffer ? (
+                          <>
+                            <div className="flex items-center space-x-2">
+                              <span className="line-through text-red-500 font-semibold">
+                              price : ₹{subscription.price}
+                              </span>
+                              <span className="text-green-600 font-semibold">
+                                ({subscription.offer}% OFF)
+                              </span>
+                            </div>
+                            <div className="text-black dark:text-white font-semibold">
+                              OfferPrice : ₹{offerPrice}
+                            </div>
+                          </>
+                        ) : (
+                          <div className="text-black dark:text-white font-semibold">
+                           price : ₹{subscription.price}
+                          </div>
+                        )}
+                      </div>
                     </div>
+
+                    <EditSubscriptionModal
+                      subscription={subscription}
+                      setPlans={setPlans}
+                    />
                   </div>
-                  <EditSubscriptionModal
-                    subscription={subscription}
-                    setPlans={setPlans}
-                  />
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>

@@ -1,8 +1,7 @@
-"use client"
+"use client";
 
-import { TrendingUp } from "lucide-react"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
-
+import { TrendingUp } from "lucide-react";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import {
   Card,
   CardContent,
@@ -10,7 +9,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -18,7 +17,8 @@ import {
   ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
+
 const chartData = [
   { month: "January", desktop: 186, mobile: 80 },
   { month: "February", desktop: 305, mobile: 200 },
@@ -26,7 +26,7 @@ const chartData = [
   { month: "April", desktop: 73, mobile: 190 },
   { month: "May", desktop: 209, mobile: 130 },
   { month: "June", desktop: 214, mobile: 140 },
-]
+];
 
 const chartConfig = {
   desktop: {
@@ -37,19 +37,21 @@ const chartConfig = {
     label: "Mobile",
     color: "hsl(var(--chart-2))",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
-export function Areachart() {
+interface AreachartProps {
+  title?: string;
+}
+
+export function Areachart({ title = "Area Chart - Legend" }: AreachartProps) {
   return (
-    <Card >
+    <Card className="flex flex-col h-full">
       <CardHeader>
-        <CardTitle>Area Chart - Legend</CardTitle>
-        <CardDescription>
-          Showing total visitors for the last 6 months
-        </CardDescription>
+        <CardTitle className="text-base sm:text-lg">{title}</CardTitle>
+        <CardDescription className="text-sm">Showing total visitors for the last 6 months</CardDescription>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
+      <CardContent className="flex-1">
+        <ChartContainer config={chartConfig} className="h-[200px] sm:h-[250px] w-full">
           <AreaChart
             accessibilityLayer
             data={chartData}
@@ -65,6 +67,7 @@ export function Areachart() {
               axisLine={false}
               tickMargin={8}
               tickFormatter={(value) => value.slice(0, 3)}
+              className="text-xs sm:text-sm"
             />
             <ChartTooltip
               cursor={false}
@@ -90,16 +93,11 @@ export function Areachart() {
           </AreaChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter>
-        <div className="flex w-full items-start gap-2 text-sm">
-          <div className="grid gap-2">
-            <div className="flex items-center gap-2 font-medium leading-none">
-              Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-            </div>
-
-          </div>
+      <CardFooter className="flex-col gap-2 text-sm">
+        <div className="flex items-center gap-2 font-medium leading-none">
+          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }

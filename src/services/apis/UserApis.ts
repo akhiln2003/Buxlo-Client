@@ -101,6 +101,15 @@ export const userApi = createApi({
         method: "GET",
       }),
     }),
+
+    // Add a new category
+    moneyCategorize: builder.mutation({
+      query: (data) => ({
+        url: UserApiEndPoints.moneyCategorize,
+        method: "POST",
+        data:data
+      }),
+    }),
   }),
 });
 
@@ -115,4 +124,5 @@ export const {
   useFetchMentorsListMutation,
   useConnectMentorMutation,
   useFetchContactsMutation,
+  useMoneyCategorizeMutation
 } = userApi;
