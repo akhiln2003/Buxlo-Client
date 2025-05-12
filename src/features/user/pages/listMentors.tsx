@@ -59,7 +59,6 @@ const ListMentors = () => {
   useEffect(() => {
     fetchData();
   }, []);
-  console.log(mentors);
 
 
   return (

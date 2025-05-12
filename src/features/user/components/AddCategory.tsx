@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import {
@@ -37,6 +35,8 @@ import {
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { useMoneyCategorizeMutation } from "@/services/apis/UserApis";
+import { Icategory } from "../pages/dashBord";
+import { errorTost, successToast } from "@/components/ui/tosastMessage";
 
 // Sample data for chart previews
 const pieData = [
@@ -52,26 +52,46 @@ const barData = [
   { browser: "safari", visitors: 200, fill: "hsl(var(--chart-2))" },
 ];
 
-
-
-function AddCategory() {
+function AddCategory({
+  setCategories,
+}: {
+  setCategories: React.Dispatch<React.SetStateAction<Icategory[]>>;
+}) {
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [amount, setAmount] = useState("");
+  const [name, setName] = useState<string>("");
+  const [amount, setAmount] = useState<number | null>(null);
   const [chartType, setChartType] = useState<"Pie" | "Area" | "Bar">("Pie");
-const [ updateNewCategory] = useMoneyCategorizeMutation();
+  const [updateNewCategory] = useMoneyCategorizeMutation();
   const handleSubmit = async () => {
-    if (name && amount && Number(amount) > 0) {
-      const response: IaxiosResponse = await updateNewCategory({name,amount,chartType});
-      console.log("Response from API:", response);
-      
+    try {
+      const response: IaxiosResponse = await updateNewCategory({
+        name,
+        amount,
+        chartType,
+      });
+      if (response.data) {
+        setCategories((prev) => [...prev, response.data]);
+        successToast("Updated", "New category added successfully");
+      } else {
+        errorTost(
+          "Something went wrong ",
+          response.error.data.error || [
+            { message: `${response.error.data} please try again later` },
+          ]
+        );
+        console.error("Error fetching categories:", response.error);
+      }
       setOpen(false);
       setName("");
-      setAmount("");
+      setAmount(null);
       setChartType("Pie");
+    } catch (error) {
+      errorTost("Something wrong", [
+        { message: "Something went wrong please try again" },
+      ]);
+      console.error("Error fetching categories:", error);
     }
   };
-
   const renderChartPreview = () => {
     switch (chartType) {
       case "Pie":
@@ -158,8 +178,10 @@ const [ updateNewCategory] = useMoneyCategorizeMutation();
                 <Input
                   id="amount"
                   type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+                  value={amount as number}
+                  onChange={(e) =>
+                    setAmount(e.target.value ? Number(e.target.value) : null)
+                  }
                   placeholder="e.g., 1000"
                   className="mt-1 text-sm sm:text-base"
                 />

@@ -50,7 +50,6 @@ const Profile = () => {
             );            
             if (imageUrl.data.imageUrl) {
               setProfileImage(imageUrl.data.imageUrl[0]);
-              console.log(imageUrl.data.imageUrl[0]);
               
             } else {
               

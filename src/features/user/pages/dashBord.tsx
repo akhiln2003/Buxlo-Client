@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddWalletAndBankAccount from "../components/AddWalletAndBankAccount";
 import AddCategory from "../components/AddCategory";
 import { Areachart } from "../components/AreaChart";
@@ -17,6 +17,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { useFetchMoneyCategorizeMutation } from "@/services/apis/UserApis";
+import { errorTost } from "@/components/ui/tosastMessage";
 
 export interface Icategory {
   id?: string;
@@ -28,15 +31,15 @@ export interface Icategory {
 
 function Dashboard() {
   const [categories, setCategories] = useState<Icategory[]>([]);
-  const [filterType, setFilterType] = useState<"day" | "month" | "year" | "">("");
+  const [filterType, setFilterType] = useState<"day" | "month" | "year" | "">(
+    ""
+  );
   const [selectedYear, setSelectedYear] = useState<string>("");
   const [selectedMonth, setSelectedMonth] = useState<string>("");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
+  const [fetchCategory] = useFetchMoneyCategorizeMutation();
   // const [ balance, setBalance] = useState<number>(1000);
-
-
-
 
   const renderChart = (category: Icategory) => {
     switch (category.chartType) {
@@ -51,12 +54,36 @@ function Dashboard() {
     }
   };
 
+  async function fetchCategories() {
+    try {
+      const response: IaxiosResponse = await fetchCategory();
+      if (response.data) {
+        setCategories(response.data.data);
+      } else {
+        errorTost(
+          "Something went wrong ",
+          response.error.data.error || [
+            { message: `${response.error.data} please try again later` },
+          ]
+        );
+        console.error("Error fetching categories:", response.error);
+      }
+    } catch (error) {
+      errorTost("Something wrong", [
+        { message: "Something went wrong please try again" },
+      ]);
+      console.error("Error fetching categories:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
   return (
     <div className="w-full min-h-screen flex flex-col bg-zinc-100 dark:bg-zinc-950">
       {/* Header Section with Wallet/Bank */}
       <div className="w-full p-4 sm:p-6 md:p-8">
-        <AddWalletAndBankAccount
-        />
+        <AddWalletAndBankAccount />
       </div>
 
       {/* Statistics Heading with Filter Button */}
@@ -95,13 +122,16 @@ function Dashboard() {
         </div>
         {/* Dynamic Category Charts */}
         {categories.map((category) => (
-          <div key={category.id} className="w-full bg-white dark:bg-zinc-900 rounded-lg shadow-sm p-4">
+          <div
+            key={category.id}
+            className="w-full bg-white dark:bg-zinc-900 rounded-lg shadow-sm p-4"
+          >
             {renderChart(category)}
           </div>
         ))}
         {/* Add Category */}
         <div className="w-full bg-white dark:bg-zinc-900 rounded-lg shadow-sm p-4">
-          <AddCategory  />
+          <AddCategory setCategories={setCategories}/>
         </div>
       </div>
 
@@ -114,29 +144,47 @@ function Dashboard() {
             </TableCaption>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-left text-sm sm:text-base">User ID</TableHead>
-                <TableHead className="text-left text-sm sm:text-base">Name</TableHead>
-                <TableHead className="text-left text-sm sm:text-base">Email</TableHead>
-                <TableHead className="text-left text-sm sm:text-base">Status</TableHead>
+                <TableHead className="text-left text-sm sm:text-base">
+                  User ID
+                </TableHead>
+                <TableHead className="text-left text-sm sm:text-base">
+                  Name
+                </TableHead>
+                <TableHead className="text-left text-sm sm:text-base">
+                  Email
+                </TableHead>
+                <TableHead className="text-left text-sm sm:text-base">
+                  Status
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               <TableRow>
                 <TableCell className="text-sm sm:text-base">1</TableCell>
                 <TableCell className="text-sm sm:text-base">John Doe</TableCell>
-                <TableCell className="text-sm sm:text-base">john.doe@example.com</TableCell>
+                <TableCell className="text-sm sm:text-base">
+                  john.doe@example.com
+                </TableCell>
                 <TableCell className="text-sm sm:text-base">Active</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className="text-sm sm:text-base">2</TableCell>
-                <TableCell className="text-sm sm:text-base">Jane Smith</TableCell>
-                <TableCell className="text-sm sm:text-base">jane.smith@example.com</TableCell>
+                <TableCell className="text-sm sm:text-base">
+                  Jane Smith
+                </TableCell>
+                <TableCell className="text-sm sm:text-base">
+                  jane.smith@example.com
+                </TableCell>
                 <TableCell className="text-sm sm:text-base">Inactive</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className="text-sm sm:text-base">3</TableCell>
-                <TableCell className="text-sm sm:text-base">Bob Johnson</TableCell>
-                <TableCell className="text-sm sm:text-base">bob.johnson@example.com</TableCell>
+                <TableCell className="text-sm sm:text-base">
+                  Bob Johnson
+                </TableCell>
+                <TableCell className="text-sm sm:text-base">
+                  bob.johnson@example.com
+                </TableCell>
                 <TableCell className="text-sm sm:text-base">Active</TableCell>
               </TableRow>
             </TableBody>

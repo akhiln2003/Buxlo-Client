@@ -110,6 +110,15 @@ export const userApi = createApi({
         data:data
       }),
     }),
+
+
+    // Fetch money categorize
+    fetchMoneyCategorize: builder.mutation({
+      query: () => ({
+        url: UserApiEndPoints.fetchmoneycategorize,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -124,5 +133,6 @@ export const {
   useFetchMentorsListMutation,
   useConnectMentorMutation,
   useFetchContactsMutation,
-  useMoneyCategorizeMutation
+  useMoneyCategorizeMutation,
+  useFetchMoneyCategorizeMutation
 } = userApi;
