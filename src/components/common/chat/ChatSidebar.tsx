@@ -23,9 +23,7 @@ export function ChatSidebar({
   myProfile,
   profileImage,
   user,
-}: ChatSidebarProps) {
-  console.log("Online users in sidebar:", onlineUsers);
-  
+}: ChatSidebarProps) {  
   return (
     <div
       className={`flex flex-col h-full w-full sm:w-64 lg:w-80 bg-white dark:bg-zinc-900 border-r dark:border-zinc-800 fixed md:static z-20 transition-transform duration-300 ${

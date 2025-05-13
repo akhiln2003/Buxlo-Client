@@ -136,28 +136,42 @@ export default function Chat() {
     }
   }, [user?.id]);
 
-
-
-
-
   useEffect(() => {
-    socketContext?.socket?.on("activeUsers", (data) => {
-      console.log("Active users:", data);
-      setOnlineUsers(new Set(data));
+    if (socketContext?.socket?.connected) {
+      socketContext.socket.emit("active_user", user?.id as string);
+      socketContext.socket.emit("online", user?.id as string);
     }
-    );
+    socketContext?.socket?.on("active_user", (data) => {
+      setOnlineUsers(new Set(data));
+    });
     socketContext?.socket?.on("online", ({ userId }) => {
-      console.log("User online:", userId);
       setOnlineUsers((prev) => new Set(prev).add(userId));
     });
-    socketContext?.socket?.on("direct_message", (data) => {
-      console.log("Received direct message:", data);
+    socketContext?.socket?.on("leave", (userId: string) => {
+      setOnlineUsers((prev) => {
+        const updatedUsers = new Set(prev);
+        updatedUsers.delete(userId);
+        return updatedUsers;
+      });
     });
-  }, [ socketContext?.socket?.connected]);
+
+    return () => {
+      socketContext?.socket?.emit("leave", user?.id as string);
+      socketContext?.socket?.on("leave", (userId: string) => {
+        setOnlineUsers((prev) => {
+          const updatedUsers = new Set(prev);
+          updatedUsers.delete(userId);
+          return updatedUsers;
+        });
+      });
+
+      socketContext?.socket?.off("active_user");
+      socketContext?.socket?.off("online");
+    };
+  }, [socketContext?.socket?.connected]);
 
   const handleChatSelect = async (contact: Icontacts) => {
     try {
-
       setActiveChat(contact);
       const response: IaxiosResponse = await getMessages(contact.id);
       if (response.data) {
@@ -199,7 +213,6 @@ export default function Chat() {
             <ChatHeader
               activeChat={activeChat}
               onlineUsers={onlineUsers}
-
               setActiveChat={setActiveChat}
               setShowSidebar={setShowSidebar}
               profileImage={
