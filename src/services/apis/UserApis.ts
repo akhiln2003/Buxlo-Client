@@ -44,38 +44,7 @@ export const userApi = createApi({
       }),
     }),
 
-    // createlinktoken
-    createlinktoken: builder.mutation({
-      query: ({
-        id,
-        name,
-      }: {
-        id: string | undefined;
-        name: string | undefined;
-      }) => ({
-        url: UserApiEndPoints.createlinktoken,
-        method: "POST",
-        data: {
-          id,
-          name,
-        },
-      }),
-    }),
-
-    //Exchange public token
-    exchangePublicToken: builder.mutation({
-      query: ({
-        publicToken,
-        user,
-      }: {
-        publicToken: string;
-        user: unknown;
-      }) => ({
-        url: UserApiEndPoints.exchangePublicToken,
-        method: "POST",
-        data: { publicToken, user },
-      }),
-    }),
+   
 
     // Fetching Mentors
     fetchMentorsList: builder.mutation({
@@ -107,10 +76,9 @@ export const userApi = createApi({
       query: (data) => ({
         url: UserApiEndPoints.moneyCategorize,
         method: "POST",
-        data:data
+        data: data,
       }),
     }),
-
 
     // Fetch money categorize
     fetchMoneyCategorize: builder.mutation({
@@ -119,6 +87,10 @@ export const userApi = createApi({
         method: "GET",
       }),
     }),
+
+    
+
+    /////////////////////////////////////////////////////////////////////////
   }),
 });
 
@@ -128,11 +100,10 @@ export const {
   useUpdateUserProfileMutation,
   useFetchUserProfileImageMutation,
   useDeleteUserProfileImageMutation,
-  useCreatelinktokenMutation,
-  useExchangePublicTokenMutation,
   useFetchMentorsListMutation,
   useConnectMentorMutation,
   useFetchContactsMutation,
   useMoneyCategorizeMutation,
-  useFetchMoneyCategorizeMutation
+  useFetchMoneyCategorizeMutation,
+  
 } = userApi;

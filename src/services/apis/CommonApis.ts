@@ -44,6 +44,24 @@ export const commonApi = createApi({
         data: { keys },
       }),
     }),
+
+    // Fetch Wallet
+    fetchUserWallet: builder.mutation({
+      query: (id) => ({
+        url: `${CommonApiEndPoints.fetchWallet}?id=${id}`,
+        method: "GET",
+      }),
+    }),
+
+    // Update Wallet Name
+    updateWalletName: builder.mutation({
+      query: ({ id, name }: { id: string; name: string }) => ({
+        url: `${CommonApiEndPoints.updateWalletName}/${id}`,
+        method: "PATCH",
+        data: {name},
+      }),
+    }),
+    //////////////////////////////////////////////////////////////////////////////////
   }),
 });
 
@@ -51,5 +69,7 @@ export const {
   useContactUsMutation,
   useFetchMessageMutation,
   useSendMessageMutation,
-  useFetchMessageFromS3Mutation
+  useFetchMessageFromS3Mutation,
+  useFetchUserWalletMutation,
+  useUpdateWalletNameMutation,
 } = commonApi;

@@ -71,10 +71,10 @@ const EditSubscriptionForm = ({
       const id = subscription.id;
 
       const response: IaxiosResponse = await updatePlan({ id, updatedData });
-      if (response.data.data) {
+      if (response.data.updatedData) {
         setPlans((prev: Isubscription[]) =>
           prev.map((sub: Isubscription) =>
-            sub.type == data.type ? {...response.data.data} : sub
+            sub.type == data.type ? {...response.data.updatedData} : sub
           )
         )
         setIsOpen(false);

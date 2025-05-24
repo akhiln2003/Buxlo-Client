@@ -1,6 +1,4 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import AddWalletAndBankAccount from "../components/AddWalletAndBankAccount";
 import AddCategory from "../components/AddCategory";
 import { Areachart } from "../components/AreaChart";
@@ -17,9 +15,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
-import { useFetchMoneyCategorizeMutation } from "@/services/apis/UserApis";
-import { errorTost } from "@/components/ui/tosastMessage";
+// import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+// import { useFetchMoneyCategorizeMutation } from "@/services/apis/UserApis";
+// import { errorTost } from "@/components/ui/tosastMessage";
 
 export interface Icategory {
   id?: string;
@@ -38,8 +36,7 @@ function Dashboard() {
   const [selectedMonth, setSelectedMonth] = useState<string>("");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
-  const [fetchCategory] = useFetchMoneyCategorizeMutation();
-  // const [ balance, setBalance] = useState<number>(1000);
+  // const [fetchCategory] = useFetchMoneyCategorizeMutation();
 
   const renderChart = (category: Icategory) => {
     switch (category.chartType) {
@@ -54,31 +51,31 @@ function Dashboard() {
     }
   };
 
-  async function fetchCategories() {
-    try {
-      const response: IaxiosResponse = await fetchCategory();
-      if (response.data) {
-        setCategories(response.data.data);
-      } else {
-        errorTost(
-          "Something went wrong ",
-          response.error.data.error || [
-            { message: `${response.error.data} please try again later` },
-          ]
-        );
-        console.error("Error fetching categories:", response.error);
-      }
-    } catch (error) {
-      errorTost("Something wrong", [
-        { message: "Something went wrong please try again" },
-      ]);
-      console.error("Error fetching categories:", error);
-    }
-  }
+  // async function fetchCategories() {
+  //   try {
+  //     const response: IaxiosResponse = await fetchCategory();
+  //     if (response.data) {
+  //       setCategories(response.data.data);
+  //     } else {
+  //       errorTost(
+  //         "Something went wrong ",
+  //         response.error.data.error || [
+  //           { message: `${response.error.data} please try again later` },
+  //         ]
+  //       );
+  //       console.error("Error fetching categories:", response.error);
+  //     }
+  //   } catch (error) {
+  //     errorTost("Something wrong", [
+  //       { message: "Something went wrong please try again" },
+  //     ]);
+  //     console.error("Error fetching categories:", error);
+  //   }
+  // }
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
+  // useEffect(() => {
+  //   fetchCategories();
+  // }, []);
   return (
     <div className="w-full min-h-screen flex flex-col bg-zinc-100 dark:bg-zinc-950">
       {/* Header Section with Wallet/Bank */}

@@ -23,7 +23,10 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EditSubscriptionModal } from "../components/EditSubscriptionModal";
-import { useFetchSubscriptionPlanMutation } from "@/services/apis/AdminApis";
+import {
+  useAddSubscriptionPlanMutation,
+  useFetchSubscriptionPlanMutation,
+} from "@/services/apis/AdminApis";
 import { Isubscription } from "@/@types/interface/Isubscription";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { errorTost } from "@/components/ui/tosastMessage";
@@ -31,6 +34,7 @@ import { errorTost } from "@/components/ui/tosastMessage";
 const Dashboard = () => {
   const [plans, setPlans] = useState<Isubscription[]>([]);
   const [fetchPlan] = useFetchSubscriptionPlanMutation();
+  const [addPlans] = useAddSubscriptionPlanMutation();
 
   const [dashboardData, setDashboardData] = useState({
     totalUsers: 5420,
@@ -60,13 +64,48 @@ const Dashboard = () => {
 
   const COLORS = ["#3B82F6", "#10B981", "#F43F5E", "#8B5CF6"];
 
+  const checkPlans = async () => {
+    type Plan = {
+      price: number;
+      offer: number;
+      type: string;
+    };
+
+    const allPlans: Plan[] = [
+      { price: 1999, offer: 0, type: "Year" },
+      { price: 599, offer: 0, type: "Month" },
+      { price: 199, offer: 0, type: "Day" },
+    ];
+
+    const filteredPlans = allPlans.filter(
+      (plan) => !plans.some((p) => p.type === plan.type)
+    );
+    if (filteredPlans.length) {
+      try {
+        const planResponse: IaxiosResponse = await addPlans(filteredPlans);
+
+        if (planResponse.data.newPlans) {
+          setPlans(planResponse.data.newPlans);
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        errorTost("Faild to add new subscription plan", [
+          { message: "Unable to add subscription plans" },
+        ]);
+      }
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const planResponse: IaxiosResponse = await fetchPlan();
-
+        const newPlans = planResponse.data.data;
         if (planResponse.data.data) {
           setPlans(planResponse.data.data);
+        }
+        if (newPlans.length < 3) {
+          checkPlans();
         }
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -79,6 +118,15 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
+  type MetricCardProps = {
+    title: string;
+    value: string | number;
+    icon: React.ElementType;
+    bgColor?: string;
+    textColor?: string;
+    trend?: "up" | "down";
+  };
+
   const MetricCard = ({
     title,
     value,
@@ -86,7 +134,7 @@ const Dashboard = () => {
     bgColor = "bg-blue-50",
     textColor = "text-blue-600",
     trend = "up",
-  }) => (
+  }: MetricCardProps) => (
     <Card
       className={`${bgColor} hover:shadow-lg transition-shadow dark:bg-zinc-900`}
     >
@@ -234,7 +282,7 @@ const Dashboard = () => {
                           <>
                             <div className="flex items-center space-x-2">
                               <span className="line-through text-red-500 font-semibold">
-                              price : ₹{subscription.price}
+                                price : ₹{subscription.price}
                               </span>
                               <span className="text-green-600 font-semibold">
                                 ({subscription.offer}% OFF)
@@ -246,7 +294,7 @@ const Dashboard = () => {
                           </>
                         ) : (
                           <div className="text-black dark:text-white font-semibold">
-                           price : ₹{subscription.price}
+                            price : ₹{subscription.price}
                           </div>
                         )}
                       </div>

@@ -19,6 +19,4 @@ export enum UserApiEndPoints {
     fetchContacts = '/chat/user/fetchcontacts',
     moneyCategorize = '/payment/user/moneycategorize',
     fetchmoneycategorize = '/payment/user/fetchmoneycategorize',
-
-
     }
