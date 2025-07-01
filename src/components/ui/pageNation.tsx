@@ -7,11 +7,17 @@ import { Button } from "./button";
   setpageNationData
 }: {
   pageNationData: { pageNum: number; totalPages: number };
-  fetchUserData:(page: number) => Promise<void>;
+  fetchUserData:(page: number , select?:string , searchData?:string) => Promise<void>;
   setpageNationData:React.Dispatch<React.SetStateAction<{ pageNum: number; totalPages: number }>>;
 }) => {
   return (
-    <div className="w-2/12 min-h-full max-h-full flex justify-between items-center rounded-s bg-zinc-200 dark:bg-zinc-800  p-1">
+<div
+  className={`${
+    pageNationData.totalPages > 1
+      ? "w-2/12 min-h-full max-h-full flex justify-between items-center rounded-s bg-zinc-200 dark:bg-zinc-800 p-1"
+      : "w-2/12 min-h-full max-h-full flex justify-center items-center rounded-s bg-zinc-200 dark:bg-zinc-800 p-1"
+  }`}
+>
       {/* Prev Button */}
       {pageNationData.pageNum > 1 && (
         <Button

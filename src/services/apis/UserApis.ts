@@ -44,12 +44,10 @@ export const userApi = createApi({
       }),
     }),
 
-   
-
     // Fetching Mentors
     fetchMentorsList: builder.mutation({
-      query: ({ page, availability }) => ({
-        url: `${UserApiEndPoints.fetchMentorsList}?page=${page}&&availability=${availability}`,
+      query: ({ page, select, searchData }) => ({
+        url: `${UserApiEndPoints.fetchMentorsList}?page=${page}&&select=${select}&&searchData=${searchData}`,
         method: "GET",
       }),
     }),
@@ -88,8 +86,6 @@ export const userApi = createApi({
       }),
     }),
 
-    
-
     /////////////////////////////////////////////////////////////////////////
   }),
 });
@@ -105,5 +101,4 @@ export const {
   useFetchContactsMutation,
   useMoneyCategorizeMutation,
   useFetchMoneyCategorizeMutation,
-  
 } = userApi;

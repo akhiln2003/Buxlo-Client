@@ -10,6 +10,19 @@ export const commonApi = createApi({
   endpoints: (builder) => ({
     ///////////////////////////////--User--///////////////////////////////
 
+    // Change Password
+    chanegePassword: builder.mutation({
+      query: (data: {
+        userId: string;
+        currentPassword: string;
+        newPassword: string;
+      }) => ({
+        url: CommonApiEndPoints.changePassword,
+        method: "PATCH",
+        data: data,
+      }),
+    }),
+
     // signUp new
     contactUs: builder.mutation({
       query: (data: IcontactUsData) => ({
@@ -58,18 +71,29 @@ export const commonApi = createApi({
       query: ({ id, name }: { id: string; name: string }) => ({
         url: `${CommonApiEndPoints.updateWalletName}/${id}`,
         method: "PATCH",
-        data: {name},
+        data: { name },
       }),
     }),
+
+    createWallet: builder.mutation({
+      query: (data) => ({
+        url: CommonApiEndPoints.createWallet,
+        method: "POST",
+        data: { data },
+      }),
+    }),
+
     //////////////////////////////////////////////////////////////////////////////////
   }),
 });
 
 export const {
+  useChanegePasswordMutation,
   useContactUsMutation,
   useFetchMessageMutation,
   useSendMessageMutation,
   useFetchMessageFromS3Mutation,
   useFetchUserWalletMutation,
   useUpdateWalletNameMutation,
+  useCreateWalletMutation,
 } = commonApi;

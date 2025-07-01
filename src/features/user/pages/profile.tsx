@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import {
   Landmark,
-  Pencil,
   WalletMinimal,
   Mail,
   Phone,
   NotebookPen,
   Camera,
+  Settings,
 } from "lucide-react";
 import {
   Dialog,
@@ -20,14 +20,24 @@ import { Iuser } from "@/@types/interface/Iuser";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { useGetUser } from "@/hooks/useGetUser";
-import { useFetchUserProfileImageMutation, useFetchUserProfileMutation } from "@/services/apis/UserApis";
+import {
+  useFetchUserProfileImageMutation,
+  useFetchUserProfileMutation,
+} from "@/services/apis/UserApis";
 import EditProfilePhoto from "../components/EditProfilePhoto";
 import dummyProfileImage from "@/assets/images/dummy-profile.webp";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@radix-ui/react-dropdown-menu";
+import { ChangePasswordForm } from "../components/ChangePasswordForm";
 // import EditProfileBanner from "../components/EditProfileBanner";
 
 const Profile = () => {
   const [showEditData, setShowEditData] = useState(false);
-  // const [showEditBanner, setShowEditBanner] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const [fetchProfileData] = useFetchUserProfileMutation();
   const [profileImage, setProfileImage] = useState("");
   const [fetchProfileImages] = useFetchUserProfileImageMutation();
@@ -44,15 +54,13 @@ const Profile = () => {
         );
         if (response.data.data) {
           setUsers(response.data.data);
-          if (response.data.data.avatar) {            
-            const imageUrl: IaxiosResponse = await fetchProfileImages(
-              [`UserProfiles/${response.data.data.avatar}`] 
-            );            
+          if (response.data.data.avatar) {
+            const imageUrl: IaxiosResponse = await fetchProfileImages([
+              `UserProfiles/${response.data.data.avatar}`,
+            ]);
             if (imageUrl.data.imageUrl) {
               setProfileImage(imageUrl.data.imageUrl[0]);
-              
             } else {
-              
               errorTost(
                 "Something went wrong ",
                 imageUrl.error.data.error || [
@@ -96,12 +104,28 @@ const Profile = () => {
           </div>
 
           {/* Banner Edit Button */}
-          {/* <button
-            onClick={() => setShowEditBanner(true)}
-            className="absolute top-4 right-4 p-2 bg-white/80 dark:bg-zinc-800/80 rounded-full shadow-md hover:bg-white dark:hover:bg-zinc-700 transition-colors"
-          >
-            <Camera className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-          </button> */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Settings
+                size={30}
+                className="absolute top-4 right-4 p-2 bg-white/80 dark:bg-zinc-800/80 rounded-full shadow-md hover:bg-white dark:hover:bg-zinc-700 transition-colors"
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="mr-14 w-fit  mt-1 rounded-sm  bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 hover:dark:bg-zinc-600">
+              <DropdownMenuItem
+                className=" h-fit py-3 px-2 cursor-pointer rounded-sm  bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 hover:dark:bg-zinc-600"
+                onClick={() => setShowEditData(true)}
+              >
+                Edit Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setShowChangePassword(true)}
+                className=" h-fit py-3 px-2 cursor-pointer rounded-sm  bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 hover:dark:bg-zinc-600"
+              >
+                Change Password
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Profile Image */}
           <div className="absolute -bottom-16 left-8 group">
@@ -130,15 +154,13 @@ const Profile = () => {
                 {users.name}
               </h1>
               {/* Edit Profile Button */}
-              <button
+
+              {/* <button
                 onClick={() => setShowEditData(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-purple-50 dark:bg-zinc-700 rounded-lg hover:bg-purple-100 dark:hover:bg-zinc-600 transition-colors"
+                className="flex items-center"
               >
-                <Pencil className="w-4 h-4 text-zinc-600 dark:text-zinc-300" />
-                <span className="text-zinc-600 dark:text-zinc-300 font-medium">
-                  Edit Profile
-                </span>
-              </button>
+                <Settings size={20} />
+              </button> */}
             </div>
 
             <div className="space-y-2">
@@ -240,19 +262,15 @@ const Profile = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Profile Banner */}
-      {/* <Dialog open={showEditBanner} onOpenChange={setShowEditBanner}>
+      {/* Change Password Dilog */}
+      <Dialog open={showChangePassword} onOpenChange={setShowChangePassword}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Edit Profile</DialogTitle>
           </DialogHeader>
-          <EditProfileBanner
-            id={user?.id as string}
-            profileImage=""
-            setShowEditImage={setShowEditImage}
-          />
+                <ChangePasswordForm setShowChangePassword={setShowChangePassword}/>
         </DialogContent>
-      </Dialog> */}
+      </Dialog>
     </div>
   );
 };

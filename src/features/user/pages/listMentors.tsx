@@ -8,26 +8,30 @@ import { useFetchMentorsListMutation } from "@/services/apis/UserApis";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { Imentor } from "@/@types/interface/Imentor";
+import { PageNation } from "@/components/ui/pageNation";
 
 const ListMentors = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mentors, setMentors] = useState<Imentor[] | []>([]);
+  const [pageNationData, setPageNationData] = useState({
+    pageNum: 1,
+    totalPages: 0,
+  });
 
   const [fetchMentors] = useFetchMentorsListMutation();
 
   const fetchData = async (
-    availability: string = "all",
-    page = 1,
-    searchData = undefined
+    page: number = 1,
+    select: string = "all",
+    searchData?: string
   ) => {
     try {
       const response: IaxiosResponse = await fetchMentors({
         page,
-        availability,
+        select,
         searchData,
       });
-      
 
       if (response.data) {
         // Extracting only required fields
@@ -41,6 +45,10 @@ const ListMentors = () => {
           yearsOfExperience: mentor.yearsOfExperience,
         }));
         setMentors(filteredMentors);
+        setPageNationData((prev) => ({
+          ...prev,
+          totalPages: response.data.totalPages,
+        }));
       } else {
         errorTost(
           "Something went wrong ",
@@ -59,7 +67,6 @@ const ListMentors = () => {
   useEffect(() => {
     fetchData();
   }, []);
-
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-slate-50">
@@ -115,13 +122,21 @@ const ListMentors = () => {
           <div className="space-y-4">
             {mentors.map((mentor) => (
               <MentorListCard
-              mentor={mentor}
+                mentor={mentor}
                 availability={"available"}
                 salary={111111}
                 rating={5}
                 key={mentor.id}
               />
             ))}
+          </div>
+
+          <div className="w-full h-14  py-2  flex justify-end pr-[2rem]">
+            <PageNation
+              pageNationData={pageNationData}
+              fetchUserData={fetchData}
+              setpageNationData={setPageNationData}
+            />
           </div>
         </div>
       </div>
