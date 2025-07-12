@@ -1,23 +1,41 @@
 import profile from "@/assets/images/dummy-profile.webp";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useEffect, useState } from "react";
 import {
   useBlockandunblockMutation,
   useFetchUsersMutation,
 } from "@/services/apis/AuthApis";
 import { errorTost } from "@/components/ui/tosastMessage";
-import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
-import { PageNation } from "@/components/ui/pageNation";
+import { ColumnConfig, TableList } from "@/components/ui/tableList";
+
+type ExtendedUser = User & { profile?: string };
+
+const columns: ColumnConfig<ExtendedUser>[] = [
+  {
+    key: "profile",
+    label: "Profile",
+    render: () => (
+      <img
+        src={profile}
+        alt="User profile"
+        className="h-8 w-8 rounded-full object-cover"
+      />
+    ),
+  },
+  { key: "name", label: "Name" },
+  { key: "email", label: "Email" },
+  {
+    key: "isBlocked",
+    label: "Status",
+    render: (val) =>
+      val === true ? (
+        <span className="text-red-500">Blocked</span>
+      ) : (
+        <span className="text-green-500">Active</span>
+      ),
+  },
+];
 
 interface User {
   id: string;
@@ -89,12 +107,7 @@ function UserManagement() {
 
   return (
     <div className="w-full h-full p-5">
-      <div className="flex justify-between items-center my-4">
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-zinc-100">
-          User Management
-        </h1>
-      </div>
-      <div className="w-full  bg-slate-00 flex justify-end h-10 relative">
+      <div className="w-full mt-2 bg-slate-00 flex justify-end h-10 relative">
         <input
           type="text"
           placeholder="Search..."
@@ -102,69 +115,14 @@ function UserManagement() {
         />
         <Search size={20} className="absolute right-9 top-3" />
       </div>
-      <div className="w-full h-5/6 py-[2rem] px-[3rem]">
-        <Table>
-          <TableCaption>A list of your recent invoices.</TableCaption>
-          <TableHeader>
-            <TableRow className=" w-full bg-zinc-200 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-800 ">
-              <TableHead>Profile</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-end">Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">
-                  <div className="flex cursor-pointer items-center justify-start">
-                    <img
-                      src={profile}
-                      alt="User profile"
-                      className="h-8 w-8 rounded-full overflow-hidden object-cover"
-                    />
-                  </div>
-                </TableCell>
-                <TableCell>{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  {user.isBlocked ? (
-                    <span className="text-red-500 ">Blocked</span>
-                  ) : (
-                    <span className="text-green-500">Active</span>
-                  )}
-                </TableCell>
-                <TableCell className="text-right">
-                  {
-                    <Button
-                      className={`${
-                        user.isBlocked
-                          ? "bg-red-700 hover:bg-red-800 text-white"
-                          : "bg-green-800 hover:bg-green-900 text-white "
-                      } min-w-24 `}
-                      onClick={() =>
-                        handileBlock(user.id, user.isBlocked ? false : true)
-                      }
-                    >
-                      {user.isBlocked ? "Blocked" : " Active "}
-                    </Button>
-                  }
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        {pageNationData.totalPages > 1 && (
-          <div className="w-full my-[3rem] flex justify-end pb-[1rem]">
-            <PageNation
-              pageNationData={pageNationData}
-              fetchUserData={fetchUserData}
-              setpageNationData={setPageNationData}
-            />
-          </div>
-        )}
-      </div>
+      <TableList
+        title="User Management"
+        columns={columns}
+        data={users}
+        onAction={handileBlock}
+        pagination={pageNationData}
+        onPageChange={async (page) => await fetchUserData(page)}
+      />
     </div>
   );
 }
