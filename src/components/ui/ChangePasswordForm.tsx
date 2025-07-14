@@ -12,24 +12,22 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { errorTost, successToast } from "@/components/ui/tosastMessage";
 import { Eye, EyeOff, Loader } from "lucide-react";
-import { ChangePasswordSchema } from "../zodeSchema/ChangePasswordSchema";
-import { useChanegePasswordMutation } from "@/services/apis/CommonApis";
-import { useGetUser } from "@/hooks/useGetUser";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { ChangePasswordSchema } from "../../features/user/zodeSchema/ChangePasswordSchema";
 
 type ChangePasswordType = z.infer<typeof ChangePasswordSchema>;
 
+interface ChangePasswordFormProps {
+  isLoading?: boolean;
+  onSubmit: (data: ChangePasswordType) => Promise<void>;
+}
+
 export function ChangePasswordForm({
-  setShowChangePassword,
-}: {
-  setShowChangePassword: (isPhotoDialogOpen: boolean) => void;
-}) {
-  const [updatePassword, { isLoading }] = useChanegePasswordMutation();
+  onSubmit,
+  isLoading = false,
+}: ChangePasswordFormProps) {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const user = useGetUser();
 
   const form = useForm<ChangePasswordType>({
     resolver: zodResolver(ChangePasswordSchema),
@@ -40,42 +38,13 @@ export function ChangePasswordForm({
     },
   });
 
-  const onSubmit = async (data: ChangePasswordType) => {
-    try {
-      const response: IaxiosResponse = await updatePassword({
-        userId: user?.id as string,
-        currentPassword: data.currentPassword,
-        newPassword: data.newPassword,
-      });
-      if (response.data) {
-        successToast(
-          "Updated",
-          response.data.result.message || "password updated successfully"
-        );
-        setShowChangePassword(false);
-      } else {
-        errorTost(
-          "Something went wrong ",
-          response.error.data.error || [
-            { message: "Something went wrong please try again" },
-          ]
-        );
-      }
-    } catch (error) {
-      console.error("Error updating password", error);
-      errorTost("Something wrong", [
-        { message: "Something went wrong please try again" },
-      ]);
-    }
-  };
-
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col space-y-6 max-w-md px-4 py-6"
       >
-        {/* Current Password with Eye Icon */}
+        {/* Current Password */}
         <FormField
           control={form.control}
           name="currentPassword"
@@ -91,7 +60,9 @@ export function ChangePasswordForm({
                   />
                   <button
                     type="button"
-                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                    onClick={() =>
+                      setShowCurrentPassword(!showCurrentPassword)
+                    }
                     className="absolute inset-y-0 right-2 flex items-center text-gray-500 dark:text-gray-400"
                     tabIndex={-1}
                   >
@@ -108,7 +79,7 @@ export function ChangePasswordForm({
           )}
         />
 
-        {/* New Password with Eye Icon */}
+        {/* New Password */}
         <FormField
           control={form.control}
           name="newPassword"
@@ -141,7 +112,7 @@ export function ChangePasswordForm({
           )}
         />
 
-        {/* Confirm New Password (no eye icon as requested) */}
+        {/* Confirm New Password */}
         <FormField
           control={form.control}
           name="confirmNewPassword"

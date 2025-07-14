@@ -4,7 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { EditProfileSchema } from "../zodeSchema/EditProfileSchema";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { Loader } from "lucide-react";
@@ -12,34 +19,54 @@ import { Textarea } from "@/components/ui/textarea";
 import { Imentor } from "@/@types/interface/Imentor";
 import { useUpdateMentorProfileMutation } from "@/services/apis/MentorApis";
 
-export function EditMentorProfile({ users, setIsOpen , setUsers }:{users:Imentor , setIsOpen:(isOpen: boolean) => void ,  setUsers: React.Dispatch<React.SetStateAction<Partial<Imentor>>>}) {
+export function EditMentorProfile({
+  users,
+  setIsOpen,
+  setUsers,
+}: {
+  users: Imentor;
+  setIsOpen: (isOpen: boolean) => void;
+  setUsers: React.Dispatch<React.SetStateAction<Partial<Imentor>>>;
+}) {
   const [updateProfile, { isLoading }] = useUpdateMentorProfileMutation();
   const form = useForm<z.infer<typeof EditProfileSchema>>({
     resolver: zodResolver(EditProfileSchema),
     defaultValues: {
       name: users.name,
-      email: users.email ,
+      email: users.email,
       bio: users.bio || "",
       expertise: users.expertise ? users.expertise : "",
       yearsOfExperience: users.yearsOfExperience || 0,
-      phone: "11234456789"
+      salary: users.salary || 0,
     },
   });
 
   const onSubmit = async (data: z.infer<typeof EditProfileSchema>) => {
     try {
       const id = users.id;
-      const updatedData = {   
+      const updatedData = {
         name: users.name !== data.name ? data.name : undefined,
-        bio: users.bio !== data.bio ? data.bio ? data.bio : "" : undefined,
-        expertise: users.expertise !== data.expertise ? data.expertise ? data.expertise : "":undefined,
-        yearsOfExperience: users.yearsOfExperience !== data.yearsOfExperience ? data.yearsOfExperience : undefined,
-      }
-      const response: IaxiosResponse = await updateProfile({ id , updatedData});
+        bio: users.bio !== data.bio ? (data.bio ? data.bio : "") : undefined,
+        expertise:
+          users.expertise !== data.expertise
+            ? data.expertise
+              ? data.expertise
+              : ""
+            : undefined,
+        yearsOfExperience:
+          users.yearsOfExperience !== data.yearsOfExperience
+            ? data.yearsOfExperience
+            : undefined,
+            salary:
+          users.salary !== data.salary
+            ? data.salary
+            : undefined,
+      };
+      const response: IaxiosResponse = await updateProfile({ id, updatedData });
 
-      if (response.data) {        
+      if (response.data) {
         setIsOpen(false);
-        setUsers(response.data.data)
+        setUsers(response.data.data);
       } else {
         errorTost(
           "Something went wrong",
@@ -65,7 +92,9 @@ export function EditMentorProfile({ users, setIsOpen , setUsers }:{users:Imentor
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-700 dark:text-gray-300">Name</FormLabel>
+                <FormLabel className="text-gray-700 dark:text-gray-300">
+                  Name
+                </FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -82,7 +111,9 @@ export function EditMentorProfile({ users, setIsOpen , setUsers }:{users:Imentor
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-700 dark:text-gray-300">Email</FormLabel>
+                <FormLabel className="text-gray-700 dark:text-gray-300">
+                  Email
+                </FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -98,28 +129,12 @@ export function EditMentorProfile({ users, setIsOpen , setUsers }:{users:Imentor
 
           <FormField
             control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-gray-700 dark:text-gray-300">Phone</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    readOnly
-                    className="w-full bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
             name="bio"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-700 dark:text-gray-300">About</FormLabel>
+                <FormLabel className="text-gray-700 dark:text-gray-300">
+                  About
+                </FormLabel>
                 <FormControl>
                   <Textarea
                     {...field}
@@ -170,6 +185,25 @@ export function EditMentorProfile({ users, setIsOpen , setUsers }:{users:Imentor
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="salary"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-gray-700 dark:text-gray-300">
+                  Salary
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    className="w-full bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         <div className="sticky bottom-0 pt-4 pb-2 bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 flex justify-end gap-4">
@@ -194,4 +228,3 @@ export function EditMentorProfile({ users, setIsOpen , setUsers }:{users:Imentor
     </Form>
   );
 }
-

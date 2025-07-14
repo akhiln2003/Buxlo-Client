@@ -17,7 +17,7 @@ import {
 import banner from "@/assets/images/landingPageBG.jpg";
 import { EditUserProfile } from "../components/EditProfileForm";
 import { Iuser } from "@/@types/interface/Iuser";
-import { errorTost } from "@/components/ui/tosastMessage";
+import { errorTost, successToast } from "@/components/ui/tosastMessage";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { useGetUser } from "@/hooks/useGetUser";
 import {
@@ -32,8 +32,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
-import { ChangePasswordForm } from "../components/ChangePasswordForm";
+import { ChangePasswordForm } from "@/components/ui/ChangePasswordForm";
+import { ChangePasswordSchema } from "../zodeSchema/ChangePasswordSchema";
+import { useChanegePasswordMutation } from "@/services/apis/CommonApis";
+import { z } from "zod";
 // import EditProfileBanner from "../components/EditProfileBanner";
+
+type ChangePasswordType = z.infer<typeof ChangePasswordSchema>;
 
 const Profile = () => {
   const [showEditData, setShowEditData] = useState(false);
@@ -43,8 +48,39 @@ const Profile = () => {
   const [fetchProfileImages] = useFetchUserProfileImageMutation();
   const [users, setUsers] = useState<Partial<Iuser>>({});
   const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
+  const [updatePassword, { isLoading: isLoadingChangePassword }] =
+    useChanegePasswordMutation();
 
   const storUserData = useGetUser();
+
+  const onSubmitChangePassword = async (data: ChangePasswordType) => {
+    try {
+      const response: IaxiosResponse = await updatePassword({
+        userId: storUserData?.id as string,
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword,
+      });
+      if (response.data) {
+        successToast(
+          "Updated",
+          response.data.result.message || "password updated successfully"
+        );
+        setShowChangePassword(false);
+      } else {
+        errorTost(
+          "Something went wrong ",
+          response.error.data.error || [
+            { message: "Something went wrong please try again" },
+          ]
+        );
+      }
+    } catch (error) {
+      console.error("Error updating password", error);
+      errorTost("Something wrong", [
+        { message: "Something went wrong please try again" },
+      ]);
+    }
+  };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -268,7 +304,10 @@ const Profile = () => {
           <DialogHeader>
             <DialogTitle>Edit Profile</DialogTitle>
           </DialogHeader>
-                <ChangePasswordForm setShowChangePassword={setShowChangePassword}/>
+          <ChangePasswordForm
+            onSubmit={onSubmitChangePassword}
+            isLoading={isLoadingChangePassword}
+          />
         </DialogContent>
       </Dialog>
     </div>
