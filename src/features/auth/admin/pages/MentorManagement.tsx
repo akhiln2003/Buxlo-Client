@@ -9,9 +9,7 @@ import { errorTost } from "@/components/ui/tosastMessage";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { IuserDB } from "@/@types/interface/IdataBase";
 import { ColumnConfig, TableList } from "@/components/ui/tableList";
-import { Search } from "lucide-react";
-
-
+import SearchInput from "@/components/ui/searchInput";
 
 interface Mentor {
   id: string;
@@ -60,7 +58,7 @@ function MentorManagement() {
     pageNum: 1,
     totalPages: 0,
   });
-
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [users, setUsers] = useState<IuserDB[]>([]);
 
   const handileBlock = async (id: string, isBlocked: boolean) => {
@@ -81,7 +79,7 @@ function MentorManagement() {
     }
   };
 
-  const fetchUserData = async (page = 1, searchData = undefined) => {
+  const fetchUserData = async (page = 1, searchData = searchQuery) => {
     try {
       const response: IaxiosResponse = await fetchUsers({ page, searchData }); // `unwrap` gets the raw response
 
@@ -108,16 +106,14 @@ function MentorManagement() {
   };
   useEffect(() => {
     fetchUserData();
-  }, []);
+  }, [searchQuery]);
   return (
     <div className="w-full h-full p-5">
-      <div className="w-full mt-2 bg-slate-00 flex justify-end h-10 relative">
-        <input
-          type="text"
-          placeholder="Search..."
-          className="mr-[1rem] rounded-md border-2  text-sm h-full w-3/12 pl-3 dark:bg-zinc-900 focus:outline-none"
+      <div className="w-full mt-2 bg-slate-00 flex justify-end h-10">
+        <SearchInput
+          onSearch={(value) => setSearchQuery(value)}
+          className="w-1/4 "
         />
-        <Search size={20} className="absolute right-9 top-3" />
       </div>
 
       <TableList

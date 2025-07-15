@@ -13,11 +13,14 @@ import { Imentor } from "@/@types/interface/Imentor";
 interface MentorCardProps {
   mentor: Imentor;
   rating: number;
-  availability:string;
-  salary:number;
+  availability: string;
 }
 
-export const MentorListCard: React.FC<MentorCardProps> = ({ mentor, rating , availability , salary }) => {
+export const MentorListCard: React.FC<MentorCardProps> = ({
+  mentor,
+  rating,
+  availability,
+}) => {
   const [fetchProfileImages] = useFetchMentorProfileImageMutation();
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
@@ -25,9 +28,9 @@ export const MentorListCard: React.FC<MentorCardProps> = ({ mentor, rating , ava
     const fetchUserData = async () => {
       try {
         if (mentor.avatar) {
-          const imageUrl: IaxiosResponse = await fetchProfileImages(
-           [ `MentorProfiles/${mentor.avatar}`]
-          );
+          const imageUrl: IaxiosResponse = await fetchProfileImages([
+            `MentorProfiles/${mentor.avatar}`,
+          ]);
           if (imageUrl.data.imageUrl) {
             setProfileImage(imageUrl.data.imageUrl[0]);
           } else {
@@ -46,6 +49,7 @@ export const MentorListCard: React.FC<MentorCardProps> = ({ mentor, rating , ava
 
     fetchUserData();
   }, []);
+
   return (
     <Card className="mb-4 w-full">
       <CardContent className="p-4 sm:p-6">
@@ -107,20 +111,20 @@ export const MentorListCard: React.FC<MentorCardProps> = ({ mentor, rating , ava
 
         <div className="flex flex-col sm:flex-row justify-between items-center">
           <p className="font-medium mb-3 sm:mb-0 text-center sm:text-left">
-            Salary: <span className="text-primary">$ {salary}</span>
+            Salary:{" "}
+            <span className="text-primary">₹ {mentor.salary || 0}/hr</span>
           </p>
           <div className="flex gap-2 w-full sm:w-auto">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 sm:flex-initial sm:w-24"
+            <Link
+              className="flex-1 sm:flex-initial sm:w-24 bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 hover:dark:bg-gray-900 flex items-center justify-center rounded-md text-sm "
+              to={`${UserUrls.mentorProfile}/${mentor.id}`}
             >
-              <Link to={`${UserUrls.mentorProfile}/${mentor.id}`}>More</Link>
-            </Button>
+              More
+            </Link>
             <Button
               variant="default"
               size="sm"
-              className="flex-1 sm:flex-initial sm:w-24 bg-black hover:bg-gray-800"
+              className="flex-1 sm:flex-initial sm:w-24 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-800  hover:dark:bg-zinc-900   dark:text-white"
             >
               Hire
             </Button>

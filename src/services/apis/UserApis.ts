@@ -46,8 +46,8 @@ export const userApi = createApi({
 
     // Fetching Mentors
     fetchMentorsList: builder.mutation({
-      query: ({ page, select, searchData }) => ({
-        url: `${UserApiEndPoints.fetchMentorsList}?page=${page}&&select=${select}&&searchData=${searchData}`,
+      query: ({ page, experience, rating, salary, searchData }) => ({
+        url: `${UserApiEndPoints.fetchMentorsList}?page=${page}&&experience=${experience}&&rating=${rating}&&salary=${salary}&&searchData=${searchData}`,
         method: "GET",
       }),
     }),

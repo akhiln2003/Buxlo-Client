@@ -5,9 +5,9 @@ import {
   useFetchUsersMutation,
 } from "@/services/apis/AuthApis";
 import { errorTost } from "@/components/ui/tosastMessage";
-import { Search } from "lucide-react";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { ColumnConfig, TableList } from "@/components/ui/tableList";
+import SearchInput from "@/components/ui/searchInput";
 
 type ExtendedUser = User & { profile?: string };
 
@@ -52,7 +52,7 @@ interface User {
 function UserManagement() {
   const [fetchUsers] = useFetchUsersMutation();
   const [userAction] = useBlockandunblockMutation();
-
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [users, setUsers] = useState<User[]>([]);
   const [pageNationData, setPageNationData] = useState({
     pageNum: 1,
@@ -76,7 +76,7 @@ function UserManagement() {
       );
     }
   };
-  const fetchUserData = async (page = 1, searchData = undefined) => {
+  const fetchUserData = async (page = 1, searchData = searchQuery) => {
     try {
       const response: IaxiosResponse = await fetchUsers({ page, searchData }); // `unwrap` gets the raw response
 
@@ -103,17 +103,16 @@ function UserManagement() {
   };
   useEffect(() => {
     fetchUserData(pageNationData.pageNum);
-  }, []);
+  }, [searchQuery]);
 
   return (
     <div className="w-full h-full p-5">
-      <div className="w-full mt-2 bg-slate-00 flex justify-end h-10 relative">
-        <input
-          type="text"
-          placeholder="Search..."
-          className="mr-[1rem] rounded-md border-2  text-sm h-full w-3/12 pl-3 dark:bg-zinc-900 focus:outline-none"
+      <div className="w-full mt-2 bg-slate-00 flex justify-end h-10">
+        <SearchInput
+          onSearch={(value) => setSearchQuery(value)}
+          debounceDelay={400}
+          className="w-1/4 "
         />
-        <Search size={20} className="absolute right-9 top-3" />
       </div>
       <TableList
         title="User Management"

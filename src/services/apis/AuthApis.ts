@@ -187,7 +187,7 @@ export const authApi = createApi({
     // Fetch users
     fetchUsers: builder.mutation({
       query: ({page,searchData}) => ({
-        url: `${AdminApiEndPoints.fetchUsers}?page=${page}&&?searchData=${searchData}`,
+        url: `${AdminApiEndPoints.fetchUsers}?page=${page}&&searchData=${searchData}`,
         method: "GET",
       }),
     }),
@@ -195,7 +195,7 @@ export const authApi = createApi({
     // Fetch mentors
     fetchMentors: builder.mutation({
       query: ({page , searchData}) => ({
-        url:   `${AdminApiEndPoints.fetchMentors}?page=${page}&&?searchData=${searchData}`,
+        url:   `${AdminApiEndPoints.fetchMentors}?page=${page}&&searchData=${searchData}`,
         method: "GET",
       }),
     }),

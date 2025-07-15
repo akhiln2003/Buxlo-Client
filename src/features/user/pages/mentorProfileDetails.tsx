@@ -38,9 +38,9 @@ const AccountantProfile = () => {
       if (response.data.data) {
         setMentor(response.data.data);
         if (response.data.data.avatar) {
-          const imageUrl: IaxiosResponse = await fetchProfileImages(
-            [`MentorProfiles/${response.data.data.avatar}`]
-          );
+          const imageUrl: IaxiosResponse = await fetchProfileImages([
+            `MentorProfiles/${response.data.data.avatar}`,
+          ]);
           if (imageUrl.data.imageUrl) {
             setProfileImage(imageUrl.data.imageUrl[0]);
           } else {
@@ -68,7 +68,7 @@ const AccountantProfile = () => {
         mentorId,
       });
       if (response.data) {
-        navigate(UserUrls.chat , {state:{Id:mentorId}});
+        navigate(UserUrls.chat, { state: { Id: mentorId } });
       } else {
         errorTost(
           "Something went wrong ",
@@ -89,7 +89,7 @@ const AccountantProfile = () => {
   }, []);
 
   return (
-    <Card className="w-full bg-white shadow-sm mb-6">
+    <Card className="w-full bg-zinc-50 dark:bg-zinc-900 shadow-sm mb-6">
       <CardContent className="p-8">
         <div className="flex flex-col items-start">
           <h1 className="text-2xl font-bold mb-6 w-full text-center">
@@ -145,7 +145,7 @@ const AccountantProfile = () => {
 
           <div className="flex justify-between items-center w-full border-t pt-4">
             <p className="text-xl font-medium">
-              Salary: <span className="text-primary">$ {1234}/hr</span>
+              Salary: <span className="text-primary">$ {mentor.salary}/hr</span>
             </p>
             <div className="flex gap-3 bg">
               <Button
@@ -161,7 +161,7 @@ const AccountantProfile = () => {
               <Button
                 variant="default"
                 size="lg"
-                className="w-32 bg-black hover:bg-gray-800"
+                className="w-32 bg-black hover:bg-zinc-800 dark:text-white"
               >
                 Hire
               </Button>
@@ -180,7 +180,7 @@ const FeedbackCard: React.FC<FeedbackCardProps> = ({
   feedback,
 }) => {
   return (
-    <Card className="w-full bg-white shadow-sm mb-4">
+    <Card className="w-full bg-zinc-50 dark:bg-zinc-900 shadow-sm mb-4">
       <CardContent className="p-6">
         <div className="flex items-start gap-4">
           {/* Small profile image */}
@@ -261,7 +261,7 @@ const MentorProfile: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-zinc-800 py-8 px-6">
       <div className="max-w-4xl mx-auto">
         {/* Main accountant profile */}
         <AccountantProfile />

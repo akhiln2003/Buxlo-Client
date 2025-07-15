@@ -3,10 +3,11 @@ import {
   Landmark,
   WalletMinimal,
   Mail,
-  Phone,
   NotebookPen,
   Camera,
   Settings,
+  User,
+  Key,
 } from "lucide-react";
 import {
   Dialog,
@@ -31,12 +32,12 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@radix-ui/react-dropdown-menu";
 import { ChangePasswordForm } from "@/components/ui/ChangePasswordForm";
 import { ChangePasswordSchema } from "../zodeSchema/ChangePasswordSchema";
 import { useChanegePasswordMutation } from "@/services/apis/CommonApis";
 import { z } from "zod";
-// import EditProfileBanner from "../components/EditProfileBanner";
 
 type ChangePasswordType = z.infer<typeof ChangePasswordSchema>;
 
@@ -62,13 +63,13 @@ const Profile = () => {
       });
       if (response.data) {
         successToast(
-          "Updated",
-          response.data.result.message || "password updated successfully"
+          "Password Updated",
+          response.data.result.message || "Password updated successfully"
         );
         setShowChangePassword(false);
       } else {
         errorTost(
-          "Something went wrong ",
+          "Update Failed",
           response.error.data.error || [
             { message: "Something went wrong please try again" },
           ]
@@ -76,7 +77,7 @@ const Profile = () => {
       }
     } catch (error) {
       console.error("Error updating password", error);
-      errorTost("Something wrong", [
+      errorTost("Update Failed", [
         { message: "Something went wrong please try again" },
       ]);
     }
@@ -98,7 +99,7 @@ const Profile = () => {
               setProfileImage(imageUrl.data.imageUrl[0]);
             } else {
               errorTost(
-                "Something went wrong ",
+                "Image Load Failed",
                 imageUrl.error.data.error || [
                   { message: `${imageUrl.error.data} please try again later` },
                 ]
@@ -107,7 +108,7 @@ const Profile = () => {
           }
         } else {
           errorTost(
-            "Something went wrong ",
+            "Data Load Failed",
             response.error.data.error || [
               { message: `${response.error.data} please try again later` },
             ]
@@ -115,7 +116,7 @@ const Profile = () => {
         }
       } catch (err) {
         console.error("Error fetching users:", err);
-        errorTost("Something wrong", [
+        errorTost("Data Load Failed", [
           { message: "Something went wrong please try again" },
         ]);
       }
@@ -133,50 +134,64 @@ const Profile = () => {
             <div className="absolute inset-0 bg-opacity-50 bg-white dark:bg-black">
               <img
                 src={banner}
-                alt="Profile"
+                alt="Profile Banner"
                 className="w-full h-full object-cover"
               />
             </div>
           </div>
 
-          {/* Banner Edit Button */}
+          {/* Enhanced Settings Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Settings
-                size={30}
-                className="absolute top-4 right-4 p-2 bg-white/80 dark:bg-zinc-800/80 rounded-full shadow-md hover:bg-white dark:hover:bg-zinc-700 transition-colors"
-              />
+              <button className="absolute top-4 right-4 flex items-center space-x-2 px-4 py-2 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white dark:hover:bg-zinc-700 transition-all duration-200 group">
+                <Settings className="w-5 h-5 text-gray-600 dark:text-gray-300 group-hover:rotate-90 transition-transform duration-200" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                  Settings
+                </span>
+              </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="mr-14 w-fit  mt-1 rounded-sm  bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 hover:dark:bg-zinc-600">
+            <DropdownMenuContent className="mr-10 mt-2 w-48 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg shadow-xl backdrop-blur-sm">
               <DropdownMenuItem
-                className=" h-fit py-3 px-2 cursor-pointer rounded-sm  bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 hover:dark:bg-zinc-600"
+                className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-zinc-700 cursor-pointer transition-colors first:rounded-t-lg"
                 onClick={() => setShowEditData(true)}
               >
-                Edit Profile
+                <User className="w-4 h-4 text-blue-500" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                  Edit Profile
+                </span>
               </DropdownMenuItem>
+              <DropdownMenuSeparator className="my-1 border-t border-gray-200 dark:border-zinc-700" />
               <DropdownMenuItem
                 onClick={() => setShowChangePassword(true)}
-                className=" h-fit py-3 px-2 cursor-pointer rounded-sm  bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 hover:dark:bg-zinc-600"
+                className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-zinc-700 cursor-pointer transition-colors last:rounded-b-lg"
               >
-                Change Password
+                <Key className="w-4 h-4 text-green-500" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                  Change Password
+                </span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Profile Image */}
+          {/* Enhanced Profile Image */}
           <div className="absolute -bottom-16 left-8 group">
-            <div className="relative w-32 h-32 rounded-full overflow-hidden ring-4 ring-white dark:ring-zinc-700 shadow-lg">
+            <div className="relative w-32 h-32 rounded-full overflow-hidden ring-4 ring-white dark:ring-zinc-700 shadow-xl">
               <img
-                src={profileImage ? profileImage : dummyProfileImage}
+                src={profileImage || dummyProfileImage}
                 alt="Profile"
                 className="w-full h-full object-cover"
               />
-              {/* Profile Picture Edit Button */}
+              {/* Enhanced Profile Picture Edit Button */}
               <button
                 onClick={() => setIsPhotoDialogOpen(true)}
-                className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300"
               >
-                <Camera className="w-6 h-6 text-white" />
+                <div className="flex flex-col items-center space-y-1">
+                  <Camera className="w-6 h-6 text-white" />
+                  <span className="text-xs text-white font-medium">
+                    Edit Photo
+                  </span>
+                </div>
               </button>
             </div>
           </div>
@@ -187,35 +202,24 @@ const Profile = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">
-                {users.name}
+                {users.name || "User Name"}
               </h1>
-              {/* Edit Profile Button */}
-
-              {/* <button
-                onClick={() => setShowEditData(true)}
-                className="flex items-center"
-              >
-                <Settings size={20} />
-              </button> */}
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center text-gray-600 dark:text-gray-300">
-                <Mail className="w-5 h-5 mr-3" />
-                <span className="font-medium">{users.email}</span>
-              </div>
-              <div className="flex items-center text-gray-600 dark:text-gray-300">
-                <Phone className="w-5 h-5 mr-3" />
-                <span className="font-medium">{9098777650}</span>
+                <Mail className="w-5 h-5 mr-3 text-blue-500" />
+                <span className="font-medium">
+                  {users.email || "email@example.com"}
+                </span>
               </div>
             </div>
           </div>
 
-          {/* Rest of the component remains the same */}
           {/* Cards Section */}
           <div className="grid md:grid-cols-2 gap-6 mt-8">
             {/* Bank Account Card */}
-            <div className="bg-rose-50 dark:bg-zinc-700 rounded-xl p-6 shadow-md">
+            <div className="bg-rose-50 dark:bg-zinc-700 rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow">
               <div className="flex items-center mb-4">
                 <Landmark className="w-6 h-6 text-rose-600 dark:text-rose-300" />
                 <h2 className="ml-3 text-lg font-semibold text-gray-800 dark:text-gray-100">
@@ -223,14 +227,14 @@ const Profile = () => {
                 </h2>
               </div>
               <div className="border-t border-rose-100 dark:border-zinc-600 pt-4">
-                <button className="w-full py-3 border-2 border-dashed border-rose-200 dark:border-zinc-500 rounded-lg text-rose-500 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-zinc-600 transition-colors">
+                <button className="w-full py-3 border-2 border-dashed border-rose-200 dark:border-zinc-500 rounded-lg text-rose-500 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-zinc-600 transition-colors font-medium">
                   + Add Bank Account
                 </button>
               </div>
             </div>
 
             {/* Wallet Card */}
-            <div className="bg-violet-50 dark:bg-zinc-700 rounded-xl p-6 shadow-md">
+            <div className="bg-violet-50 dark:bg-zinc-700 rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow">
               <div className="flex items-center mb-4">
                 <WalletMinimal className="w-6 h-6 text-violet-600 dark:text-violet-300" />
                 <h2 className="ml-3 text-lg font-semibold text-gray-800 dark:text-gray-100">
@@ -238,7 +242,7 @@ const Profile = () => {
                 </h2>
               </div>
               <div className="border-t border-violet-100 dark:border-zinc-600 pt-4">
-                <button className="w-full py-3 border-2 border-dashed border-violet-200 dark:border-zinc-500 rounded-lg text-violet-500 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-zinc-600 transition-colors">
+                <button className="w-full py-3 border-2 border-dashed border-violet-200 dark:border-zinc-500 rounded-lg text-violet-500 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-zinc-600 transition-colors font-medium">
                   + Add Wallet
                 </button>
                 <p className="text-center mt-4 text-gray-500 dark:text-gray-400">
@@ -250,16 +254,16 @@ const Profile = () => {
 
           {/* Mentor Card */}
           <div className="w-full mt-8">
-            <div className="bg-zinc-50 dark:bg-zinc-700 rounded-xl p-6 shadow-md">
+            <div className="bg-zinc-50 dark:bg-zinc-700 rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow">
               <div className="flex items-center mb-4">
-                <NotebookPen className="w-6 h-6 text-zinc-600 dark:text-zinc-50" />
+                <NotebookPen className="w-6 h-6 text-zinc-600 dark:text-zinc-300" />
                 <h2 className="ml-3 text-lg font-semibold text-gray-800 dark:text-gray-100">
                   Mentors
                 </h2>
               </div>
-              <div className="border-t border-violet-100 dark:border-zinc-600 pt-4">
+              <div className="border-t border-zinc-100 dark:border-zinc-600 pt-4">
                 <p className="text-center mt-4 text-gray-500 dark:text-gray-400">
-                  Mentor Not available
+                  No mentors available
                 </p>
               </div>
             </div>
@@ -267,11 +271,14 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Edit Profile Dialog */}
+      {/* Enhanced Edit Profile Dialog */}
       <Dialog open={showEditData} onOpenChange={setShowEditData}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit Profile</DialogTitle>
+            <DialogTitle className="flex items-center space-x-2">
+              <User className="w-5 h-5 text-blue-500" />
+              <span>Edit Profile</span>
+            </DialogTitle>
           </DialogHeader>
           <EditUserProfile
             setIsOpen={setShowEditData}
@@ -281,11 +288,14 @@ const Profile = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Profile Photo */}
+      {/* Enhanced Edit Profile Photo Dialog */}
       <Dialog open={isPhotoDialogOpen} onOpenChange={setIsPhotoDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit Profile</DialogTitle>
+            <DialogTitle className="flex items-center space-x-2">
+              <Camera className="w-5 h-5 text-purple-500" />
+              <span>Edit Profile Photo</span>
+            </DialogTitle>
           </DialogHeader>
           <EditProfilePhoto
             id={users.id as string}
@@ -298,11 +308,14 @@ const Profile = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Change Password Dilog */}
+      {/* Enhanced Change Password Dialog */}
       <Dialog open={showChangePassword} onOpenChange={setShowChangePassword}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit Profile</DialogTitle>
+            <DialogTitle className="flex items-center space-x-2">
+              <Key className="w-5 h-5 text-green-500" />
+              <span>Change Password</span>
+            </DialogTitle>
           </DialogHeader>
           <ChangePasswordForm
             onSubmit={onSubmitChangePassword}
