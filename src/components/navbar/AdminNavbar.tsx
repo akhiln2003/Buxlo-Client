@@ -10,11 +10,9 @@ import { Link, useNavigate } from "react-router-dom";
 import logoWhite from "@/assets/images/logoWhite.png";
 import logoBlack from "@/assets/images/logoBlack-.png";
 import {
-  Bell,
   LogIn,
   LogOut,
   Menu,
-  MessageCircle,
   Sparkles,
   Sun,
   SunMoon,
@@ -44,6 +42,7 @@ import { RootState } from "@/redux/store";
 import { useState } from "react";
 import { USER_ROLE } from "@/@types/userRoleEnum";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import NotificationDropdown from "../common/notification/notificationDropdown";
 
 function AdminNavbar() {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -74,7 +73,6 @@ function AdminNavbar() {
       );
     }
   };
-  const colorTheam = isDarkMode ? "white" : "black";
 
   return (
     <>
@@ -92,89 +90,12 @@ function AdminNavbar() {
               </Link>
             </div>
 
-            {/* Desktop Navigation */}
-            {/* <div className="hidden md:flex items-center space-x-8 font-extrabold text-base">
-              <a
-                href="#"
-                className="text-gray-900 dark:text-white  hover:text-gray-500"
-              >
-                DASHBOARD
-              </a>
-              <a
-                href="#"
-                className="text-gray-500 hover:text-gray-900 dark:hover:text-white"
-              >
-                PAGES
-              </a>
-              <a
-                href="#"
-                className="text-gray-500 hover:text-gray-900 dark:hover:text-white"
-              >
-                ABOUT
-              </a>
-              <a
-                href="#"
-                className="text-gray-500 hover:text-gray-900 dark:hover:text-white "
-              >
-                Contact
-              </a>
-            </div> */}
-
             {/* Right side icons */}
             <div className="hidden md:flex items-center space-x-4">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Bell size={25} strokeWidth={1.5} color={colorTheam} />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="  mr-9 w-[25rem]  h-[25rem] pt-5 overflow-y-scroll  scrollbar-thin dark:scrollbar-track-zinc-900 scrollbar-thumb-gray-500 dark:scrollbar-thumb-gray-500 scrollbar-track-gray scrollbar-track-rounded-full ">
-                  <DropdownMenuItem className="border-b h-fit py-3 px-2">
-                    Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="border-b h-fit py-3">
-                    Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="border-b h-fit py-3">
-                    Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="border-b h-fit py-3">
-                    <MessageCircle />
-                    Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="border-b py-3">
-                    <MessageCircle />
-                    Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="border-b h-fit py-3 px-2">
-                    Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="border-b h-fit py-3 px-2">
-                    Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="border-b h-fit py-3 px-2">
-                    Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="border-b h-fit py-3 px-2">
-                    Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="border-b h-fit py-3 px-2">
-                    Completed a daily challenge for October LeetCoding Challenge
-                    2024LeetCoin+10
-                  </DropdownMenuItem>
-
-                  <div className="absolute pr-[2rem] flex justify-end  items-center bottom-0 left-0 w-[25rem] h-10 rounded-b-md bg-gray-100 dark:bg-zinc-950 py-3 shadow-sm shadow-gray-600 ">
-                    <DropdownMenuItem className=" ">...</DropdownMenuItem>
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <NotificationDropdown
+                notificationsUrl={AdminUrls.notifications}
+                onNotificationClick={() => {}}
+              />
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -239,7 +160,7 @@ function AdminNavbar() {
                       <span className="ml-[0.5rem]">Subscription</span>
                     </Link>
                   </DropdownMenuItem>
-                  { user?.role !== USER_ROLE.ADMIN ? (
+                  {user?.role !== USER_ROLE.ADMIN ? (
                     <DropdownMenuItem onClick={navigateSignIn}>
                       <LogIn size={20} />
                       <span className="ml-[0.5rem]">SignIn</span>
@@ -284,7 +205,11 @@ function AdminNavbar() {
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden flex items-center">
+            <div className="md:hidden flex items-center space-x-2">
+              <NotificationDropdown
+                notificationsUrl={AdminUrls.notifications}
+                onNotificationClick={() => {}}
+              />
               <motion.button
                 onClick={() => setIsOpen(!isOpen)}
                 className="p-2 text-gray-500 hover:text-gray-900"

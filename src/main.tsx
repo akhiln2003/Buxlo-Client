@@ -8,6 +8,7 @@ import { injectStore } from "./services/axios/axiosInstance";
 injectStore(store);
 
 import * as Sentry from "@sentry/react";
+import { SocketProvider } from "./contexts/socketContext";
 
 Sentry.init({
   dsn: "https://977df4528040acbeebfef2f8b37f9e03@o4508772597039104.ingest.us.sentry.io/4508772653924352",
@@ -27,7 +28,9 @@ Sentry.init({
 createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
-      <App />
+      <SocketProvider>
+        <App />
+      </SocketProvider>
     </PersistGate>
   </Provider>
 );

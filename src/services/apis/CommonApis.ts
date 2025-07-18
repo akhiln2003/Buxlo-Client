@@ -2,6 +2,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { axiosBaseQuery } from "../axios/axiosBaseQuery";
 import { IcontactUsData } from "@/@types/interface/IuserApisQuery";
 import { CommonApiEndPoints } from "../endPoints/CommonEndPoints";
+import { Inotification } from "@/@types/interface/Inotification";
 
 export const commonApi = createApi({
   reducerPath: "commonApi",
@@ -75,11 +76,38 @@ export const commonApi = createApi({
       }),
     }),
 
+    // Create Wallet
     createWallet: builder.mutation({
       query: (data) => ({
         url: CommonApiEndPoints.createWallet,
         method: "POST",
         data: { data },
+      }),
+    }),
+
+    // Create Notification
+    createNotification: builder.mutation({
+      query: (data: Inotification) => ({
+        url: CommonApiEndPoints.createNotification,
+        method: "POST",
+        data: { data },
+      }),
+    }),
+
+    // Fetch Notifications
+    fetchNotifications: builder.mutation({
+      query: ({ userId, page, status, searchData }) => ({
+        url: `${CommonApiEndPoints.fetchNotifications}?userId=${userId}&&page=${page}&&status=${status}&&searchData=${searchData}`,
+        method: "GET",
+      }),
+    }),
+
+    // Read Notifications
+    readNotifications: builder.mutation({
+      query: (updates: { id: string; status: "unread" | "read" }[]) => ({
+        url: CommonApiEndPoints.readNotifications,
+        method: "PATCH",
+        data: { updates },
       }),
     }),
 
@@ -96,4 +124,7 @@ export const {
   useFetchUserWalletMutation,
   useUpdateWalletNameMutation,
   useCreateWalletMutation,
+  useCreateNotificationMutation,
+  useFetchNotificationsMutation,
+  useReadNotificationsMutation,
 } = commonApi;

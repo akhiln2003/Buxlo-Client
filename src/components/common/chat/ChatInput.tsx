@@ -5,12 +5,14 @@ import { ChatRecordingControls } from "./ChatRecordingControls";
 import { ChatTextInput } from "./ChatTextInput";
 import { ChatAttachmentPreview } from "./ChatAttachmentPreview";
 import { ChatCameraPreview } from "./ChatCameraPreview";
-import { useSendMessageMutation } from "@/services/apis/CommonApis";
+import {
+  useCreateNotificationMutation,
+  useSendMessageMutation,
+} from "@/services/apis/CommonApis";
 import { SocketContext } from "@/contexts/socketContext";
 import { InewMessage } from "@/pages/chat";
-
-
-
+import { errorTost } from "@/components/ui/tosastMessage";
+import { useGetUser } from "@/hooks/useGetUser";
 
 interface ChatInputProps {
   setMessages: React.Dispatch<React.SetStateAction<InewMessage[]>>;
@@ -46,7 +48,9 @@ export function ChatInputContainer({
   const [showCameraPreview, setShowCameraPreview] = useState<boolean>(false);
   const [previewFile, setPreviewFile] = useState<File | null>(null);
   const [sendMsg] = useSendMessageMutation();
-const socketContext = useContext(SocketContext);
+  const [createNotification] = useCreateNotificationMutation();
+  const socketContext = useContext(SocketContext);
+  const user = useGetUser();
 
   useEffect(() => {
     if (
@@ -82,19 +86,48 @@ const socketContext = useContext(SocketContext);
     try {
       const response = await sendMsg(formData).unwrap();
 
-      setMessages(prev => {
-         const array = [...prev];
-         array.pop();
+      setMessages((prev) => {
+        const array = [...prev];
+        array.pop();
 
-          return [...array, {...message, ...response.message}];
+        return [...array, { ...message, ...response.message }];
       });
 
-      socketContext?.socket?.emit("direct_message", {...message , ...response.message})
+      await sendNotification(receiverId);
+
+      socketContext?.socket?.emit("direct_message", {
+        ...message,
+        ...response.message,
+      });
       return response;
     } catch (error) {
       console.error("Error sending message:", error);
       alert("Failed to send message. Please try again.");
       throw error;
+    }
+  };
+
+  const sendNotification = async (receiverId: string) => {
+    try {
+      const response = await createNotification({
+        recipient: receiverId,
+        type: "message",
+        message: `You have a new message from ${user?.name || "a user"}`,
+        status: "unread",
+      }).unwrap();
+      if (response.notification) {
+        socketContext?.notificationSocket?.emit("direct_notification", {
+          receiverId,
+          notification:response.notification
+        });
+      } else {
+        console.error("No notification data returned", response.error);
+      }
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      errorTost("Something went wrong", [
+        { message: "Please try again later" },
+      ]);
     }
   };
 
@@ -116,7 +149,7 @@ const socketContext = useContext(SocketContext);
       };
       try {
         setMessages((prevMessages) => [...prevMessages, messagePayload]);
-       
+
         await sendMessage(messagePayload);
 
         resetInput();

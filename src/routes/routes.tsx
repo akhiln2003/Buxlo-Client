@@ -30,7 +30,9 @@ const UserSetNewPassword = lazy(
 const UserDashboardPage = lazy(() => import("@/features/user/pages/dashBord"));
 const UserProfilePage = lazy(() => import("@/features/user/pages/profile"));
 const ListMentors = lazy(() => import("@/features/user/pages/listMentors"));
-const UserMentorProfile = lazy(()=> import("@/features/user/pages/mentorProfileDetails"))
+const UserMentorProfile = lazy(
+  () => import("@/features/user/pages/mentorProfileDetails")
+);
 ////////////////////////--User side--///////////////////////
 ////////////////////////--Mentor side--/////////////////////
 
@@ -76,6 +78,9 @@ const ContactPage = lazy(() => import("@/pages/contact"));
 const Chat = lazy(() => import("@/pages/chat"));
 const Call = lazy(() => import("@/pages/call"));
 const VideoCall = lazy(() => import("@/pages/videoCall"));
+const Notification = lazy(
+  () => import("@/components/common/notification/notification")
+);
 
 ////////////////////////--Common side--////////////////////
 
@@ -205,6 +210,16 @@ const routes = createBrowserRouter(
           ),
         },
         {
+          path: UserUrls.notifications,
+          element: (
+            <UserProtected>
+              <Suspense fallback={<div>Loading...</div>}>
+                <Notification />
+              </Suspense>
+            </UserProtected>
+          ),
+        },
+        {
           path: UserUrls.listMentors,
           element: (
             <UserProtected>
@@ -215,7 +230,7 @@ const routes = createBrowserRouter(
           ),
         },
         {
-          path:`${ UserUrls.mentorProfile}/:mentorId`,
+          path: `${UserUrls.mentorProfile}/:mentorId`,
           element: (
             <UserProtected>
               <Suspense fallback={<div>Loading ....</div>}>
@@ -343,6 +358,16 @@ const routes = createBrowserRouter(
             </MentorProtected>
           ),
         },
+        {
+          path: MentorUrl.notifications,
+          element: (
+            <MentorProtected>
+              <Suspense fallback={<div>Loading...</div>}>
+                <Notification />
+              </Suspense>
+            </MentorProtected>
+          ),
+        },
       ],
     },
 
@@ -424,11 +449,24 @@ const routes = createBrowserRouter(
             </AdminProtected>
           ),
         },
+        {
+          path: AdminUrls.notifications,
+          element: (
+            <AdminProtected>
+              <Suspense fallback={<div>Loading.....</div>}>
+                <Notification />
+              </Suspense>
+            </AdminProtected>
+          ),
+        },
       ],
     },
     { path: "/servererror", element: <ErrorPage500 /> },
     { path: "*", element: <ErrorPage404 /> },
     ////////////////--Admin end--///////////////////
+    ///////////////--Common start--///////////////////
+
+    ////////////////--Common end--///////////////////
   ],
   {
     future: {

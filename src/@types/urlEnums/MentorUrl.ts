@@ -6,11 +6,14 @@ export enum MentorUrl{
     signOut = '/mentor/signout',
     forgotPassword = '/mentor/forgotpassword',
     setNewPassword = '/mentor/resetpassword/:token',
+    dashboard = '/mentor/dashboard',
+    notifications = '/mentor/notifications',
     profile = '/mentor/profile',
     subscription = '/mentor/subscription',
     contact = '/mentor/contact',
     chat = '/mentor/chat',
     call = '/mentor/call',
+    about = '/mentor/about',
     videoCall = '/mentor/videoCall',
     
 }

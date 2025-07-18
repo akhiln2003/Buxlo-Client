@@ -9,10 +9,12 @@ export enum UserUrls  {
     profile = '/profile',
     subscription = '/subscription',
     dashboard = '/dashboard',
+    about = '/about',
     contact = '/contact',
     chat = '/chat',
     call = '/call',
     videoCall = '/videocall',
     listMentors = '/listmentors',
-    mentorProfile = '/mentorprofile'
+    mentorProfile = '/mentorprofile',
+    notifications = '/notifications',
 }

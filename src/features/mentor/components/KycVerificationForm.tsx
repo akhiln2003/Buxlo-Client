@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -19,6 +19,9 @@ import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { useKycVerificationMutation } from "@/services/apis/MentorApis";
 import { KycImageUploader } from "./KycImageUploader";
 import { Imentor } from "@/@types/interface/Imentor";
+import { SocketContext } from "@/contexts/socketContext";
+import { useGetUser } from "@/hooks/useGetUser";
+import { useCreateNotificationMutation } from "@/services/apis/CommonApis";
 
 export function KycVerificationForm({
   id,
@@ -34,6 +37,9 @@ export function KycVerificationForm({
   );
   const [backImagePreview, setBackImagePreview] = useState<string | null>(null);
   const [kycVerify, { isLoading }] = useKycVerificationMutation();
+  const socketContext = useContext(SocketContext);
+  const [createNotification] = useCreateNotificationMutation();
+  const user = useGetUser();
 
   const form = useForm<z.infer<typeof KycVerificationSchema>>({
     resolver: zodResolver(KycVerificationSchema),
@@ -100,19 +106,20 @@ export function KycVerificationForm({
       if (data.backImage) {
         formData.append("backImage", data.backImage);
       }
-
       const response: IaxiosResponse = await kycVerify(formData);
 
       if (response.data.responseData) {
-        setUsers((prev)=>({
+        setUsers((prev) => ({
           ...prev,
-          verified:"verificationPending"
-        }))
+          verified: "verificationPending",
+        }));
         setVerifyIsOpen(false);
         successToast(
           " Profile Verification Submitted",
           "Your profile verification request has been successfully submitted using Aadhaar. Our admin team will review your details and update the verification status soon. You will be notified once the process is complete."
         );
+
+        await sendNotification(import.meta.env.VITE_ADMIN_ID as string);
       } else {
         errorTost(
           "KYC Submission Error",
@@ -124,6 +131,32 @@ export function KycVerificationForm({
     } catch (error) {
       console.error("KYC Submission Error:", error);
       errorTost("Submission Failed", [{ message: "Please try again" }]);
+    }
+  };
+
+  const sendNotification = async (receiverId: string) => {
+    try {
+      const response = await createNotification({
+        recipient: receiverId,
+        type: "update",
+        message: `${
+          user?.name || "a user"
+        } has submitted their KYC for verification.`,
+        status: "unread",
+      }).unwrap();
+      if (response.notification) {
+        socketContext?.notificationSocket?.emit("direct_notification", {
+          receiverId,
+          notification: response.notification,
+        });
+      } else {
+        console.error("No notification data returned", response.error);
+      }
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      errorTost("Something went wrong", [
+        { message: "Please try again later" },
+      ]);
     }
   };
 
@@ -215,7 +248,6 @@ export function KycVerificationForm({
             ) : (
               "Submit KYC"
             )}
-            Submit KYC
           </Button>
         </div>
       </form>

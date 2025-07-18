@@ -8,4 +8,7 @@ export enum CommonApiEndPoints {
     createWallet = '/payment/common/createwallet',
     updateWalletName = '/payment/common/updatewalletname',
     sendNotification = '/notification/common/sendnotification',
+    createNotification = '/notification/common/createnotification',
+    fetchNotifications = '/notification/common/fetchnotifications',
+    readNotifications = '/notification/common/readnotifications',
 }

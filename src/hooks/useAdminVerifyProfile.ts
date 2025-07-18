@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Imentor } from "@/@types/interface/Imentor";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import {
@@ -7,6 +7,7 @@ import {
   useFethAadhaarImagesMutation,
 } from "@/services/apis/AdminApis";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
+import { SocketContext } from "@/contexts/socketContext";
 
 export const useVerifyProfile = () => {
   const [selectedOption, setSelectedOption] = useState("all");
@@ -18,20 +19,29 @@ export const useVerifyProfile = () => {
     friendImage: string;
     backImage: string;
   } | null>(null);
-  const [zoomImage, setZoomImage] = useState<{ url: string; side: string } | null>(null);
+  const [zoomImage, setZoomImage] = useState<{
+    url: string;
+    side: string;
+  } | null>(null);
   const [profileData, setProfileData] = useState<Imentor[]>([]);
-  
+
   const [fetchProfileData] = useFetchVerifyProfileDataMutation();
   const [fetchAadhaarImages] = useFethAadhaarImagesMutation();
-  const [updateVerifyStatus, { isLoading }] = useAdminUpdateVerifyProfileMutation();
+  const [updateVerifyStatus, { isLoading }] =
+    useAdminUpdateVerifyProfileMutation();
+  const socketContext = useContext(SocketContext);
 
-  const handleVerify = async (id: string, name: string, verified = "verified") => {
+  const handleVerify = async (
+    id: string,
+    name: string,
+    verified = "verified"
+  ) => {
     try {
       const response: IaxiosResponse = await updateVerifyStatus({
         id,
         verified,
       });
-      
+
       if (response.data) {
         setProfileData((prevData) =>
           prevData.map((profile) =>
@@ -39,17 +49,36 @@ export const useVerifyProfile = () => {
           )
         );
         setIsModalOpen(false);
-        successToast("Verified Profile", `${name} profile verification accepted`);
+        successToast(
+          "Verified Profile",
+          `${name} profile verification accepted`
+        );
+        
+        socketContext?.notificationSocket?.emit("direct_notification", {
+          receiverId: id,
+          notification: {
+            type: "success",
+            message:
+              "Your profile verification is successfuly completed",
+            status: "unread",
+          },
+        });
       } else {
         errorTost("Failed to update verify status", response.error.data.error);
       }
     } catch (err) {
       console.error("Error fetching data:", err);
-      errorTost("Something went wrong", [{ message: "Please try again later" }]);
+      errorTost("Something went wrong", [
+        { message: "Please try again later" },
+      ]);
     }
   };
 
-  const handleReject = async (id: string, name: string, verified = "applicationPending") => {
+  const handleReject = async (
+    id: string,
+    name: string,
+    verified = "applicationPending"
+  ) => {
     try {
       const user = profileData.find((profile) => profile.id === id);
       if (!user) return;
@@ -74,13 +103,27 @@ export const useVerifyProfile = () => {
           )
         );
         setIsModalOpen(false);
-        successToast("Application rejected", `${name} profile verification rejected`);
+        successToast(
+          "Application rejected",
+          `${name} profile verification rejected`
+        );
+        socketContext?.notificationSocket?.emit("direct_notification", {
+          receiverId: id,
+          notification: {
+            type: "error",
+            message:
+              "Your profile verification is faild please apply with currect details",
+            status: "unread",
+          },
+        });
       } else {
         errorTost("Failed to update verify status", response.error.data.error);
       }
     } catch (err) {
       console.error("Error fetching data:", err);
-      errorTost("Something went wrong", [{ message: "Please try again later" }]);
+      errorTost("Something went wrong", [
+        { message: "Please try again later" },
+      ]);
     }
   };
 
@@ -90,7 +133,7 @@ export const useVerifyProfile = () => {
         `Kyc/${profile.aadhaarFrontImage}`,
         `Kyc/${profile.aadhaarBackImage}`,
       ]);
-      
+
       if (response.data) {
         setSelectedProfile({
           id: profile.id as string,
@@ -105,17 +148,23 @@ export const useVerifyProfile = () => {
       }
     } catch (err) {
       console.error("Error fetching data:", err);
-      errorTost("Something went wrong", [{ message: "Please try again later" }]);
+      errorTost("Something went wrong", [
+        { message: "Please try again later" },
+      ]);
     }
   };
 
-  const fetchData = async (verified: string, page = 1, searchData = undefined) => {
+  const fetchData = async (
+    verified: string,
+    page = 1,
+    searchData = undefined
+  ) => {
     const response: IaxiosResponse = await fetchProfileData({
       page,
       searchData,
       verified,
     });
-    
+
     if (response.data) {
       setProfileData(response.data.datas);
     } else {
