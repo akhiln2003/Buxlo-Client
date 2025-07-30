@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useGetUser } from "@/hooks/useGetUser";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { errorTost } from "@/components/ui/tosastMessage";
@@ -15,8 +15,10 @@ import { ChatInputContainer } from "@/components/common/chat/ChatInput";
 import { useFetchMessageMutation } from "@/services/apis/CommonApis";
 import { MessageCircle } from "lucide-react";
 import { SocketContext } from "@/contexts/socketContext";
+import { IncomingCallModal } from "@/components/common/chat/IncomingCallModal";
+import { VideoCallModal } from "@/components/common/chat/videoCall";
 
-// Interfaces remain unchanged
+// Types
 export interface IparticipantDetails {
   avatar: string;
   createdAt: string;
@@ -31,11 +33,10 @@ export interface IparticipantDetails {
 export interface Icontacts {
   id: string;
   participantDetails: IparticipantDetails[];
-  lastMessage: string;
-  unreadCount?: number;
+  lastMessage: InewMessage;
+  unreadCount: number;
 }
 
-// src/@types/InewMessage.ts
 export interface InewMessage {
   createdAt: string | number | Date;
   chatId: string;
@@ -49,20 +50,49 @@ export interface InewMessage {
   id?: string;
 }
 
+// Add new call states enum
+export enum CallState {
+  IDLE = "idle",
+  CALLING = "calling",
+  RINGING = "ringing",
+  CONNECTED = "connected",
+  ENDED = "ended",
+}
+
+export interface CallInfo {
+  state: CallState;
+  isOutgoing: boolean;
+  remoteUserId: string;
+  remoteName: string;
+  remoteAvatar: string;
+}
+
 export default function Chat() {
   const [activeChat, setActiveChat] = useState<Icontacts | null>(null);
-  const [showSidebar, setShowSidebar] = useState(true);
   const [messages, setMessages] = useState<InewMessage[]>([]);
   const [contacts, setContacts] = useState<Icontacts[]>([]);
-  const [getContacts] = useFetchContactsMutation();
-  const [fetchMentorProfileImages] = useFetchMentorProfileImageMutation();
-  const [fetchUserProfileImages] = useFetchUserProfileImageMutation();
   const [profileImage, setProfileImage] = useState<string[]>([]);
   const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
   const [myProfile, setMyProfile] = useState("");
+  const [showSidebar, setShowSidebar] = useState(true);
+
+  // Updated call state management
+  const [callInfo, setCallInfo] = useState<CallInfo | null>(null);
+  const [showVideoModal, setShowVideoModal] = useState(false);
+
+  const activeChatIdRef = useRef<string | null>(null);
+
+  const [getContacts] = useFetchContactsMutation();
+  const [fetchMentorProfileImages] = useFetchMentorProfileImageMutation();
+  const [fetchUserProfileImages] = useFetchUserProfileImageMutation();
   const [getMessages] = useFetchMessageMutation();
+
   const user = useGetUser();
   const socketContext = useContext(SocketContext);
+
+  useEffect(() => {
+    activeChatIdRef.current = activeChat?.id || null;
+  }, [activeChat]);
 
   const fetchContacts = async (id: string) => {
     try {
@@ -73,7 +103,7 @@ export default function Chat() {
           (contact: Icontacts) =>
             contact.participantDetails.map((participant: IparticipantDetails) =>
               participant.avatar
-                ? participant.role == USER_ROLE.MENTOR
+                ? participant.role === USER_ROLE.MENTOR
                   ? `MentorProfiles/${participant.avatar}`
                   : `UserProfiles/${participant.avatar}`
                 : ""
@@ -141,47 +171,123 @@ export default function Chat() {
       socketContext.socket.emit("active_user", user?.id as string);
       socketContext.socket.emit("online", user?.id as string);
     }
+
     socketContext?.socket?.on("active_user", (data) => {
       setOnlineUsers(new Set(data));
     });
+
     socketContext?.socket?.on("online", ({ userId }) => {
       setOnlineUsers((prev) => new Set(prev).add(userId));
     });
+
+    socketContext?.socket?.on("chat_updated", (data: InewMessage) => {
+      setContacts((prevContacts) =>
+        prevContacts.map((contact) => {
+          if (contact.id === data.chatId) {
+            const isUnread = data.chatId !== activeChatIdRef.current;
+
+            return {
+              ...contact,
+              lastMessage: data,
+              unreadCount: isUnread
+                ? contact.unreadCount + 1
+                : contact.unreadCount,
+            };
+          }
+          return contact;
+        })
+      );
+    });
+
+    // Updated call event handlers
+    socketContext?.socket?.on("incoming_call", ({ from, name, avatar }) => {
+      setCallInfo({
+        state: CallState.RINGING,
+        isOutgoing: false,
+        remoteUserId: from,
+        remoteName: name,
+        remoteAvatar: avatar,
+      });
+    });
+
+    socketContext?.socket?.on("call_accepted", () => {
+      setCallInfo((prev) =>
+        prev ? { ...prev, state: CallState.CONNECTED } : null
+      );
+    });
+
+    socketContext?.socket?.on("call_rejected", () => {
+      setCallInfo(null);
+      setShowVideoModal(false);
+    });
+
+    socketContext?.socket?.on("end-call", () => {
+      handleCallEnd();
+    });
+
     socketContext?.socket?.on("leave", (userId: string) => {
       setOnlineUsers((prev) => {
         const updatedUsers = new Set(prev);
         updatedUsers.delete(userId);
         return updatedUsers;
       });
+
+      // If the user who left was in a call with us, end the call
+      if (callInfo && callInfo.remoteUserId === userId) {
+        handleCallEnd();
+      }
     });
 
     return () => {
       socketContext?.socket?.emit("leave", user?.id as string);
-      socketContext?.socket?.on("leave", (userId: string) => {
-        setOnlineUsers((prev) => {
-          const updatedUsers = new Set(prev);
-          updatedUsers.delete(userId);
-          return updatedUsers;
-        });
-      });
-
       socketContext?.socket?.off("active_user");
       socketContext?.socket?.off("online");
+      socketContext?.socket?.off("chat_updated");
+      socketContext?.socket?.off("leave");
+      socketContext?.socket?.off("incoming_call");
+      socketContext?.socket?.off("call_accepted");
+      socketContext?.socket?.off("call_rejected");
+      socketContext?.socket?.off("end-call");
     };
-  }, [socketContext?.socket?.connected]);
+  }, [
+    socketContext.socket,
+    socketContext.socket?.connected,
+    user?.id,
+  ]);
 
   const handleChatSelect = async (contact: Icontacts) => {
     try {
       setActiveChat(contact);
-      const response: IaxiosResponse = await getMessages(contact.id);
+      setContacts((prevContacts) =>
+        prevContacts.map((c) =>
+          c.id === contact.id ? { ...c, unreadCount: 0 } : c
+        )
+      );
+
+      const response: IaxiosResponse = await getMessages({
+        id: contact.id,
+        receiverId: user?.id,
+      });
+
       if (response.data) {
         setMessages(response.data.messages);
+        const receiverId =
+          response.data.messages[0].senderId == user?.id
+            ? response.data.messages[0].receiverId
+            : response.data.messages[0].senderId;
+
+        socketContext?.socket?.emit("mark_messages_read", {
+          chatId: response.data.messages[0].chatId,
+          receiverId: user?.id,
+          userId: receiverId,
+        });
       } else {
         errorTost(
           "Something went wrong",
           response.error.data.error || [{ message: "Please try again later" }]
         );
       }
+
       if (window.innerWidth < 768) {
         setShowSidebar(false);
       }
@@ -189,6 +295,75 @@ export default function Chat() {
       console.error("Error selecting chat:", err);
       errorTost("Something went wrong", [{ message: "Please try again" }]);
     }
+  };
+
+  const handleStartVideoCall = (contact: Icontacts) => {
+    const remoteUser = contact.participantDetails[0];
+
+    // Check if user is online
+    if (!onlineUsers.has(remoteUser._id)) {
+      errorTost("User is offline", [
+        { message: "Cannot start call with offline user" },
+      ]);
+      return;
+    }
+
+    setCallInfo({
+      state: CallState.CALLING,
+      isOutgoing: true,
+      remoteUserId: remoteUser._id,
+      remoteName: remoteUser.name,
+      remoteAvatar: remoteUser.avatar,
+    });
+
+    setShowVideoModal(true);
+
+    // Emit call-user event
+    socketContext?.socket?.emit("call-user", {
+      to: remoteUser._id,
+      from: user?.id,
+      name: user?.name,
+      avatar: user?.avatar || "",
+    });
+  };
+
+  const handleAcceptCall = () => {
+    if (!callInfo) return;
+
+    setCallInfo((prev) =>
+      prev ? { ...prev, state: CallState.CONNECTED } : null
+    );
+    setShowVideoModal(true);
+
+    // Emit call accepted
+    socketContext?.socket?.emit("answer-call", {
+      from: user?.id,
+      to: callInfo.remoteUserId,
+    });
+  };
+
+  const handleRejectCall = () => {
+    if (!callInfo) return;
+
+    socketContext?.socket?.emit("call-rejected", {
+      from: user?.id,
+      to: callInfo.remoteUserId,
+    });
+
+    setCallInfo(null);
+  };
+
+  const handleCallEnd = () => {
+    if (callInfo) {
+      // Emit end call event if we're ending it
+      socketContext?.socket?.emit("end-call", {
+        from: user?.id,
+        to: callInfo.remoteUserId,
+      });
+    }
+
+    setCallInfo(null);
+    setShowVideoModal(false);
   };
 
   return (
@@ -220,12 +395,15 @@ export default function Chat() {
                   contacts.findIndex((contact) => contact.id === activeChat.id)
                 ]
               }
+              onStartVideoCall={() => handleStartVideoCall(activeChat)}
+              isInCall={!!callInfo}
             />
             <div className="flex-1 overflow-y-auto">
               <ChatMessages
                 messages={messages}
                 setMessages={setMessages}
                 userId={user?.id as string}
+                chatId={activeChat.id}
                 receiverId={activeChat.participantDetails[0]._id}
               />
             </div>
@@ -253,6 +431,29 @@ export default function Chat() {
           </div>
         )}
       </div>
+
+      {/* Incoming Call Modal */}
+      {callInfo &&
+        callInfo.state === CallState.RINGING &&
+        !callInfo.isOutgoing && (
+          <IncomingCallModal
+            name={callInfo.remoteName}
+            avatar={callInfo.remoteAvatar}
+            onAccept={handleAcceptCall}
+            onReject={handleRejectCall}
+          />
+        )}
+
+      {/* Video Call Modal */}
+      {showVideoModal && callInfo && (
+        <VideoCallModal
+          callInfo={callInfo}
+          currentUserId={user?.id as string}
+          onlineUsers={onlineUsers}
+          onClose={handleCallEnd}
+          socket={socketContext?.socket as import("socket.io-client").Socket}
+        />
+      )}
     </div>
   );
 }

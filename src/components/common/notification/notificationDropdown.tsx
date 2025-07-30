@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Bell } from "lucide-react";
 import {
@@ -16,10 +16,11 @@ import {
   useReadNotificationsMutation,
 } from "@/services/apis/CommonApis";
 import { SocketContext } from "@/contexts/socketContext";
+import NotificationSound from "@/assets/sounds/notification.mp3";
 
 interface NotificationDropdownProps {
-  notificationsUrl: string; // URL to redirect to "View all notifications"
-  onNotificationClick?: () => void; // Optional callback when notification is clicked
+  notificationsUrl: string;
+  onNotificationClick?: () => void;
 }
 
 export default function NotificationDropdown({
@@ -34,6 +35,9 @@ export default function NotificationDropdown({
   const { isDarkMode } = useTheme();
   const { user } = useSelector((state: RootState) => state.userAuth);
 
+  const notificationSoundRef = useRef<HTMLAudioElement | null>(null);
+  const [audioUnlocked, setAudioUnlocked] = useState(false);
+
   const colorTheme = isDarkMode ? "white" : "black";
 
   const formatTimeAgo = (dateString: string) => {
@@ -46,10 +50,8 @@ export default function NotificationDropdown({
     return `${Math.floor(diff / 86400)}d`;
   };
 
-  // Fetch notifications
   const fetchNotificationDatas = async () => {
     if (!user?.id) return;
-
     try {
       const response: IaxiosResponse = await fetchNotifications({
         userId: user.id,
@@ -73,7 +75,6 @@ export default function NotificationDropdown({
       const response: IaxiosResponse = await readNotification([
         { id, status: "read" },
       ]);
-
       if (response.data) {
         setNotifications((prev) =>
           prev.map((notif) =>
@@ -88,40 +89,78 @@ export default function NotificationDropdown({
     }
   };
 
-  // Fetch notifications on mount
   useEffect(() => {
     if (user?.id) {
       fetchNotificationDatas();
     }
   }, [user?.id]);
 
-  // Listen for real-time notifications
+  useEffect(() => {
+    notificationSoundRef.current = new Audio(NotificationSound);
+    notificationSoundRef.current.volume = 0.5;
+
+    const unlockAudio = () => {
+      if (!notificationSoundRef.current) return;
+
+      notificationSoundRef.current
+        .play()
+        .then(() => {
+          notificationSoundRef.current?.pause();
+          if (notificationSoundRef.current)
+            notificationSoundRef.current.currentTime = 0;
+          setAudioUnlocked(true);
+        })
+        .catch((err) => {
+          console.warn("Audio unlock failed:", err);
+        });
+
+      window.removeEventListener("click", unlockAudio);
+    };
+
+    window.addEventListener("click", unlockAudio);
+
+    return () => {
+      window.removeEventListener("click", unlockAudio);
+    };
+  }, []);
+
   useEffect(() => {
     const socket = socketContext.notificationSocket;
     if (!socket) return;
 
     const handleNotification = (data: Inotification) => {
+      if (audioUnlocked && notificationSoundRef.current) {
+        notificationSoundRef.current
+          .play()
+          .catch((err) =>
+            console.warn("Failed to play notification sound:", err)
+          );
+      }
       setNotifications((prev) => [data, ...prev]);
+    };
+    const handleClearNotifications = (data: { userId: string }) => {
+      if (data.userId === user?.id) {
+        setNotifications([]);
+      }
     };
 
     socket.on("direct_notification", handleNotification);
+    socket.on("mark_all_read", handleClearNotifications);
 
     return () => {
       socket.off("direct_notification", handleNotification);
+      socket.off("mark_all_read", handleClearNotifications);
     };
-  }, [socketContext?.notificationSocket]);
+  }, [socketContext?.notificationSocket, audioUnlocked]);
 
-  // Calculate unread count
   const unreadCount = notifications.filter((n) => n.status === "unread").length;
 
-  // Get notifications for dropdown (5 unread + 5 latest)
   const getDropdownNotifications = () => {
     const unreadNotifs = notifications
       .filter((n) => n.status === "unread")
       .slice(0, 5);
     const latestNotifs = notifications.slice(0, 5);
 
-    // Combine and remove duplicates
     const combined = [...unreadNotifs];
     latestNotifs.forEach((notif) => {
       if (!combined.find((n) => n.id === notif.id)) {
@@ -129,7 +168,7 @@ export default function NotificationDropdown({
       }
     });
 
-    return combined.slice(0, 10); // Maximum 10 notifications
+    return combined.slice(0, 10);
   };
 
   const handleNotificationClick = (id: string) => {

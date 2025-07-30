@@ -103,6 +103,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        
         const response: IaxiosResponse = await fetchProfileData(
           storUserData!.id
         );

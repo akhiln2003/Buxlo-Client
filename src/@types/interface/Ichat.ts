@@ -1,9 +1,11 @@
+import { InewMessage } from "@/pages/chat";
+
 export class Ichat {
   constructor(
     public participants: string[],
     public unreadCount: number,
     public type: "OneToOne" | "Group",
-    public lastMessage?: string,
+    public lastMessage?: InewMessage,
     public name?: string,
     public avatar?: string,
     public id?: string

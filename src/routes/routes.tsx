@@ -77,7 +77,7 @@ const AdminVerifyProfilePage = lazy(
 const ContactPage = lazy(() => import("@/pages/contact"));
 const Chat = lazy(() => import("@/pages/chat"));
 const Call = lazy(() => import("@/pages/call"));
-const VideoCall = lazy(() => import("@/pages/videoCall"));
+const VideoCall = lazy(() => import("@/components/common/chat/videoCall"));
 const Notification = lazy(
   () => import("@/components/common/notification/notification")
 );

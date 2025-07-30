@@ -21,6 +21,7 @@ interface ChatMessagesProps {
   messages: InewMessage[];
   setMessages: React.Dispatch<React.SetStateAction<InewMessage[]>>;
   userId: string;
+  chatId: string;
   receiverId: string;
 }
 
@@ -177,7 +178,9 @@ export const MediaContent = ({
           <div className="flex items-center">
             <File className="h-6 w-6 text-blue-500 mr-2" />
             <span className="text-sm font-medium truncate max-w-xs">
-              {message.content.split("/").pop() || "Document"}
+              {typeof message.content === "string"
+                ? message.content.split("/").pop() || "Document"
+                : "Document"}
             </span>
           </div>
           <a
@@ -229,7 +232,7 @@ export const Message = ({
           </div>
         ) : message.contentType === "text" ? (
           <div className="whitespace-pre-wrap break-words">
-            {message.content}
+            {typeof message.content === "string" ? message.content : ""}
           </div>
         ) : (
           <MediaContent
@@ -291,6 +294,7 @@ export const DateGroup = ({
 export const ChatMessages = ({
   messages,
   userId,
+  chatId,
   receiverId,
   setMessages,
 }: ChatMessagesProps) => {
@@ -314,8 +318,26 @@ export const ChatMessages = ({
         ...prev,
         ...(Array.isArray(data) ? data : [data]),
       ]);
+      socketContext?.socket?.emit("mark_messages_read", {
+        chatId,
+        receiverId: userId,
+        userId: receiverId,
+      });
     });
-  }, [ socketContext?.socket?.connected]);
+    socketContext?.socket?.on("messages_marked_read", () => {
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.senderId == userId ? { ...msg, status: "read" } : msg
+        )
+      );
+    });
+
+    return () => {
+      socketContext?.socket?.off("direct_message");
+      socketContext?.socket?.off("mark_messages_read");
+      socketContext?.socket?.off("messages_marked_read");
+    };
+  }, [socketContext?.socket?.connected]);
 
   useEffect(() => {
     const mediaMessages = messages.filter(
@@ -356,18 +378,18 @@ export const ChatMessages = ({
 
   const groupMessagesByDate = () => {
     const groups: Record<string, InewMessage[]> = {};
-  
+
     messages.forEach((message) => {
       const dateObj = new Date(message.createdAt);
       const dateStr = isToday(dateObj)
         ? "Today"
         : format(dateObj, "MMMM d, yyyy");
-  
+
       groups[dateStr] = groups[dateStr]
         ? [...groups[dateStr], message]
         : [message];
     });
-  
+
     return Object.entries(groups).map(([date, messages]) => ({
       date,
       messages,
@@ -378,13 +400,7 @@ export const ChatMessages = ({
 
   return (
     <div className="flex flex-col p-4 space-y-3 bg-gray-50 dark:bg-zinc-900">
-      <div
-        className="absolute inset-0 bg-repeat opacity-5 dark:opacity-2 pointer-events-none"
-        style={{
-          backgroundImage:
-            "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QAAKqNIzIAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAAHdElNRQfkBQoLDDf2IqZsAAAA7klEQVQ4y5XUzU3DQBCG4ScR90gF0A6ECpJjJJIKYtMBdBDS0EWcU4QKAhVACUmOIFmWD57Pdlw1h13p1czO/kn2QsuFhla3aqngXGfAEJIlBwbJdgFnlnxLrp1AEp8s8UiuoLEy0NpBV8uLlp6e1sqAVwMXziz5MVKz4XTvRK+7NuCkVNR5UxtLJpITtTH8y/gVMZlIpqI+2OjYWXKVXLIzSO4c+JIcyqcuGUre5Yfs5JIXeZQnhaTvp91XspFsypXXXe7EJ5+OVdzZ6Gg4sLLUscS5X7XhVxNJ09FIg1Lj78yKN2lZkHxI3v4AfOB6hzq7UYEAAAAldEVYdGRhdGU6Y3JlYXRlADIwMjAtMDUtMTBUMTE6MTI6NTUrMDA6MDAi+wQ6AAAAJXRFWHRkYXRlOm1vZGlmyQAyMDIwLTA1LTEwVDExOjEyOjU1KzAwOjAwU6a8hgAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAAASUVORK5CYII=')",
-        }}
-      />
+      <div className="absolute inset-0 bg-repeat opacity-5 dark:opacity-2 pointer-events-none" />
       <div className="flex flex-col space-y-6 z-10">
         {messageGroups.map((group, index) => (
           <DateGroup

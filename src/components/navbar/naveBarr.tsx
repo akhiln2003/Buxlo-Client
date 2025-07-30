@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logoWhite from "@/assets/images/logoWhite.png";
 import logoBlack from "@/assets/images/logoBlack-.png";
@@ -39,8 +39,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import { useTheme } from "@/contexts/themeContext";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { useDispatch } from "react-redux";
 import { addUser } from "@/redux/slices/userSlice";
 import { useSignOutUserMutation } from "@/services/apis/AuthApis";
 import { errorTost } from "../ui/tosastMessage";
@@ -49,6 +48,9 @@ import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import NotificationDropdown from "../common/notification/notificationDropdown";
 import { UserUrls } from "@/@types/urlEnums/UserUrls";
 import { MentorUrl } from "@/@types/urlEnums/MentorUrl";
+import { useFetchMentorProfileImageMutation } from "@/services/apis/MentorApis";
+import { useGetUser } from "@/hooks/useGetUser";
+
 
 // Define the interface for navigation items
 interface NavigationItem {
@@ -184,8 +186,10 @@ function ReusableNavbar({
   const { isDarkMode, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [signOut] = useSignOutUserMutation();
-  const { user } = useSelector((state: RootState) => state.userAuth);
+  const user = useGetUser();
   const dispatch = useDispatch();
+  const [fetchProfileImage] = useFetchMentorProfileImageMutation();
+  const [profilePhoto, setProfilePhoto] = useState<string>("");
 
   // Use provided navigation items or default ones
   const finalNavigationItems =
@@ -227,7 +231,41 @@ function ReusableNavbar({
   };
 
   const isAuthenticated = user?.role === role;
-  const userAvatar = user?.avatar || profileImage;
+  const userAvatar = profilePhoto || profileImage;
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        if (user?.avatar) {
+          const folderName =
+            user.role == "user" ? "UserProfiles/" : "MentorProfiles/";
+
+          const imageUrl: IaxiosResponse = await fetchProfileImage([
+            `${folderName}${user.avatar}`,
+          ]);
+          if (imageUrl.data.imageUrl) {
+
+            setProfilePhoto(imageUrl.data.imageUrl[0]);
+          } else {
+            errorTost(
+              "Image Load Failed",
+              imageUrl.error.data.error || [
+                { message: `${imageUrl.error.data} please try again later` },
+              ]
+            );
+          }
+        }
+      } catch (err) {
+        console.error("Error wile fetching profile image ", err);
+
+        errorTost("Data Load Failed", [
+          { message: "Faild to fetch profile image" },
+        ]);
+      }
+    };
+
+    fetchUserData();
+  }, [user]);
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md z-50 border-b border-gray-200/20 dark:border-gray-800/20">

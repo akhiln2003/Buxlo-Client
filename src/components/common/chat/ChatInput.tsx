@@ -13,6 +13,7 @@ import { SocketContext } from "@/contexts/socketContext";
 import { InewMessage } from "@/pages/chat";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { useGetUser } from "@/hooks/useGetUser";
+import sendMessageSound from "@/assets/sounds/message.mp3";
 
 interface ChatInputProps {
   setMessages: React.Dispatch<React.SetStateAction<InewMessage[]>>;
@@ -51,23 +52,7 @@ export function ChatInputContainer({
   const [createNotification] = useCreateNotificationMutation();
   const socketContext = useContext(SocketContext);
   const user = useGetUser();
-
-  useEffect(() => {
-    if (
-      showEmojiPicker ||
-      isRecording ||
-      (typeof newMessage.content === "string" && newMessage.content.trim())
-    ) {
-      setShowAttachmentMenu(false);
-    }
-  }, [showEmojiPicker, isRecording, newMessage.content]);
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const sendSoundRef = useRef<HTMLAudioElement | null>(null);
 
   const sendMessage = async (message: InewMessage) => {
     const formData = new FormData();
@@ -99,6 +84,10 @@ export function ChatInputContainer({
         ...message,
         ...response.message,
       });
+      socketContext?.socket?.emit("chat_updated", {
+        ...response.message,
+      });
+
       return response;
     } catch (error) {
       console.error("Error sending message:", error);
@@ -118,7 +107,7 @@ export function ChatInputContainer({
       if (response.notification) {
         socketContext?.notificationSocket?.emit("direct_notification", {
           receiverId,
-          notification:response.notification
+          notification: response.notification,
         });
       } else {
         console.error("No notification data returned", response.error);
@@ -151,7 +140,7 @@ export function ChatInputContainer({
         setMessages((prevMessages) => [...prevMessages, messagePayload]);
 
         await sendMessage(messagePayload);
-
+        playSendSound();
         resetInput();
       } catch (error) {
         console.error("Failed to send message:", error);
@@ -180,6 +169,7 @@ export function ChatInputContainer({
       try {
         setMessages((prevMessages) => [...prevMessages, messagePayload]);
         await sendMessage(messagePayload);
+        playSendSound();
         resetInput();
       } catch (error) {
         console.error("Failed to upload file:", error);
@@ -238,7 +228,7 @@ export function ChatInputContainer({
       mediaRecorderRef.current.stop();
       mediaRecorderRef.current.onstop = () => {
         const audioBlob = new Blob(audioChunksRef.current, {
-          type: "audio/mp3",
+          type: "audio/webm",
         });
         const messagePayload: InewMessage = {
           chatId,
@@ -308,8 +298,38 @@ export function ChatInputContainer({
     setMessages((prevMessages) => [...prevMessages, messagePayload]);
     sendMessage(messagePayload);
     setPreviewFile(null);
+    playSendSound();
     resetInput();
   };
+  const playSendSound = () => {
+    if (sendSoundRef.current) {
+      sendSoundRef.current.currentTime = 0; // rewind to start
+      sendSoundRef.current.play().catch((err) => {
+        console.warn("Send sound failed:", err);
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (
+      showEmojiPicker ||
+      isRecording ||
+      (typeof newMessage.content === "string" && newMessage.content.trim())
+    ) {
+      setShowAttachmentMenu(false);
+    }
+  }, [showEmojiPicker, isRecording, newMessage.content]);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    sendSoundRef.current = new Audio(sendMessageSound);
+  }, []);
 
   return (
     <div className="relative flex items-center space-x-2 p-2 sm:p-3 bg-gray-100 dark:bg-zinc-800 border-t dark:border-zinc-700 sticky bottom-0 z-10">

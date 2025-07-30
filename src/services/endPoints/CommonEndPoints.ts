@@ -11,4 +11,5 @@ export enum CommonApiEndPoints {
     createNotification = '/notification/common/createnotification',
     fetchNotifications = '/notification/common/fetchnotifications',
     readNotifications = '/notification/common/readnotifications',
+    deleteNotifications = '/notification/common/deletenotifications'
 }

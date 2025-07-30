@@ -44,8 +44,8 @@ export const commonApi = createApi({
 
     // Fetch  messages
     fetchMessage: builder.mutation({
-      query: (id) => ({
-        url: `${CommonApiEndPoints.fetchMessages}?id=${id}`,
+      query: ({ id, receiverId }) => ({
+        url: `${CommonApiEndPoints.fetchMessages}?id=${id}&&receiverId=${receiverId}`,
         method: "GET",
       }),
     }),
@@ -111,6 +111,15 @@ export const commonApi = createApi({
       }),
     }),
 
+    // Delete Notifications
+    deleteNotifications: builder.mutation({
+      query: (ids: string[]) => ({
+        url: CommonApiEndPoints.deleteNotifications,
+        method: "DELETE",
+        data: { ids },
+      }),
+    }),
+
     //////////////////////////////////////////////////////////////////////////////////
   }),
 });
@@ -127,4 +136,5 @@ export const {
   useCreateNotificationMutation,
   useFetchNotificationsMutation,
   useReadNotificationsMutation,
+  useDeleteNotificationsMutation,
 } = commonApi;

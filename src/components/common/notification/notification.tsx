@@ -11,8 +11,9 @@ import {
   CheckCheck,
 } from "lucide-react";
 import { useGetUser } from "@/hooks/useGetUser";
-import { errorTost } from "@/components/ui/tosastMessage";
+import { errorTost, successToast } from "@/components/ui/tosastMessage";
 import {
+  useDeleteNotificationsMutation,
   useFetchNotificationsMutation,
   useReadNotificationsMutation,
 } from "@/services/apis/CommonApis";
@@ -60,10 +61,10 @@ const NotificationPage = () => {
     pageNum: 1,
     totalPages: 1,
   });
-
   const user = useGetUser();
   const [fetchNotifications] = useFetchNotificationsMutation();
   const [readNotification] = useReadNotificationsMutation();
+  const [notificationDelete] = useDeleteNotificationsMutation();
   const socketContext = useContext(SocketContext);
 
   const fetchNotificationDatas = useCallback(
@@ -146,7 +147,6 @@ const NotificationPage = () => {
         color: colorMap[data.type as keyof typeof colorMap] || "bg-gray-400",
         time: formatTimeAgo(data.createdAt as string),
       };
-
       setNotifications((prev) => [newNotification, ...prev]);
     };
 
@@ -198,6 +198,10 @@ const NotificationPage = () => {
       const response: IaxiosResponse = await readNotification(payload);
 
       if (response.data) {
+        socketContext?.notificationSocket?.emit("mark_all_read", {
+          userId: user?.id,
+        });
+
         setNotifications((prev) =>
           prev.map((notif) => (!notif.read ? { ...notif, read: true } : notif))
         );
@@ -217,8 +221,26 @@ const NotificationPage = () => {
     }
   };
 
-  const deleteNotification = (id: string) => {
-    setNotifications((prev) => prev.filter((notif) => notif.id !== id));
+  const deleteNotification = async (id: string) => {
+    try {
+      const response: IaxiosResponse = await notificationDelete([id]);
+      if (response.data) {
+        successToast("Delete", response.data.response);
+        setNotifications((prev) => prev.filter((notif) => notif.id !== id));
+      } else {
+        errorTost(
+          "Something went wrong",
+          response.error?.data?.error || [
+            { message: `${response.error?.data || "Unknown error"}` },
+          ]
+        );
+      }
+    } catch (error) {
+      console.error("Error deleting  notifications :", error);
+      errorTost("Something went wrong", [
+        { message: "Please try again later" },
+      ]);
+    }
   };
 
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -248,8 +270,18 @@ const NotificationPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className={`bg-white shadow-sm sticky ${user?.role == USER_ROLE.ADMIN ? "top-0" : "top-14"} z-10`}>
-        <div className={`${user?.role == USER_ROLE.ADMIN  ? "w-full px-4 sm:px-6 lg:px-8 py-4" : "max-w-4xl mx-auto px-4 py-4" }`}>
+      <div
+        className={`bg-white shadow-sm sticky ${
+          user?.role == USER_ROLE.ADMIN ? "top-0" : "top-14"
+        } z-10`}
+      >
+        <div
+          className={`${
+            user?.role == USER_ROLE.ADMIN
+              ? "w-full px-4 sm:px-6 lg:px-8 py-4"
+              : "max-w-4xl mx-auto px-4 py-4"
+          }`}
+        >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="relative">

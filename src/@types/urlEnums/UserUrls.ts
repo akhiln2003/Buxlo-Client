@@ -13,7 +13,7 @@ export enum UserUrls  {
     contact = '/contact',
     chat = '/chat',
     call = '/call',
-    videoCall = '/videocall',
+    videoCall = '/video-call',
     listMentors = '/listmentors',
     mentorProfile = '/mentorprofile',
     notifications = '/notifications',
