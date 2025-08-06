@@ -23,13 +23,11 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EditSubscriptionModal } from "../components/EditSubscriptionModal";
-import {
-  useAddSubscriptionPlanMutation,
-  useFetchSubscriptionPlanMutation,
-} from "@/services/apis/AdminApis";
+import { useAddSubscriptionPlanMutation } from "@/services/apis/AdminApis";
 import { Isubscription } from "@/@types/interface/Isubscription";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { errorTost } from "@/components/ui/tosastMessage";
+import { useFetchSubscriptionPlanMutation } from "@/services/apis/CommonApis";
 
 const Dashboard = () => {
   const [plans, setPlans] = useState<Isubscription[]>([]);
@@ -262,9 +260,10 @@ const Dashboard = () => {
               {plans.map((subscription) => {
                 const hasOffer = subscription.offer && subscription.offer > 0;
                 const offerPrice = hasOffer
-                  ? Math.round(
-                      subscription.price * (1 - subscription.offer / 100)
-                    )
+                  ? (
+                      subscription.price *
+                      (1 - subscription.offer / 100)
+                    ).toFixed(2)
                   : null;
 
                 return (

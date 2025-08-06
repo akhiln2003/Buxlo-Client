@@ -8,9 +8,9 @@ import {
   Minimize2,
   Maximize2,
 } from "lucide-react";
-import { useWebRTC } from "@/hooks/useVideoCall";
-import { CallState, CallInfo } from "@/pages/chat";
+import { useWebRTC } from "@/hooks/useWebRTC";
 import dummyProfileImage from "@/assets/images/dummy-profile.webp";
+import { CallInfo, CallState } from "@/contexts/videoCallContext";
 
 interface VideoCallModalProps {
   callInfo: CallInfo;
@@ -36,7 +36,6 @@ export function VideoCallModal({
   const isConnected = callInfo.state === CallState.CONNECTED;
   const isRemoteOnline = onlineUsers.has(callInfo.remoteUserId);
 
-  // Updated addRemoteStream with null check
   const addRemoteStream = (remoteStream: MediaStream) => {
     if (remoteRef.current) {
       remoteRef.current.srcObject = remoteStream;
@@ -78,7 +77,6 @@ export function VideoCallModal({
   }, [socket, onClose]);
 
   const handleEndCall = () => {
-    // Clean up media streams
     if (localRef.current?.srcObject) {
       const stream = localRef.current.srcObject as MediaStream;
       stream.getTracks().forEach((track) => track.stop());
@@ -135,7 +133,6 @@ export function VideoCallModal({
             : "w-full h-full max-w-6xl max-h-[90vh]"
         }`}
       >
-        {/* Header */}
         <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-center">
           <div className="text-white text-sm bg-black bg-opacity-50 px-3 py-1 rounded">
             {callInfo.remoteName}
@@ -154,9 +151,7 @@ export function VideoCallModal({
           </div>
         </div>
 
-        {/* Video Container */}
         <div className="relative w-full h-full">
-          {/* Remote Video or Status */}
           {isConnected && isRemoteOnline ? (
             <video
               ref={remoteRef}
@@ -178,7 +173,6 @@ export function VideoCallModal({
             </div>
           )}
 
-          {/* Local Video (Picture in Picture) */}
           <div
             className={`absolute ${
               isMinimized
@@ -201,7 +195,6 @@ export function VideoCallModal({
           </div>
         </div>
 
-        {/* Controls */}
         {!isMinimized && (
           <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-4">
             {/* <button
@@ -217,9 +210,9 @@ export function VideoCallModal({
               ) : (
                 <Mic className="w-5 h-5" />
               )}
-            </button> */}
+            </button>
 
-            {/* <button
+            <button
               onClick={toggleVideo}
               className={`p-3 rounded-full transition-colors ${
                 isVideoOff
@@ -243,7 +236,6 @@ export function VideoCallModal({
           </div>
         )}
 
-        {/* Minimized Controls */}
         {isMinimized && (
           <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex gap-1">
             <button

@@ -120,6 +120,33 @@ export const commonApi = createApi({
       }),
     }),
 
+    //  fetch SubscriptionPlan
+    fetchSubscriptionPlan: builder.mutation({
+      query: () => ({
+        url: CommonApiEndPoints.fetchSubscriptionPlan,
+        method: "GET",
+      }),
+    }),
+
+    // Create Checkout Session
+    createCheckoutSession: builder.mutation({
+      query: ({
+        amount,
+        mentorName,
+        slotId,
+      }: {
+        amount: number;
+        mentorName: string;
+        slotId: string;
+      }) => ({
+        url: CommonApiEndPoints.createCheckoutSession,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+
+        data: { amount, mentorName, slotId },
+      }),
+    }),
+
     //////////////////////////////////////////////////////////////////////////////////
   }),
 });
@@ -137,4 +164,6 @@ export const {
   useFetchNotificationsMutation,
   useReadNotificationsMutation,
   useDeleteNotificationsMutation,
+  useFetchSubscriptionPlanMutation,
+  useCreateCheckoutSessionMutation,
 } = commonApi;

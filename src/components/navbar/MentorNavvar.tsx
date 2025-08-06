@@ -7,7 +7,6 @@ function MentorNavbar() {
     <ReusableNavbar
       role={USER_ROLE.MENTOR}
       homeUrl={MentorUrl.home}
-      dashboardUrl={MentorUrl.dashboard}
       notificationsUrl={MentorUrl.notifications}
       profileUrl={MentorUrl.profile}
       subscriptionUrl={MentorUrl.subscription}

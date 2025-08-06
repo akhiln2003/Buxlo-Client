@@ -37,7 +37,6 @@ export function EditMentorProfile({
       bio: users.bio || "",
       expertise: users.expertise ? users.expertise : "",
       yearsOfExperience: users.yearsOfExperience || 0,
-      salary: users.salary || 0,
     },
   });
 
@@ -56,10 +55,6 @@ export function EditMentorProfile({
         yearsOfExperience:
           users.yearsOfExperience !== data.yearsOfExperience
             ? data.yearsOfExperience
-            : undefined,
-            salary:
-          users.salary !== data.salary
-            ? data.salary
             : undefined,
       };
       const response: IaxiosResponse = await updateProfile({ id, updatedData });
@@ -178,25 +173,6 @@ export function EditMentorProfile({
                     {...field}
                     type="number"
                     onChange={(e) => field.onChange(Number(e.target.value))}
-                    className="w-full bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="salary"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-gray-700 dark:text-gray-300">
-                  Salary
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
                     className="w-full bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700"
                   />
                 </FormControl>

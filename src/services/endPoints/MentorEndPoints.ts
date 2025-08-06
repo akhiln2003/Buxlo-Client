@@ -12,7 +12,10 @@ export enum MentorApiEndPoints {
     deleteProfileImage = '/user/mentor/deleteprofileimage',
     updateProfile = '/user/mentor/updateprofile',
     updateProfileImage = '/user/mentor/updateprofileimage',
-    kycVerification = '/user/mentor/verifyprofile'
+    kycVerification = '/user/mentor/verifyprofile',
+    createOneSlot = '/booking/mentor/createoneslot',
+    createRecurringSlot = '/booking/mentor/createrecurringslot',
+    fetchSlots = '/booking/mentor/fetchslots',
 
 
 }

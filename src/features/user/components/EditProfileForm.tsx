@@ -27,28 +27,26 @@ export function EditUserProfile({
   setIsOpen: (isOpen: boolean) => void;
   setUsers: React.Dispatch<React.SetStateAction<Partial<Iuser>>>;
 }) {
-  
   const [updateProfile, { isLoading }] = useUpdateUserProfileMutation();
   const form = useForm<z.infer<typeof EditProfileSchema>>({
     resolver: zodResolver(EditProfileSchema),
     defaultValues: {
       name: users.name,
       email: users.email,
-      phone: "11234456789",
     },
   });
 
   const onSubmit = async (data: z.infer<typeof EditProfileSchema>) => {
-    try {      
-      const id =  users.id;
+    try {
+      const id = users.id;
       const updatedData = {
         name: users.name !== data.name ? data.name : undefined,
-      }
-      
-      const response: IaxiosResponse = await updateProfile({ id, updatedData });      
+      };
+
+      const response: IaxiosResponse = await updateProfile({ id, updatedData });
       if (response.data.data) {
         setIsOpen(false);
-        setUsers(response.data.data)
+        setUsers(response.data.data);
       } else {
         errorTost(
           "Something went wrong",
@@ -102,26 +100,6 @@ export function EditUserProfile({
                       <Input
                         {...field}
                         type="email"
-                        readOnly
-                        className="w-full bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-700 dark:text-gray-300">
-                      Phone
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
                         readOnly
                         className="w-full bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700"
                       />

@@ -28,6 +28,8 @@
     "@sentry/react": "^8.54.0",
     "@sentry/vite-plugin": "^3.1.2",
     "@shadcn/ui": "^0.0.4",
+    "@stripe/react-stripe-js": "^3.9.0",
+    "@stripe/stripe-js": "^7.8.0",
     "axios": "^1.7.8",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

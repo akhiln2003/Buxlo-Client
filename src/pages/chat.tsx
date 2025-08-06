@@ -15,8 +15,7 @@ import { ChatInputContainer } from "@/components/common/chat/ChatInput";
 import { useFetchMessageMutation } from "@/services/apis/CommonApis";
 import { MessageCircle } from "lucide-react";
 import { SocketContext } from "@/contexts/socketContext";
-import { IncomingCallModal } from "@/components/common/chat/IncomingCallModal";
-import { VideoCallModal } from "@/components/common/chat/videoCall";
+import { useCall } from "@/contexts/videoCallContext";
 
 // Types
 export interface IparticipantDetails {
@@ -50,23 +49,6 @@ export interface InewMessage {
   id?: string;
 }
 
-// Add new call states enum
-export enum CallState {
-  IDLE = "idle",
-  CALLING = "calling",
-  RINGING = "ringing",
-  CONNECTED = "connected",
-  ENDED = "ended",
-}
-
-export interface CallInfo {
-  state: CallState;
-  isOutgoing: boolean;
-  remoteUserId: string;
-  remoteName: string;
-  remoteAvatar: string;
-}
-
 export default function Chat() {
   const [activeChat, setActiveChat] = useState<Icontacts | null>(null);
   const [messages, setMessages] = useState<InewMessage[]>([]);
@@ -75,10 +57,6 @@ export default function Chat() {
   const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
   const [myProfile, setMyProfile] = useState("");
   const [showSidebar, setShowSidebar] = useState(true);
-
-  // Updated call state management
-  const [callInfo, setCallInfo] = useState<CallInfo | null>(null);
-  const [showVideoModal, setShowVideoModal] = useState(false);
 
   const activeChatIdRef = useRef<string | null>(null);
 
@@ -89,6 +67,7 @@ export default function Chat() {
 
   const user = useGetUser();
   const socketContext = useContext(SocketContext);
+  const { startVideoCall, isInCall } = useCall();
 
   useEffect(() => {
     activeChatIdRef.current = activeChat?.id || null;
@@ -169,7 +148,6 @@ export default function Chat() {
   useEffect(() => {
     if (socketContext?.socket?.connected) {
       socketContext.socket.emit("active_user", user?.id as string);
-      socketContext.socket.emit("online", user?.id as string);
     }
 
     socketContext?.socket?.on("active_user", (data) => {
@@ -199,61 +177,19 @@ export default function Chat() {
       );
     });
 
-    // Updated call event handlers
-    socketContext?.socket?.on("incoming_call", ({ from, name, avatar }) => {
-      setCallInfo({
-        state: CallState.RINGING,
-        isOutgoing: false,
-        remoteUserId: from,
-        remoteName: name,
-        remoteAvatar: avatar,
-      });
-    });
-
-    socketContext?.socket?.on("call_accepted", () => {
-      setCallInfo((prev) =>
-        prev ? { ...prev, state: CallState.CONNECTED } : null
-      );
-    });
-
-    socketContext?.socket?.on("call_rejected", () => {
-      setCallInfo(null);
-      setShowVideoModal(false);
-    });
-
-    socketContext?.socket?.on("end-call", () => {
-      handleCallEnd();
-    });
-
     socketContext?.socket?.on("leave", (userId: string) => {
       setOnlineUsers((prev) => {
         const updatedUsers = new Set(prev);
         updatedUsers.delete(userId);
         return updatedUsers;
       });
-
-      // If the user who left was in a call with us, end the call
-      if (callInfo && callInfo.remoteUserId === userId) {
-        handleCallEnd();
-      }
     });
 
     return () => {
-      socketContext?.socket?.emit("leave", user?.id as string);
       socketContext?.socket?.off("active_user");
-      socketContext?.socket?.off("online");
       socketContext?.socket?.off("chat_updated");
-      socketContext?.socket?.off("leave");
-      socketContext?.socket?.off("incoming_call");
-      socketContext?.socket?.off("call_accepted");
-      socketContext?.socket?.off("call_rejected");
-      socketContext?.socket?.off("end-call");
     };
-  }, [
-    socketContext.socket,
-    socketContext.socket?.connected,
-    user?.id,
-  ]);
+  }, [socketContext.socket, socketContext.socket?.connected, user?.id]);
 
   const handleChatSelect = async (contact: Icontacts) => {
     try {
@@ -271,16 +207,15 @@ export default function Chat() {
 
       if (response.data) {
         setMessages(response.data.messages);
-        const receiverId =
-          response.data.messages[0].senderId == user?.id
-            ? response.data.messages[0].receiverId
-            : response.data.messages[0].senderId;
+        if (response.data.messages.length > 0) {
+          const receiverId = contact.participantDetails[0]._id;
 
-        socketContext?.socket?.emit("mark_messages_read", {
-          chatId: response.data.messages[0].chatId,
-          receiverId: user?.id,
-          userId: receiverId,
-        });
+          socketContext?.socket?.emit("mark_messages_read", {
+            chatId: response.data.messages[0].chatId,
+            receiverId: user?.id,
+            userId: receiverId,
+          });
+        }
       } else {
         errorTost(
           "Something went wrong",
@@ -299,71 +234,12 @@ export default function Chat() {
 
   const handleStartVideoCall = (contact: Icontacts) => {
     const remoteUser = contact.participantDetails[0];
-
-    // Check if user is online
-    if (!onlineUsers.has(remoteUser._id)) {
-      errorTost("User is offline", [
-        { message: "Cannot start call with offline user" },
-      ]);
-      return;
-    }
-
-    setCallInfo({
-      state: CallState.CALLING,
-      isOutgoing: true,
-      remoteUserId: remoteUser._id,
-      remoteName: remoteUser.name,
-      remoteAvatar: remoteUser.avatar,
-    });
-
-    setShowVideoModal(true);
-
-    // Emit call-user event
-    socketContext?.socket?.emit("call-user", {
-      to: remoteUser._id,
-      from: user?.id,
-      name: user?.name,
-      avatar: user?.avatar || "",
-    });
-  };
-
-  const handleAcceptCall = () => {
-    if (!callInfo) return;
-
-    setCallInfo((prev) =>
-      prev ? { ...prev, state: CallState.CONNECTED } : null
+    startVideoCall(
+      remoteUser._id,
+      remoteUser.name,
+      remoteUser.avatar,
+      onlineUsers
     );
-    setShowVideoModal(true);
-
-    // Emit call accepted
-    socketContext?.socket?.emit("answer-call", {
-      from: user?.id,
-      to: callInfo.remoteUserId,
-    });
-  };
-
-  const handleRejectCall = () => {
-    if (!callInfo) return;
-
-    socketContext?.socket?.emit("call-rejected", {
-      from: user?.id,
-      to: callInfo.remoteUserId,
-    });
-
-    setCallInfo(null);
-  };
-
-  const handleCallEnd = () => {
-    if (callInfo) {
-      // Emit end call event if we're ending it
-      socketContext?.socket?.emit("end-call", {
-        from: user?.id,
-        to: callInfo.remoteUserId,
-      });
-    }
-
-    setCallInfo(null);
-    setShowVideoModal(false);
   };
 
   return (
@@ -396,7 +272,7 @@ export default function Chat() {
                 ]
               }
               onStartVideoCall={() => handleStartVideoCall(activeChat)}
-              isInCall={!!callInfo}
+              isInCall={isInCall}
             />
             <div className="flex-1 overflow-y-auto">
               <ChatMessages
@@ -431,29 +307,6 @@ export default function Chat() {
           </div>
         )}
       </div>
-
-      {/* Incoming Call Modal */}
-      {callInfo &&
-        callInfo.state === CallState.RINGING &&
-        !callInfo.isOutgoing && (
-          <IncomingCallModal
-            name={callInfo.remoteName}
-            avatar={callInfo.remoteAvatar}
-            onAccept={handleAcceptCall}
-            onReject={handleRejectCall}
-          />
-        )}
-
-      {/* Video Call Modal */}
-      {showVideoModal && callInfo && (
-        <VideoCallModal
-          callInfo={callInfo}
-          currentUserId={user?.id as string}
-          onlineUsers={onlineUsers}
-          onClose={handleCallEnd}
-          socket={socketContext?.socket as import("socket.io-client").Socket}
-        />
-      )}
     </div>
   );
 }

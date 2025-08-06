@@ -103,7 +103,6 @@ const Profile = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        
         const response: IaxiosResponse = await fetchProfileData(
           storUserData!.id
         );
@@ -388,10 +387,6 @@ const Profile = () => {
                   ) : (
                     <p>{users.yearsOfExperience} years of experience</p>
                   )}
-                </div>
-
-                <div className="text-sm text-zinc-900 dark:text-zinc-200  font-cabinet">
-                  <p className=" font-bold">Salary : ₹{users.salary} </p>
                 </div>
               </div>
             </CardContent>

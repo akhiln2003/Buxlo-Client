@@ -10,7 +10,7 @@ import {
 } from "@/services/apis/MentorApis";
 import { Imentor } from "@/@types/interface/Imentor";
 import { errorTost } from "@/components/ui/tosastMessage";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useGetUser } from "@/hooks/useGetUser";
 import { useConnectMentorMutation } from "@/services/apis/UserApis";
 import { UserUrls } from "@/@types/urlEnums/UserUrls";
@@ -144,9 +144,10 @@ const AccountantProfile = () => {
           </div>
 
           <div className="flex justify-between items-center w-full border-t pt-4">
-            <p className="text-xl font-medium">
+            {/* find and show avrage salary of mentor */}
+            {/* <p className="text-xl font-medium">
               Salary: <span className="text-primary">$ {mentor.salary}/hr</span>
-            </p>
+            </p> */}
             <div className="flex gap-3 bg">
               <Button
                 onClick={() =>
@@ -158,13 +159,12 @@ const AccountantProfile = () => {
               >
                 Contact
               </Button>
-              <Button
-                variant="default"
-                size="lg"
-                className="w-32 bg-black hover:bg-zinc-800 dark:text-white"
+              <Link
+                to={`${UserUrls.booking}/${mentor.id}`}
+                className="flex-1 sm:flex-initial sm:w-24 text-white bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-800 hover:dark:bg-zinc-900 flex items-center justify-center rounded-md text-sm p-2 "
               >
-                Hire
-              </Button>
+                Book Now
+              </Link>
             </div>
           </div>
         </div>

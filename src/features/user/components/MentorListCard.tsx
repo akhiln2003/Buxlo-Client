@@ -2,7 +2,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
 import { UserUrls } from "@/@types/urlEnums/UserUrls";
-import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { errorTost } from "@/components/ui/tosastMessage";
@@ -111,7 +110,7 @@ export const MentorListCard: React.FC<MentorCardProps> = ({
 
         <div className="flex flex-col sm:flex-row justify-between items-center">
           <p className="font-medium mb-3 sm:mb-0 text-center sm:text-left">
-            Salary:{" "}
+            Salary:
             <span className="text-primary">₹ {mentor.salary || 0}/hr</span>
           </p>
           <div className="flex gap-2 w-full sm:w-auto">
@@ -121,13 +120,12 @@ export const MentorListCard: React.FC<MentorCardProps> = ({
             >
               More
             </Link>
-            <Button
-              variant="default"
-              size="sm"
-              className="flex-1 sm:flex-initial sm:w-24 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-800  hover:dark:bg-zinc-900   dark:text-white"
+            <Link
+              to={`${UserUrls.booking}/${mentor.id}`}
+              className="flex-1 sm:flex-initial sm:w-24 text-white bg-zinc-800 hover:bg-zinc-900 dark:bg-zinc-800 hover:dark:bg-zinc-900 flex items-center justify-center rounded-md text-sm p-2 "
             >
-              Hire
-            </Button>
+              Book Now
+            </Link>
           </div>
         </div>
       </CardContent>

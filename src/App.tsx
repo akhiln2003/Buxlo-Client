@@ -6,32 +6,54 @@ import { ThemeProvider } from "./contexts/themeContext";
 import { SocketContext } from "./contexts/socketContext";
 import { useContext, useEffect } from "react";
 import { useGetUser } from "./hooks/useGetUser";
+import { CallProvider } from "./contexts/videoCallContext";
 
 function App() {
   const socketContext = useContext(SocketContext);
   const user = useGetUser();
 
   useEffect(() => {
-    const socket = socketContext.notificationSocket;
+    const notification = socketContext.notificationSocket;
 
-    // Guard: wait until socket is connected and user is available
-    if (!socket || !user?.id) return;
+    if (!notification || !user?.id) return;
 
-    if (socket.connected) {
-      socket.emit("join", { userId: user.id });
+    if (notification.connected) {
+      notification.emit("join", { userId: user.id });
     } else {
       // If not connected yet, wait for connection and then emit
-      socket.once("connect", () => {
-        socket.emit("join", { userId: user.id });
+      notification.once("connect", () => {
+        notification.emit("join", { userId: user.id });
       });
     }
   }, [socketContext?.notificationSocket, user?.id]);
 
+  useEffect(() => {
+    const chat = socketContext.socket;
+
+    if (!chat || !user?.id) return;
+
+    if (chat.connected) {
+      chat.emit("online", user?.id as string);
+    } else {
+      chat.once("connect", () => {
+        chat.emit("online", user?.id as string);
+      });
+    }
+
+    return () => {
+      chat.emit("leave", user?.id as string);
+      chat.off("leave");
+      chat.off("online");
+    };
+  }, [socketContext?.socket, user?.id]);
+
   return (
     <ThemeProvider>
       <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-        <RouterProvider router={routes} />
-        <Toaster />
+        <CallProvider>
+          <RouterProvider router={routes} />
+          <Toaster />
+        </CallProvider>
       </GoogleOAuthProvider>
     </ThemeProvider>
   );

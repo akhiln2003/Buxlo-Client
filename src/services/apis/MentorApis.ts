@@ -32,7 +32,7 @@ export const mentorApi = createApi({
       query: (keys: string[]) => ({
         url: MentorApiEndPoints.fetchProfileImage,
         method: "POST",
-        data:{keys}
+        data: { keys },
       }),
     }),
 
@@ -44,17 +44,40 @@ export const mentorApi = createApi({
       }),
     }),
 
-      // kyc verification
-      kycVerification: builder.mutation({
-        query: (data) => ({
-          url: MentorApiEndPoints.kycVerification,
-          method: "PUT",
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          data:data
-        }),
+    // kyc verification
+    kycVerification: builder.mutation({
+      query: (data) => ({
+        url: MentorApiEndPoints.kycVerification,
+        method: "PUT",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        data: data,
       }),
+    }),
+    // Create one slot
+    createOneSlot: builder.mutation({
+      query: (data) => ({
+        url: MentorApiEndPoints.createOneSlot,
+        method: "POST",
+        data: data,
+      }),
+    }),
+    // Create one slot
+    createRecurringSlot: builder.mutation({
+      query: (data) => ({
+        url: MentorApiEndPoints.createRecurringSlot,
+        method: "POST",
+        data: data,
+      }),
+    }),
+    // Fetch slots
+    fetchSlots: builder.mutation({
+      query: (mentorId) => ({
+        url: `${MentorApiEndPoints.fetchSlots}/${mentorId}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -64,5 +87,8 @@ export const {
   useUpdateMentorProfileMutation,
   useFetchMentorProfileImageMutation,
   useDeleteMentorProfileImageMutation,
-  useKycVerificationMutation
+  useKycVerificationMutation,
+  useCreateOneSlotMutation,
+  useCreateRecurringSlotMutation,
+  useFetchSlotsMutation,
 } = mentorApi;

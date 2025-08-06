@@ -95,13 +95,7 @@ export const adminApi = createApi({
       }),
     }),
 
-    //  fetch SubscriptionPlan
-    fetchSubscriptionPlan: builder.mutation({
-      query: () => ({
-        url: AdminApiEndPoints.fetchSubscriptionPlan,
-        method: "GET",
-      }),
-    }),
+  
 
     // Add subscription plans
     addSubscriptionPlan: builder.mutation({
@@ -161,7 +155,6 @@ export const {
   useDeleteTrustedUsImageMutation,
   useDeleteAdvImageMutation,
   useEditAdvMutation,
-  useFetchSubscriptionPlanMutation,
   useAddSubscriptionPlanMutation,
   useUpdateSubscriptionPlanMutation,
   useFetchVerifyProfileDataMutation,

@@ -3,7 +3,6 @@ export class Imentor {
       public name: string,
       public email: string,
       public verified: "verified"| "applicationPending" | "verificationPending",
-      public salary:number,
       public role?: string,
       public isGoogle?: boolean,
       public id?: string,

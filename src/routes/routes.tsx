@@ -47,6 +47,10 @@ const MentorSetNewPassword = lazy(
   () => import("@/features/auth/mentor/pages/newPassword")
 );
 const MentorProfilePage = lazy(() => import("@/features/mentor/pages/profile"));
+const MentorAppointmentPange = lazy(
+  () => import("@/features/mentor/pages/appointment")
+);
+const MentorBooking = lazy(()=>import("@/features/user/pages/mentorBooking"))
 
 ////////////////////////--Mentor side--/////////////////////
 ////////////////////////--Admin side--/////////////////////
@@ -77,7 +81,7 @@ const AdminVerifyProfilePage = lazy(
 const ContactPage = lazy(() => import("@/pages/contact"));
 const Chat = lazy(() => import("@/pages/chat"));
 const Call = lazy(() => import("@/pages/call"));
-const VideoCall = lazy(() => import("@/components/common/chat/videoCall"));
+// const VideoCall = lazy(() => import("@/components/common/chat/videoCall"));
 const Notification = lazy(
   () => import("@/components/common/notification/notification")
 );
@@ -199,16 +203,7 @@ const routes = createBrowserRouter(
             </UserProtected>
           ),
         },
-        {
-          path: UserUrls.videoCall,
-          element: (
-            <UserProtected>
-              <Suspense fallback={<div>Loading...</div>}>
-                <VideoCall />
-              </Suspense>
-            </UserProtected>
-          ),
-        },
+
         {
           path: UserUrls.notifications,
           element: (
@@ -239,8 +234,19 @@ const routes = createBrowserRouter(
             </UserProtected>
           ),
         },
+         {
+          path: `${UserUrls.booking}/:mentorId`,
+          element: (
+            <UserProtected>
+              <Suspense fallback={<div>Loading ....</div>}>
+                <MentorBooking />
+              </Suspense>
+            </UserProtected>
+          ),
+        },
       ],
     },
+    
 
     ////////////////--User end--///////////////////
 
@@ -348,22 +354,23 @@ const routes = createBrowserRouter(
             </MentorProtected>
           ),
         },
-        {
-          path: MentorUrl.videoCall,
-          element: (
-            <MentorProtected>
-              <Suspense fallback={<div>Loading...</div>}>
-                <VideoCall />
-              </Suspense>
-            </MentorProtected>
-          ),
-        },
+
         {
           path: MentorUrl.notifications,
           element: (
             <MentorProtected>
               <Suspense fallback={<div>Loading...</div>}>
                 <Notification />
+              </Suspense>
+            </MentorProtected>
+          ),
+        },
+        {
+          path: MentorUrl.appointment,
+          element: (
+            <MentorProtected>
+              <Suspense fallback={<div>Loading...</div>}>
+                <MentorAppointmentPange />
               </Suspense>
             </MentorProtected>
           ),

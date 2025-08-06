@@ -29,36 +29,38 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   const [notificationSocket, setNotificationSocket] = useState<Socket | null>(
     null
   );
+
   useEffect(() => {
-    const newSocket = io(SOCKET_CONFIG.urls.socket);
-    const notificationSocket = io(SOCKET_CONFIG.urls.notification);
+    console.log("Initializing sockets...");
+    
+    const newSocket = io(SOCKET_CONFIG.urls.socket, SOCKET_CONFIG.base);
+    const newNotificationSocket = io(SOCKET_CONFIG.urls.notification, SOCKET_CONFIG.base);
 
     setSocket(newSocket);
-    setNotificationSocket(notificationSocket);
+    setNotificationSocket(newNotificationSocket);
 
-    if (socket) {
-      socket.on("connect", () => {
-        console.log("Socket connected:", socket.id);
-      });
-    }
+    newSocket.on("connect", () => {
+      console.log("ChatSocket connected:", newSocket.id);
+    });
 
-    if (notificationSocket) {
-      notificationSocket.on("connect", () => {
-        console.log("NotificationSocket connected:", notificationSocket.id);
-      });
-    }
+    newSocket.on("disconnect", () => {
+      console.log("ChatSocket disconnected");
+    });
+
+    newNotificationSocket.on("connect", () => {
+      console.log("NotificationSocket connected:", newNotificationSocket.id);
+    });
+
+    newNotificationSocket.on("disconnect", () => {
+      console.log("NotificationSocket disconnected");
+    });
 
     return () => {
-      if (socket) {
-        socket.disconnect();
-        console.log("ChatSocket disconnected");
-      }
-      if (notificationSocket) {
-        notificationSocket.disconnect();
-        console.log("NotificationSocket disconnected");
-      }
+      console.log("Cleaning up sockets...");
+      newSocket.disconnect();
+      newNotificationSocket.disconnect();
     };
-  }, [socket?.connected]);
+  }, []); // Remove the dependency to prevent re-initialization loop
 
   return (
     <SocketContext.Provider value={{ socket, notificationSocket }}>

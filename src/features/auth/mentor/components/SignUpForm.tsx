@@ -25,6 +25,8 @@ import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 
 export function SignUnForm() {
   const [passwordVisibility, setPasswordVisibility] = useState<boolean>(false);
+  const [confirmPasswordVisibility, setconfirmPasswordVisibility] =
+    useState<boolean>(false);
   const [isFormFilled, setIsFormFilled] = useState<boolean>(false);
 
   const [signUp, { isLoading }] = useSignUpMentorMutation();
@@ -159,8 +161,10 @@ export function SignUnForm() {
               <FormControl>
                 <Input
                   placeholder="ConfirmPassword"
-                  type="password"
+                  type={confirmPasswordVisibility ? "text" : "password"}
                   {...field}
+                  passwordVisibility={confirmPasswordVisibility}
+                  setPasswordVisibility={setconfirmPasswordVisibility}
                 />
               </FormControl>
               <FormMessage />
