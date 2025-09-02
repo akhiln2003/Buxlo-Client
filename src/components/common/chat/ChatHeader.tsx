@@ -27,12 +27,12 @@ export function ChatHeader({
   };
 
   const handleVideoCall = () => {
-    if (isInCall) return; // Prevent starting new call if already in one
+    if (isInCall) return; 
     onStartVideoCall();
   };
 
   const isUserOnline = onlineUsers.has(
-    activeChat?.participantDetails[0]._id as string
+    activeChat?.participantDetails[0].id as string
   );
 
   return (

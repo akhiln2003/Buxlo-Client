@@ -123,7 +123,7 @@ export function EditUserProfile({
           </Button>
           <Button
             onClick={form.handleSubmit(onSubmit)}
-            disabled={isLoading}
+            disabled={isLoading || !form.formState.isDirty as boolean}
             className="bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:hover:bg-gray-100 dark:text-gray-900"
           >
             {isLoading && <Loader className="mr-2 h-4 w-4 animate-spin" />}

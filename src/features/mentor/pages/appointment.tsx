@@ -33,6 +33,7 @@ export interface AvailabilityRule {
   startTime: string;
   duration: number;
   startDate: string;
+  salary:number;
   endDate: string;
   description?: string;
 }
@@ -191,6 +192,7 @@ const Appointment: React.FC = () => {
   };
 
   const addRecurringRule = async () => {
+    
     const result = recurringFormSchema.safeParse(recurringForm);
     if (!result.success) {
       errorTost("Something wrong", [
@@ -204,6 +206,7 @@ const Appointment: React.FC = () => {
       days: recurringForm.days,
       startTime: recurringForm.startTime,
       duration: recurringForm.duration,
+      salary: recurringForm.salary,
       startDate: recurringForm.startDate,
       endDate: recurringForm.endDate,
     };

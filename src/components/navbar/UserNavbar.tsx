@@ -15,7 +15,6 @@ function UserNavbar() {
       subscriptionUrl={UserUrls.subscription}
       signInUrl={UserUrls.signIn}
       showCenterNavigation={true}
-      showSubscription={true}
     />
   );
 }

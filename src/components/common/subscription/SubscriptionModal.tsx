@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { X, Check, Star, Crown, CreditCard, Calendar } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useFetchSubscriptionPlanMutation } from "@/services/apis/CommonApis";
+import {
+  useCreateSubscriptionCheckoutSessionMutation,
+  useFetchSubscriptionPlanMutation,
+} from "@/services/apis/CommonApis";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { errorTost } from "@/components/ui/tosastMessage";
+import { useGetUser } from "@/hooks/useGetUser";
 
 // Backend data structure
 interface BackendSubscriptionPlan {
@@ -33,19 +37,22 @@ interface SubscriptionModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentSubscription?: string;
-  onPurchase?: (planId: string) => void;
 }
 
 const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
   isOpen,
   onClose,
   currentSubscription,
-  onPurchase,
 }) => {
   const [selectedPlan, setSelectedPlan] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+  const [rowPlans, setRowPlans] = useState<SubscriptionPlan[]>([]);
+
   const [fetchPlan] = useFetchSubscriptionPlanMutation();
+  const [createChecKoutSession] =
+    useCreateSubscriptionCheckoutSessionMutation();
+  const user = useGetUser();
 
   // Function to transform backend data to frontend format
   // Function to transform backend data to frontend format with percentage-based offers
@@ -156,28 +163,34 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
     });
   };
 
-  const handlePurchase = async (planId: string) => {
+  const handlePurchase = async (plan: SubscriptionPlan) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const select = rowPlans.filter((data)=>data.id == plan.id)
+      console.log("::::: " , select);
+      
 
-      if (onPurchase) {
-        onPurchase(planId);
+      const response: IaxiosResponse = await createChecKoutSession({
+        userId: user?.id as string,
+        data: select[0],
+        type: "subscription",
+      });
+      console.log("ddeecdeddre ", response);
+
+      if (response.data) {
+        window.location.href = response.data.url;
+        onClose();
+      } else {
+        errorTost("Error", [
+          {
+            message:
+              response.error?.data?.error[0].message || "Booking failed.",
+          },
+        ]);
       }
-
-      // Show success message or redirect
-      alert(
-        `Successfully subscribed to ${
-          plans.find((p) => p.id === planId)?.name
-        }!`
-      );
-      onClose();
     } catch (error) {
-      console.error("Purchase failed:", error);
-      alert("Purchase failed. Please try again.");
-    } finally {
-      setIsLoading(false);
+      console.error("Error during booking:", error);
+      errorTost("Error", [{ message: "Something went wrong while booking." }]);
     }
   };
 
@@ -186,8 +199,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
       const response: IaxiosResponse = await fetchPlan();
 
       if (response.data.data && Array.isArray(response.data.data)) {
-        console.log("Backend subscription data:", response.data.data);
-
+        setRowPlans(response.data.data)
         const transformedPlans = transformBackendData(response.data.data);
 
         const sortedPlans = transformedPlans.sort((a, b) => {
@@ -219,8 +231,6 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
       setSelectedPlan(""); // Reset selection when modal opens
     }
   }, [isOpen]);
-
-  console.log("Transformed plans:", plans);
 
   if (!isOpen) return null;
 
@@ -374,7 +384,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                             !isLoading &&
                             selectedPlan === plan.id
                           ) {
-                            handlePurchase(plan.id);
+                            handlePurchase(plan);
                           }
                         }}
                         disabled={

@@ -8,6 +8,7 @@ import {
 } from "@/services/apis/AdminApis";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
 import { SocketContext } from "@/contexts/socketContext";
+import { useCreateNotificationMutation } from "@/services/apis/CommonApis";
 
 export const useVerifyProfile = () => {
   const [selectedOption, setSelectedOption] = useState("all");
@@ -30,6 +31,7 @@ export const useVerifyProfile = () => {
   const [updateVerifyStatus, { isLoading }] =
     useAdminUpdateVerifyProfileMutation();
   const socketContext = useContext(SocketContext);
+  const [createNotification] = useCreateNotificationMutation();
 
   const handleVerify = async (
     id: string,
@@ -37,10 +39,13 @@ export const useVerifyProfile = () => {
     verified = "verified"
   ) => {
     try {
+      console.log("top verifiy", id, name, verified);
+
       const response: IaxiosResponse = await updateVerifyStatus({
         id,
         verified,
       });
+      console.log("response in verify ", response);
 
       if (response.data) {
         setProfileData((prevData) =>
@@ -53,16 +58,21 @@ export const useVerifyProfile = () => {
           "Verified Profile",
           `${name} profile verification accepted`
         );
-        
-        socketContext?.notificationSocket?.emit("direct_notification", {
-          receiverId: id,
-          notification: {
-            type: "success",
-            message:
-              "Your profile verification is successfuly completed",
-            status: "unread",
-          },
-        });
+        const notificationResponse = await createNotification({
+          recipient: id,
+          type: "success",
+          message: "Your profile verification is successfuly completed",
+          status: "unread",
+        }).unwrap();
+
+        if (notificationResponse.notification) {
+          socketContext?.notificationSocket?.emit("direct_notification", {
+            receiverId: id,
+            notification: notificationResponse.notification,
+          });
+        } else {
+          console.error("No notification data returned", response.error);
+        }
       } else {
         errorTost("Failed to update verify status", response.error.data.error);
       }
@@ -107,15 +117,21 @@ export const useVerifyProfile = () => {
           "Application rejected",
           `${name} profile verification rejected`
         );
-        socketContext?.notificationSocket?.emit("direct_notification", {
-          receiverId: id,
-          notification: {
-            type: "error",
-            message:
-              "Your profile verification is faild please apply with currect details",
-            status: "unread",
-          },
-        });
+        const notificationResponse = await createNotification({
+          recipient: id,
+          type: "error",
+          message:
+            "Your profile verification is faild please apply with currect details",
+          status: "unread",
+        }).unwrap();
+        if (notificationResponse.notification) {
+          socketContext?.notificationSocket?.emit("direct_notification", {
+            receiverId: id,
+            notification: notificationResponse.notification,
+          });
+        } else {
+          console.error("No notification data returned", response.error);
+        }
       } else {
         errorTost("Failed to update verify status", response.error.data.error);
       }

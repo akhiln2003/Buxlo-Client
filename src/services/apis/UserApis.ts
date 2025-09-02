@@ -61,13 +61,7 @@ export const userApi = createApi({
       }),
     }),
 
-    // Fetch contacts
-    fetchContacts: builder.mutation({
-      query: (id) => ({
-        url: `${UserApiEndPoints.fetchContacts}?id=${id}`,
-        method: "GET",
-      }),
-    }),
+  
 
     // Add a new category
     moneyCategorize: builder.mutation({
@@ -98,7 +92,6 @@ export const {
   useDeleteUserProfileImageMutation,
   useFetchMentorsListMutation,
   useConnectMentorMutation,
-  useFetchContactsMutation,
   useMoneyCategorizeMutation,
   useFetchMoneyCategorizeMutation,
 } = userApi;

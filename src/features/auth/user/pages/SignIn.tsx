@@ -21,35 +21,42 @@ function SignIn() {
   const [googleAuth] = useGoogleAuthUserMutation();
   const dispatch = useDispatch();
 
-  const handleGoogleSignUp = async (respons: GoogleCredentialResponse ) => {
+  const handleGoogleSignUp = async (respons: GoogleCredentialResponse) => {
     try {
       if (respons?.credential) {
-        // Call your API to handle Google login or signup        
-        const response: IaxiosResponse= await googleAuth({ token: respons.credential }); 
-        
+        // Call your API to handle Google login or signup
+        const response: IaxiosResponse = await googleAuth({
+          token: respons.credential,
+        });
+
         if (response.data?.user) {
           const user = response.data.user;
           dispatch(addUser(user));
 
           navigate(UserUrls.home);
-        } else {
-          
-          errorTost("Somthing when wrong ", response.error.data.error || [{message: `${response.error.data} please try again laiter`}]);
+        } else {          
+          errorTost(
+            "Somthing when wrong ",
+            response.error.data.error || [
+              { message: `${response.error.data} please try again laiter` },
+            ]
+          );
         }
       }
     } catch (error) {
       console.error("Error during Google signup:", error);
     }
   };
-  const handleGoogleAthError  = ()=>{
-    errorTost("Faild to sing in " , [{ message:"Somting when wrong please try again"}])
-
-  }
+  const handleGoogleAthError = () => {
+    errorTost("Faild to sing in ", [
+      { message: "Somting when wrong please try again" },
+    ]);
+  };
   const handleResendPassword = () => {
     navigate(UserUrls.forgotPassword);
   };
 
-  const googlTheam = isDarkMode ?  "filled_black" : "outline"; 
+  const googlTheam = isDarkMode ? "filled_black" : "outline";
   return (
     <>
       <div className=" dark:bg-zinc-900  min-h-screen">

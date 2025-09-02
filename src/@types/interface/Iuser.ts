@@ -6,5 +6,7 @@ export class Iuser {
     public isGoogle?: boolean,
     public id?: string,
     public avatar?: string,
+    public premiumId?: boolean,
+    public premiumEndDate?: Date
   ) {}
 }

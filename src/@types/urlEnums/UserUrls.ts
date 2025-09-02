@@ -16,6 +16,9 @@ export enum UserUrls  {
     videoCall = '/video-call',
     listMentors = '/listmentors',
     mentorProfile = '/mentorprofile',
-    booking = '/booking',
+    booking = "/booking",
+    bookingSucess = '/bookingsuccess',
+    subscriptionSucess = "/subscriptionsuccess",
     notifications = '/notifications',
+    paymetnCalcel = '/cancel'
 }

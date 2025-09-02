@@ -8,8 +8,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Star,
+  Loader,
 } from "lucide-react";
-import { useParams } from "react-router-dom";
+import {  useParams } from "react-router-dom";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { Imentor } from "@/@types/interface/Imentor";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
@@ -19,7 +20,8 @@ import {
   useFetchSlotsMutation,
 } from "@/services/apis/MentorApis";
 import dummyProfileImage from "@/assets/images/dummy-profile.webp";
-import { useCreateCheckoutSessionMutation } from "@/services/apis/CommonApis";
+import { useCreateBookingCheckoutSessionMutation } from "@/services/apis/CommonApis";
+import { useGetUser } from "@/hooks/useGetUser";
 
 export interface Slot {
   mentorId: string;
@@ -35,7 +37,7 @@ export interface Slot {
 
 const MentorBooking = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [selectedSlot, setSelectedSlot] = useState<any | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [findSlots] = useFetchSlotsMutation();
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -44,7 +46,9 @@ const MentorBooking = () => {
   const [mentor, setMentor] = useState<Partial<Imentor>>({});
   const [fetchProfileData] = useFetchMentorProfileMutation();
   const [fetchProfileImages] = useFetchMentorProfileImageMutation();
-  const [createChecKoutSession] = useCreateCheckoutSessionMutation();
+  const [createChecKoutSession, { isLoading: createChecKoutSessionIsloading }] =
+    useCreateBookingCheckoutSessionMutation();
+  const user = useGetUser();
 
   // Fetch mentor data
   const fetchMentor = async (id: string) => {
@@ -122,7 +126,10 @@ const MentorBooking = () => {
   };
 
   const formatDate = (date: Date) => {
-    return date.toISOString().split("T")[0];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
 
   const isDateAvailable = (date: Date | null) => {
@@ -133,13 +140,7 @@ const MentorBooking = () => {
 
   const getAvailableSlots = (date: Date) => {
     const dateStr = formatDate(date);
-    return slots
-      .filter((slot) => slot.date === dateStr && !slot.isBooked)
-      .map((slot) => ({
-        id: slot.id,
-        time: slot.startTime,
-        duration: slot.duration,
-      }));
+    return slots.filter((slot) => slot.date === dateStr && !slot.isBooked);
   };
 
   const handleDateSelect = (date: Date) => {
@@ -157,24 +158,25 @@ const MentorBooking = () => {
 
   const handleBooking = async () => {
     try {
-      console.log("Booking details:", {
-        amount: mentor.salary || 100,
-        mentorName: mentor.name || "Akhil",
-        slotId: selectedSlot.id,
+      if (createChecKoutSessionIsloading) return;
+      const data = {
+        name: mentor.name,
+        ...selectedSlot,
+      };
+      const response: IaxiosResponse = await createChecKoutSession({
+        data,
+        userId: user?.id as string,
+        type:"booking"
       });
 
-      const response: IaxiosResponse = await createChecKoutSession({
-        amount: mentor.salary || (100 as number),
-        mentorName: mentor.name || ("akhil" as string),
-        slotId: selectedSlot.id as string,
-      });
-      console.log("Booking response:", response.data);
       if (response.data) {
-        const sessionId = response.data.sessionId;
-        window.location.href = sessionId;
+        window.location.href = response.data.url;
       } else {
         errorTost("Error", [
-          { message: response.error?.data?.error || "Booking failed." },
+          {
+            message:
+              response.error?.data?.error[0].message || "Booking failed.",
+          },
         ]);
       }
     } catch (error) {
@@ -207,6 +209,21 @@ const MentorBooking = () => {
       new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1)
     );
   };
+
+  function getEndTime(startTime: string, durationMinutes: number): string {
+    const [hours, minutes] = startTime.split(":").map(Number);
+    const totalStartMinutes = hours * 60 + minutes;
+    const totalEndMinutes = totalStartMinutes + durationMinutes;
+
+    const endHours = Math.floor(totalEndMinutes / 60);
+    const endMinutes = totalEndMinutes % 60;
+
+    // Pad with leading zeros if needed
+    const formattedHours = endHours.toString().padStart(2, "0");
+    const formattedMinutes = endMinutes.toString().padStart(2, "0");
+
+    return `${formattedHours}:${formattedMinutes}`;
+  }
 
   const monthNames = [
     "January",
@@ -356,7 +373,7 @@ const MentorBooking = () => {
                       <Clock className="w-6 h-6 text-gray-600 group-hover:text-white" />
                     </div>
                     <span className="font-bold text-xl text-black">
-                      {slot.time}
+                      {slot.startTime}
                     </span>
                     <span className="text-sm text-gray-500 mt-1">
                       {slot.duration} min
@@ -394,15 +411,24 @@ const MentorBooking = () => {
                   <div className="p-4 bg-gray-50 rounded-2xl flex justify-between">
                     <Clock className="w-6 h-6 mr-2 text-gray-600" />
                     <span className="font-bold text-black">
-                      {selectedSlot.time}
+                      {selectedSlot.startTime +
+                        " - " +
+                        getEndTime(
+                          selectedSlot.startTime,
+                          selectedSlot.duration
+                        )}
                     </span>
                   </div>
                 </div>
                 <button
                   onClick={handleBooking}
-                  className="w-full bg-black text-white py-6 rounded-2xl font-bold text-lg hover:bg-gray-800 transition-all transform hover:scale-105"
+                  className="w-full text-white bg-zinc-800 hover:bg-zinc-900  p-5 rounded-md flex justify-center"
                 >
-                  Confirm Booking
+                  {createChecKoutSessionIsloading ? (
+                    <Loader className="animate-spin" />
+                  ) : (
+                    "Confirm Booking"
+                  )}
                 </button>
               </div>
             </div>

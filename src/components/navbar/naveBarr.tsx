@@ -48,9 +48,13 @@ import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import NotificationDropdown from "../common/notification/notificationDropdown";
 import { UserUrls } from "@/@types/urlEnums/UserUrls";
 import { MentorUrl } from "@/@types/urlEnums/MentorUrl";
-import { useFetchMentorProfileImageMutation } from "@/services/apis/MentorApis";
+import {
+  useFetchMentorProfileImageMutation,
+  useFetchMentorProfileMutation,
+} from "@/services/apis/MentorApis";
 import { useGetUser } from "@/hooks/useGetUser";
 import SubscriptionModal from "../common/subscription/SubscriptionModal";
+import { useFetchUserProfileMutation } from "@/services/apis/UserApis";
 
 // Define the interface for navigation items
 interface NavigationItem {
@@ -77,7 +81,6 @@ interface NavbarProps {
   navigationItems?: NavigationItem[];
   pageCategories?: PageCategory[];
   showCenterNavigation?: boolean;
-  showSubscription?: boolean;
   customSignOutMutation?: (email: string) => Promise<IaxiosResponse>;
 }
 
@@ -173,7 +176,6 @@ function ReusableNavbar({
   navigationItems,
   pageCategories,
   showCenterNavigation = true,
-  showSubscription = false,
   customSignOutMutation,
 }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
@@ -191,14 +193,13 @@ function ReusableNavbar({
   const dispatch = useDispatch();
   const [fetchProfileImage] = useFetchMentorProfileImageMutation();
   const [profilePhoto, setProfilePhoto] = useState<string>("");
+  const [fetchUserProfileData] = useFetchUserProfileMutation();
+  const [fetchMentorProfileData] = useFetchMentorProfileMutation();
 
   // Use provided navigation items or default ones
   const finalNavigationItems =
     navigationItems || getDefaultNavigationItems(role);
   const finalPageCategories = pageCategories || getDefaultPageCategories(role);
-
-  // Determine if subscription should be shown (only for users)
-  const shouldShowSubscription = showSubscription && user ? true : false;
 
   const handleSignOutUser = async (): Promise<void> => {
     try {
@@ -235,15 +236,9 @@ function ReusableNavbar({
     setIsSubscriptionModalOpen(true);
   };
 
-  const handleSubscriptionPurchase = (planId: string): void => {
-    // Handle subscription purchase logic here
-    console.log("Purchasing plan:", planId);
-    // You can implement your actual purchase logic here
-  };
-
   const isAuthenticated = user?.role === role;
   const userAvatar = profilePhoto || profileImage;
-
+  const [isPremium, setPremium] = useState<boolean>(false);
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -275,6 +270,30 @@ function ReusableNavbar({
     };
 
     fetchUserData();
+  }, [user]);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response: IaxiosResponse =
+          user?.role == USER_ROLE.USER
+            ? await fetchUserProfileData(user!.id)
+            : await fetchMentorProfileData(user!.id);
+
+        if (response.data.data) {
+
+          setPremium(response.data.data.premiumId ? true : false);
+        }
+      } catch (err) {
+        console.error("Error fetching users:", err);
+        errorTost("Data Load Failed", [
+          { message: "Something went wrong please try again" },
+        ]);
+      }
+    };
+    if (user) {
+      fetchUserData();
+    }
   }, [user]);
 
   return (
@@ -372,7 +391,7 @@ function ReusableNavbar({
             {/* Desktop Right Side */}
             <div className="hidden md:flex items-center space-x-4 pr-0 mr-0">
               {/* Subscription Icon */}
-              {shouldShowSubscription && (
+              {!isPremium && (
                 <motion.button
                   onClick={handleSubscriptionClick}
                   className="flex items-center space-x-1 px-3 py-2 bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-500 hover:from-yellow-500 hover:via-orange-500 hover:to-yellow-600 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-300"
@@ -442,7 +461,7 @@ function ReusableNavbar({
                     )}
                     Theme
                   </DropdownMenuItem>
-                  {shouldShowSubscription && (
+                  {!isPremium && (
                     <DropdownMenuItem onClick={handleSubscriptionClick}>
                       <Crown size={16} className="mr-2" />
                       Subscription
@@ -492,7 +511,7 @@ function ReusableNavbar({
             {/* Mobile Menu Button */}
             <div className="md:hidden flex items-center space-x-2">
               {/* Mobile Subscription Icon */}
-              {shouldShowSubscription && (
+              {!isPremium && (
                 <button
                   onClick={handleSubscriptionClick}
                   className="p-2 text-gray-600 dark:text-gray-400 hover:text-yellow-500 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors duration-200"
@@ -683,7 +702,7 @@ function ReusableNavbar({
                       <span className="text-sm">Toggle Theme</span>
                     </button>
 
-                    {shouldShowSubscription && (
+                    {!isPremium && (
                       <motion.button
                         onClick={handleSubscriptionClick}
                         className="flex items-center space-x-1 px-3 py-2 bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-500 hover:from-yellow-500 hover:via-orange-500 hover:to-yellow-600 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-300"
@@ -757,8 +776,6 @@ function ReusableNavbar({
       <SubscriptionModal
         isOpen={isSubscriptionModalOpen}
         onClose={() => setIsSubscriptionModalOpen(false)}
-        currentSubscription={user?.subscription || undefined}
-        onPurchase={handleSubscriptionPurchase}
       />
     </>
   );

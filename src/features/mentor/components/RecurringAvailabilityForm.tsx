@@ -58,7 +58,7 @@ export const RecurringAvailabilityForm = ({
       duration: duration || 60,
       startDate: startDate || "",
       endDate: endDate || "",
-      salary: recurringForm.salary || 0,
+      salary: salary || 0,
       description: description || "",
     });
   }, [
@@ -167,7 +167,7 @@ export const RecurringAvailabilityForm = ({
             <input
               type="number"
               {...register("salary", { valueAsNumber: true })}
-              placeholder="Amount"
+              placeholder="salary"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             {errors.salary && (

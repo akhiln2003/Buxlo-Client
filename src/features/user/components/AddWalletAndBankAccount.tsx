@@ -31,7 +31,11 @@ interface InewWallet {
   userId: string;
 }
 
-type IchangeWalletName = Omit<Iwallet, "balance">;
+interface IchangeWalletName {
+  id: string;
+  currentName?: string;
+  name: string;
+}
 
 function AddWalletAndBankAccount() {
   const [activeTab, setActiveTab] = useState("wallet");
@@ -41,6 +45,7 @@ function AddWalletAndBankAccount() {
   const [changeWalletName, setChangeWalletName] = useState<IchangeWalletName>({
     id: "",
     name: "",
+    currentName: "",
   });
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -77,7 +82,12 @@ function AddWalletAndBankAccount() {
 
   const handilChangeWalletName = async () => {
     try {
-      const response: IaxiosResponse = await updateWalletName(changeWalletName);
+      const data = { name: changeWalletName.name };
+      const response: IaxiosResponse = await updateWalletName({
+        name: changeWalletName.currentName as string,
+        id: changeWalletName.id,
+        data,
+      });
       if (response.data) {
         setWallet(
           (prev) =>
@@ -188,14 +198,14 @@ function AddWalletAndBankAccount() {
                   onOpenChange={setIsEditDialogOpen}
                 >
                   <DialogTrigger asChild>
-                    <Pencil
+                    {w.name != "Primary" && (<Pencil
                       size={18}
                       className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer"
                       aria-label="Edit wallet"
                       onClick={() => {
-                        setChangeWalletName({ id: w.id, name: w.name });
+                        setChangeWalletName({ id: w.id, name: w.name   });
                       }}
-                    />
+                    />)}
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-md">
                     <DialogHeader>
@@ -247,16 +257,20 @@ function AddWalletAndBankAccount() {
               onOpenChange={setIsCreateDialogOpen}
             >
               <DialogTrigger asChild>
-               {  wallet && wallet?.length < 5 && <div
-                  className="w-full h-auto border-dashed border-2 border-zinc-300 dark:border-zinc-700 rounded-md flex items-center justify-center p-4 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/70 transition-colors"
-                  role="button"
-                  aria-label="Add wallet"
-                >
-                  <div className="flex flex-col items-center text-zinc-500 dark:text-zinc-400">
-                    <Plus size={24} className="mb-2" />
-                    <span className="text-sm font-medium">Add New Wallet</span>
+                {wallet && wallet?.length < 5 && (
+                  <div
+                    className="w-full h-auto border-dashed border-2 border-zinc-300 dark:border-zinc-700 rounded-md flex items-center justify-center p-4 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/70 transition-colors"
+                    role="button"
+                    aria-label="Add wallet"
+                  >
+                    <div className="flex flex-col items-center text-zinc-500 dark:text-zinc-400">
+                      <Plus size={24} className="mb-2" />
+                      <span className="text-sm font-medium">
+                        Add New Wallet
+                      </span>
+                    </div>
                   </div>
-                </div>}
+                )}
               </DialogTrigger>
 
               <DialogContent className="sm:max-w-md w-full p-6 rounded-2xl shadow-lg bg-white dark:bg-zinc-900">

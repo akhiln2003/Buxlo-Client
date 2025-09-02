@@ -27,7 +27,11 @@ interface TableListProps<T extends { id: string; isBlocked?: boolean }> {
   data: T[];
   onAction?: (id: string, isBlocked: boolean) => void;
   pagination?: PaginationData;
-onPageChange?: (page: number, select?: string, searchData?: string) => Promise<void>;
+  onPageChange?: (
+    page: number,
+    select?: string,
+    searchData?: string
+  ) => Promise<void>;
 }
 
 export function TableList<T extends { id: string; isBlocked?: boolean }>({
@@ -93,15 +97,13 @@ export function TableList<T extends { id: string; isBlocked?: boolean }>({
           </TableBody>
         </Table>
 
-        {pagination && pagination.totalPages > 1 && onPageChange && (
-          <div className="w-full mt-8 flex justify-end">
-            <PageNation
-              pageNationData={pagination}
-              fetchUserData={onPageChange}
-              setpageNationData={() => {}}
-            />
-          </div>
-        )}
+        <div className="w-full mt-8 flex justify-end">
+          <PageNation
+            pageNationData={pagination ?? { pageNum: 1, totalPages: 1 }}
+            fetchUserData={onPageChange ?? (async () => {})}
+            setpageNationData={() => {}}
+          />
+        </div>
       </div>
     </div>
   );

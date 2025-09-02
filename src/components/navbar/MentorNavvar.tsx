@@ -12,7 +12,6 @@ function MentorNavbar() {
       subscriptionUrl={MentorUrl.subscription}
       signInUrl={MentorUrl.signIn}
       showCenterNavigation={true}
-      showSubscription={true}
     />
   );
 }

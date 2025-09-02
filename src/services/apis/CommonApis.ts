@@ -69,10 +69,18 @@ export const commonApi = createApi({
 
     // Update Wallet Name
     updateWalletName: builder.mutation({
-      query: ({ id, name }: { id: string; name: string }) => ({
-        url: `${CommonApiEndPoints.updateWalletName}/${id}`,
+      query: ({
+        id,
+        name,
+        data,
+      }: {
+        id: string;
+        name: string;
+        data: { name: string };
+      }) => ({
+        url: `${CommonApiEndPoints.updateWalletName}/${id}/${name}`,
         method: "PATCH",
-        data: { name },
+        data: data,
       }),
     }),
 
@@ -82,6 +90,14 @@ export const commonApi = createApi({
         url: CommonApiEndPoints.createWallet,
         method: "POST",
         data: { data },
+      }),
+    }),
+
+    // Fetch contacts
+    fetchContacts: builder.mutation({
+      query: (id) => ({
+        url: `${CommonApiEndPoints.fetchContacts}?id=${id}`,
+        method: "GET",
       }),
     }),
 
@@ -128,22 +144,47 @@ export const commonApi = createApi({
       }),
     }),
 
-    // Create Checkout Session
-    createCheckoutSession: builder.mutation({
-      query: ({
-        amount,
-        mentorName,
-        slotId,
-      }: {
-        amount: number;
-        mentorName: string;
-        slotId: string;
-      }) => ({
-        url: CommonApiEndPoints.createCheckoutSession,
+    // Create Bookingn Checkout Session
+    createBookingCheckoutSession: builder.mutation({
+      query: ({ data, userId, type }) => ({
+        url: `${CommonApiEndPoints.createBookingCheckoutSession}/${userId}/${type}`,
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        data: data,
+      }),
+    }),
 
-        data: { amount, mentorName, slotId },
+    // Create Subscription Checkout Session
+    createSubscriptionCheckoutSession: builder.mutation({
+      query: ({ data, userId, type }) => ({
+        url: `${CommonApiEndPoints.createSubscriptionCheckoutSession}/${userId}/${type}`,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        data: data,
+      }),
+    }),
+
+    // Create Subscription Checkout Session
+    useUpdateSubscriptionPlan: builder.mutation({
+      query: ({ data, id }) => ({
+        url: `${CommonApiEndPoints.updateSubscriptionPaymet}/${id}`,
+        method: "POST",
+        data: data,
+      }),
+    }), // Create Subscription Checkout Session
+    useUpdateBookingPlan: builder.mutation({
+      query: ({ data, id }) => ({
+        url: `${CommonApiEndPoints.updateBookingPaymet}/${id}`,
+        method: "POST",
+        data: data,
+      }),
+    }),
+
+    // fetch one Payment
+    fetchOnePaymet: builder.mutation({
+      query: (id) => ({
+        url: `${CommonApiEndPoints.fetchOnePaymet}/${id}`,
+        method: "GET",
       }),
     }),
 
@@ -160,10 +201,15 @@ export const {
   useFetchUserWalletMutation,
   useUpdateWalletNameMutation,
   useCreateWalletMutation,
+  useFetchContactsMutation,
   useCreateNotificationMutation,
   useFetchNotificationsMutation,
   useReadNotificationsMutation,
   useDeleteNotificationsMutation,
   useFetchSubscriptionPlanMutation,
-  useCreateCheckoutSessionMutation,
+  useCreateBookingCheckoutSessionMutation,
+  useCreateSubscriptionCheckoutSessionMutation,
+  useUseUpdateBookingPlanMutation,
+  useUseUpdateSubscriptionPlanMutation,
+  useFetchOnePaymetMutation,
 } = commonApi;

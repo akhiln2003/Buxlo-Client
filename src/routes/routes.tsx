@@ -50,7 +50,7 @@ const MentorProfilePage = lazy(() => import("@/features/mentor/pages/profile"));
 const MentorAppointmentPange = lazy(
   () => import("@/features/mentor/pages/appointment")
 );
-const MentorBooking = lazy(()=>import("@/features/user/pages/mentorBooking"))
+const MentorBooking = lazy(() => import("@/features/user/pages/mentorBooking"));
 
 ////////////////////////--Mentor side--/////////////////////
 ////////////////////////--Admin side--/////////////////////
@@ -85,7 +85,15 @@ const Call = lazy(() => import("@/pages/call"));
 const Notification = lazy(
   () => import("@/components/common/notification/notification")
 );
+const BookingPaymentSuccess = lazy(
+  () => import("@/components/common/payment/bookingSucess")
+);
 
+const SubscriptionPaymentPage = lazy(
+  () => import("@/components/common/payment/subscriptionSucess")
+);
+
+const PaymentCancelPage = lazy(()=>import("@/components/common/payment/cancel"))
 ////////////////////////--Common side--////////////////////
 
 const routes = createBrowserRouter(
@@ -234,7 +242,7 @@ const routes = createBrowserRouter(
             </UserProtected>
           ),
         },
-         {
+        {
           path: `${UserUrls.booking}/:mentorId`,
           element: (
             <UserProtected>
@@ -246,7 +254,6 @@ const routes = createBrowserRouter(
         },
       ],
     },
-    
 
     ////////////////--User end--///////////////////
 
@@ -467,6 +474,36 @@ const routes = createBrowserRouter(
           ),
         },
       ],
+    },
+    {
+      path: UserUrls.bookingSucess,
+      element: (
+        <UserProtected>
+          <Suspense fallback={<div>Loading ....</div>}>
+            <BookingPaymentSuccess />
+          </Suspense>
+        </UserProtected>
+      ),
+    },
+    {
+      path: UserUrls.subscriptionSucess,
+      element: (
+        <UserProtected>
+          <Suspense fallback={<div>Loading ....</div>}>
+            <SubscriptionPaymentPage />
+          </Suspense>
+        </UserProtected>
+      ),
+    },
+    {
+      path: UserUrls.paymetnCalcel,
+      element: (
+        <UserProtected>
+          <Suspense fallback={<div>Loading ....</div>}>
+            <PaymentCancelPage />
+          </Suspense>
+        </UserProtected>
+      ),
     },
     { path: "/servererror", element: <ErrorPage500 /> },
     { path: "*", element: <ErrorPage404 /> },

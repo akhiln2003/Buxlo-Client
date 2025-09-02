@@ -116,7 +116,7 @@ export function ChatSidebar({
                 />
                 <div
                   className={`absolute bottom-0 right-0 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full border-2 border-white dark:border-zinc-900 ${
-                    onlineUsers.has(contact.participantDetails[0]._id)
+                    onlineUsers.has(contact.participantDetails[0].id)
                       ? "bg-green-500"
                       : "bg-gray-400"
                   }`}

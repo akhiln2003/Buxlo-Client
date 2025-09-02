@@ -2,20 +2,17 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { useGetUser } from "@/hooks/useGetUser";
 import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
 import { errorTost } from "@/components/ui/tosastMessage";
-import {
-  useFetchContactsMutation,
-  useFetchUserProfileImageMutation,
-} from "@/services/apis/UserApis";
+import { useFetchUserProfileImageMutation } from "@/services/apis/UserApis";
 import { useFetchMentorProfileImageMutation } from "@/services/apis/MentorApis";
 import { USER_ROLE } from "@/@types/userRoleEnum";
-import { ChatSidebar } from "@/components/common/chat/ChatSidebar";
 import { ChatHeader } from "@/components/common/chat/ChatHeader";
 import { ChatMessages } from "@/components/common/chat/ChatMessages";
 import { ChatInputContainer } from "@/components/common/chat/ChatInput";
-import { useFetchMessageMutation } from "@/services/apis/CommonApis";
+import { useFetchContactsMutation, useFetchMessageMutation } from "@/services/apis/CommonApis";
 import { MessageCircle } from "lucide-react";
 import { SocketContext } from "@/contexts/socketContext";
 import { useCall } from "@/contexts/videoCallContext";
+import { ChatSidebar } from "@/components/common/chat/ChatSidebar";
 
 // Types
 export interface IparticipantDetails {
@@ -26,7 +23,7 @@ export interface IparticipantDetails {
   role: "mentor" | "user";
   status: boolean;
   updatedAt: string;
-  _id: string;
+  id: string;
 }
 
 export interface Icontacts {
@@ -208,7 +205,7 @@ export default function Chat() {
       if (response.data) {
         setMessages(response.data.messages);
         if (response.data.messages.length > 0) {
-          const receiverId = contact.participantDetails[0]._id;
+          const receiverId = contact.participantDetails[0].id;
 
           socketContext?.socket?.emit("mark_messages_read", {
             chatId: response.data.messages[0].chatId,
@@ -235,7 +232,7 @@ export default function Chat() {
   const handleStartVideoCall = (contact: Icontacts) => {
     const remoteUser = contact.participantDetails[0];
     startVideoCall(
-      remoteUser._id,
+      remoteUser.id,
       remoteUser.name,
       remoteUser.avatar,
       onlineUsers
@@ -280,13 +277,13 @@ export default function Chat() {
                 setMessages={setMessages}
                 userId={user?.id as string}
                 chatId={activeChat.id}
-                receiverId={activeChat.participantDetails[0]._id}
+                receiverId={activeChat.participantDetails[0].id}
               />
             </div>
             <ChatInputContainer
               setMessages={setMessages}
               chatId={activeChat.id}
-              receiverId={activeChat.participantDetails[0]._id}
+              receiverId={activeChat.participantDetails[0].id}
               senderId={user?.id as string}
             />
           </div>
