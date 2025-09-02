@@ -1,7 +1,7 @@
 import { Search } from "lucide-react";
 import dummyProfileImage from "@/assets/images/dummy-profile.webp";
 import { Icontacts } from "@/pages/chat";
-import { Iuser } from "@/@types/interface/Iuser";
+import { IUserDB } from "@/@types/interface/IDataBase";
 
 interface ChatSidebarProps {
   showSidebar: boolean;
@@ -11,7 +11,7 @@ interface ChatSidebarProps {
   handleChatSelect: (contact: Icontacts) => void;
   myProfile: string;
   profileImage: string[];
-  user: Iuser | null;
+  user: IUserDB | null;
 }
 
 export function ChatSidebar({

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { CreateModal } from "../components/CreateAdv";
-import { ItrustedUs } from "@/@types/interface/ItrustedUs";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
-import { Iadv } from "@/@types/interface/Iadv";
+import { ITrustedUs } from "@/@types/interface/ITrustedUs";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
+import { IAdv } from "@/@types/interface/IAdv";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { Trash2 } from "lucide-react";
 import {
@@ -33,8 +33,8 @@ const AdvManagement = () => {
     pageNum: 1,
     totalPages: 0,
   });
-  const [trustedUsData, setTrustedUsData] = useState<ItrustedUs[]>([]);
-  const [advData, setAdvData] = useState<Iadv[]>([]);
+  const [trustedUsData, setTrustedUsData] = useState<ITrustedUs[]>([]);
+  const [advData, setAdvData] = useState<IAdv[]>([]);
   const [trustedUsImage, setTrustedUsImage] = useState<string[]>([]);
   const [advImage, setAdvImage] = useState<string[]>([]);
 
@@ -45,7 +45,7 @@ const AdvManagement = () => {
 
   const fetchAdv = async (page: number = 1) => {
     try {
-      const advResponse: IaxiosResponse = await fetchAdvData(page);
+      const advResponse: IAxiosResponse = await fetchAdvData(page);
 
       if (advResponse.data.advs) {
         setAdvData(advResponse.data.advs);
@@ -54,11 +54,11 @@ const AdvManagement = () => {
           totalPages: advResponse.data.totalPages,
         }));
         const advKeys: string[] = advResponse.data.advs.map(
-          (val: ItrustedUs) => `Adv/${val.image}`
+          (val: ITrustedUs) => `Adv/${val.image}`
         );
 
         if (advKeys.length > 0) {
-          const trustedUsImageUrls: IaxiosResponse = await fetchAdvImages({
+          const trustedUsImageUrls: IAxiosResponse = await fetchAdvImages({
             keys: advKeys,
           });
 
@@ -82,7 +82,7 @@ const AdvManagement = () => {
 
   const fetchTrustedUs = async (page: number = 1) => {
     try {
-      const trustedUsResponse: IaxiosResponse = await fetchTrustedUsData(page);
+      const trustedUsResponse: IAxiosResponse = await fetchTrustedUsData(page);
 
       if (trustedUsResponse.data.trustedUs) {
         setTrustedUsData(trustedUsResponse.data.trustedUs);
@@ -91,11 +91,11 @@ const AdvManagement = () => {
           totalPages: trustedUsResponse.data.totalPages,
         }));
         const trustedUsKeys: string[] = trustedUsResponse.data.trustedUs.map(
-          (val: ItrustedUs) => `TrustedUs/${val.image}`
+          (val: ITrustedUs) => `TrustedUs/${val.image}`
         );
 
         if (trustedUsKeys.length > 0) {
-          const trustedUsImageUrls: IaxiosResponse = await fetchTrustedUsImages(
+          const trustedUsImageUrls: IAxiosResponse = await fetchTrustedUsImages(
             { keys: trustedUsKeys }
           );
           if (trustedUsImageUrls.data.imageUrl) {
@@ -167,7 +167,9 @@ const AdvManagement = () => {
         setAdvData={setAdvData}
         advData={advData}
         setAdvImage={setAdvImage}
-        fetchFunction={deleteData?.type == 'trustedUs'? fetchTrustedUs : fetchAdv}
+        fetchFunction={
+          deleteData?.type == "trustedUs" ? fetchTrustedUs : fetchAdv
+        }
       />
 
       <div className="w-full mt-[2rem] p-4 md:p-10 ">

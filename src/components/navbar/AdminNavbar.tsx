@@ -41,7 +41,7 @@ import { addUser } from "@/redux/slices/userSlice";
 import { RootState } from "@/redux/store";
 import { useState } from "react";
 import { USER_ROLE } from "@/@types/userRoleEnum";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import NotificationDropdown from "../common/notification/notificationDropdown";
 
 function AdminNavbar() {
@@ -60,7 +60,7 @@ function AdminNavbar() {
   };
 
   const handleSignOutUser = async () => {
-    const response: IaxiosResponse = await signOut(user?.email);
+    const response: IAxiosResponse = await signOut(user?.email);
     if (response.data) {
       dispatch(addUser(null));
       navigate(AdminUrls.signIn);

@@ -1,10 +1,10 @@
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { Button } from "@/components/ui/button";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
 import { Loader, PencilIcon, Trash2 } from "lucide-react";
 import React, { useState } from "react";
 import dummyProfileImage from "@/assets/images/dummy-profile.webp";
-import { Iuser } from "@/@types/interface/Iuser";
+import { IUser } from "@/@types/interface/IUser";
 import {
   useDeleteUserProfileImageMutation,
   useFetchUserProfileImageMutation,
@@ -26,7 +26,7 @@ function EditProfilePhoto({
   profileImage: string;
   setProfileImage: (isPhotoDialogOpen: string) => void;
   setIsPhotoDialogOpen: (isPhotoDialogOpen: boolean) => void;
-  setUsers: React.Dispatch<React.SetStateAction<Partial<Iuser>>>;
+  setUsers: React.Dispatch<React.SetStateAction<Partial<IUser>>>;
   avatar: string;
 }) {
   const [newProfileImage, setNewProfileImage] = useState<File | null>(null);
@@ -58,7 +58,7 @@ function EditProfilePhoto({
     if (!newProfileImage) return;
 
     try {
-      const response: IaxiosResponse = await updateProfile({
+      const response: IAxiosResponse = await updateProfile({
         id,
         newProfileImage,
         currentProfileImage: avatar,
@@ -69,12 +69,12 @@ function EditProfilePhoto({
           ...prev,
           avatar: response.data.data.avatar,
         }));
-        if(user){
-          dispatch(addUser({...user, avatar: response.data.data.avatar }));
+        if (user) {
+          dispatch(addUser({ ...user, avatar: response.data.data.avatar }));
         }
-        const imageUrl: IaxiosResponse = await fetchProfileImages(
-        [`UserProfiles/${response.data.data.avatar }`]
-        );
+        const imageUrl: IAxiosResponse = await fetchProfileImages([
+          `UserProfiles/${response.data.data.avatar}`,
+        ]);
 
         if (imageUrl.data) {
           setProfileImage(imageUrl.data.imageUrl[0]);
@@ -99,7 +99,7 @@ function EditProfilePhoto({
   };
 
   const handleCancel = async () => {
-    const response: IaxiosResponse = await deleteProfileImages({
+    const response: IAxiosResponse = await deleteProfileImages({
       id,
       key: avatar,
     });

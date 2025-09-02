@@ -2,7 +2,7 @@ import { X } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { UserUrls } from "@/@types/urlEnums/UserUrls";
 import { errorTost } from "@/components/ui/tosastMessage";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { useEffect } from "react";
 import {
   useUseUpdateBookingPlanMutation,
@@ -22,7 +22,7 @@ const PaymentCancel = () => {
       const data = { status: "cancelled" };
 
       if (type == "booking") {
-        const response: IaxiosResponse = await updateBooking({ id, data });
+        const response: IAxiosResponse = await updateBooking({ id, data });
 
         if (response.error) {
           errorTost("Error", [
@@ -34,7 +34,7 @@ const PaymentCancel = () => {
           ]);
         }
       } else {
-        const response: IaxiosResponse = await updateSbuscription({ id, data });
+        const response: IAxiosResponse = await updateSbuscription({ id, data });
 
         if (response.error) {
           errorTost("Error", [

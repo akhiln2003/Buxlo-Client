@@ -1,14 +1,14 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
-import { Ipayment } from "@/@types/interface/Ipayment";
+import { IPayment } from "@/@types/interface/IPayment";
 import { Link, useSearchParams } from "react-router-dom";
 import { errorTost } from "@/components/ui/tosastMessage";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { useFetchOnePaymetMutation } from "@/services/apis/CommonApis";
 import { UserUrls } from "@/@types/urlEnums/UserUrls";
 
 const BookingSuccess = () => {
-  const [paymentDetails, setPaymentDetails] = useState<Ipayment | null>(null);
+  const [paymentDetails, setPaymentDetails] = useState<IPayment | null>(null);
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
   const [fetchPayment] = useFetchOnePaymetMutation();
@@ -42,7 +42,7 @@ const BookingSuccess = () => {
 
   const fetchData = async (id: string) => {
     try {
-      const response: IaxiosResponse = await fetchPayment(id);
+      const response: IAxiosResponse = await fetchPayment(id);
       if (response.data) {
         setPaymentDetails(response.data.payment);
       } else {
@@ -65,8 +65,6 @@ const BookingSuccess = () => {
   useEffect(() => {
     fetchData(id!);
   }, []);
-
-  console.log("::::::::::::::::::", paymentDetails);
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">

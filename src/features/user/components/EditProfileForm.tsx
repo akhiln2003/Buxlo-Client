@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import {
   Form,
   FormControl,
@@ -15,7 +15,7 @@ import {
 import { EditProfileSchema } from "../zodeSchema/EditProfileSchema";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { Loader } from "lucide-react";
-import { Iuser } from "@/@types/interface/Iuser";
+import { IUser } from "@/@types/interface/IUser";
 import { useUpdateUserProfileMutation } from "@/services/apis/UserApis";
 
 export function EditUserProfile({
@@ -23,9 +23,9 @@ export function EditUserProfile({
   setIsOpen,
   setUsers,
 }: {
-  users: Partial<Iuser>;
+  users: Partial<IUser>;
   setIsOpen: (isOpen: boolean) => void;
-  setUsers: React.Dispatch<React.SetStateAction<Partial<Iuser>>>;
+  setUsers: React.Dispatch<React.SetStateAction<Partial<IUser>>>;
 }) {
   const [updateProfile, { isLoading }] = useUpdateUserProfileMutation();
   const form = useForm<z.infer<typeof EditProfileSchema>>({
@@ -43,7 +43,7 @@ export function EditUserProfile({
         name: users.name !== data.name ? data.name : undefined,
       };
 
-      const response: IaxiosResponse = await updateProfile({ id, updatedData });
+      const response: IAxiosResponse = await updateProfile({ id, updatedData });
       if (response.data.data) {
         setIsOpen(false);
         setUsers(response.data.data);
@@ -123,7 +123,7 @@ export function EditUserProfile({
           </Button>
           <Button
             onClick={form.handleSubmit(onSubmit)}
-            disabled={isLoading || !form.formState.isDirty as boolean}
+            disabled={isLoading || (!form.formState.isDirty as boolean)}
             className="bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:hover:bg-gray-100 dark:text-gray-900"
           >
             {isLoading && <Loader className="mr-2 h-4 w-4 animate-spin" />}

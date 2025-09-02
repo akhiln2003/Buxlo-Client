@@ -1,4 +1,4 @@
-export class Inotification {
+export class INotification {
   constructor(
     public recipient: string,
     public type: "update" | "warning" | "error" | "success" | "message",

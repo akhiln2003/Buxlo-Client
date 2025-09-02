@@ -17,8 +17,8 @@ import {
   useFetchNotificationsMutation,
   useReadNotificationsMutation,
 } from "@/services/apis/CommonApis";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
-import { Inotification } from "@/@types/interface/Inotification";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
+import { INotification } from "@/@types/interface/INotification";
 import { SocketContext } from "@/contexts/socketContext";
 import SearchInput from "@/components/ui/searchInput";
 import { PageNation } from "@/components/ui/pageNation";
@@ -46,7 +46,7 @@ const formatTimeAgo = (dateString: string) => {
   return `${Math.floor(diff / 86400)}d`;
 };
 
-interface Inotifications extends Inotification {
+interface Inotifications extends INotification {
   icon?: React.ElementType;
   color?: string;
   time?: string;
@@ -76,7 +76,7 @@ const NotificationPage = () => {
     ) => {
       const userId = id || user?.id;
       try {
-        const response: IaxiosResponse = await fetchNotifications({
+        const response: IAxiosResponse = await fetchNotifications({
           userId,
           page,
           status,
@@ -86,7 +86,7 @@ const NotificationPage = () => {
         if (response.data) {
           const rawNotifs = response.data.notifications;
           const mapped: Inotifications[] = rawNotifs.map(
-            (n: Inotification) => ({
+            (n: INotification) => ({
               ...n,
               read: n.status !== "unread",
               icon: iconMap[n.type as keyof typeof iconMap] || Bell,
@@ -139,7 +139,7 @@ const NotificationPage = () => {
     const socket = socketContext.notificationSocket;
     if (!socket) return;
 
-    const handleNotification = (data: Inotification) => {
+    const handleNotification = (data: INotification) => {
       const newNotification: Inotifications = {
         ...data,
         read: data.status !== "unread",
@@ -159,7 +159,7 @@ const NotificationPage = () => {
 
   const markAsRead = async (id: string) => {
     try {
-      const response: IaxiosResponse = await readNotification([
+      const response: IAxiosResponse = await readNotification([
         { id, status: "read" },
       ]);
 
@@ -195,7 +195,7 @@ const NotificationPage = () => {
     }));
 
     try {
-      const response: IaxiosResponse = await readNotification(payload);
+      const response: IAxiosResponse = await readNotification(payload);
 
       if (response.data) {
         socketContext?.notificationSocket?.emit("mark_all_read", {
@@ -223,7 +223,7 @@ const NotificationPage = () => {
 
   const deleteNotification = async (id: string) => {
     try {
-      const response: IaxiosResponse = await notificationDelete([id]);
+      const response: IAxiosResponse = await notificationDelete([id]);
       if (response.data) {
         successToast("Delete", response.data.response);
         setNotifications((prev) => prev.filter((notif) => notif.id !== id));

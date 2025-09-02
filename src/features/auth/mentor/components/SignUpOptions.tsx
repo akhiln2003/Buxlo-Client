@@ -14,7 +14,7 @@ import { useDispatch } from "react-redux";
 import { useGoogleAuthMentMutation } from "@/services/apis/AuthApis";
 import { GoogleCredentialResponse, GoogleLogin } from "@react-oauth/google";
 import { useTheme } from "@/contexts/themeContext";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 
 function SignUpOptions({ setIsFormVisible }: IsignUpOptionProps) {
   const [showMore, setShowMore] = useState<boolean>(false);
@@ -34,7 +34,7 @@ function SignUpOptions({ setIsFormVisible }: IsignUpOptionProps) {
     try {
       if (respons?.credential) {
         // Call your API to handle Google login or signup
-        const response: IaxiosResponse = await googleAuth({
+        const response: IAxiosResponse = await googleAuth({
           token: respons.credential,
         });
         if (response.data?.user) {

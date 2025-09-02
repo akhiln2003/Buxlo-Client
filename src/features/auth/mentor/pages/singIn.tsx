@@ -12,7 +12,7 @@ import { errorTost } from "@/components/ui/tosastMessage";
 import { GoogleCredentialResponse, GoogleLogin } from "@react-oauth/google";
 
 import BGIMG from "@/assets/images/MentorLoginPageBG.avif";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 
 function SignIn() {
   const { isDarkMode } = useTheme();
@@ -25,7 +25,7 @@ function SignIn() {
   const handleGoogleSignUp = async (respons: GoogleCredentialResponse) => {
     try {
       if (respons?.credential) {
-        const response: IaxiosResponse = await googleAuth({
+        const response: IAxiosResponse = await googleAuth({
           token: respons.credential,
         });
         if (response.data?.user) {

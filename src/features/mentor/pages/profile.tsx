@@ -21,14 +21,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 // Using built-in menu solution
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
 import { useGetUser } from "@/hooks/useGetUser";
 import {
   useFetchMentorProfileImageMutation,
   useFetchMentorProfileMutation,
 } from "@/services/apis/MentorApis";
-import { Imentor } from "@/@types/interface/Imentor";
+import { IMentor } from "@/@types/interface/IMentor";
 import { EditMentorProfile } from "../components/EditProfileForm";
 import EditProfilePhoto from "../components/EditProfilePhoto";
 import KycVerificationForm from "../components/KycVerificationForm";
@@ -49,7 +49,7 @@ const Profile = () => {
 
   const [fetchProfileData] = useFetchMentorProfileMutation();
   const [fetchProfileImages] = useFetchMentorProfileImageMutation();
-  const [users, setUsers] = useState<Partial<Imentor>>({});
+  const [users, setUsers] = useState<Partial<IMentor>>({});
   const [profileImage, setProfileImage] = useState("");
   const storUserData = useGetUser();
   const [updatePassword, { isLoading: isLoadingChangePassword }] =
@@ -57,7 +57,7 @@ const Profile = () => {
 
   const onSubmitChangePassword = async (data: ChangePasswordType) => {
     try {
-      const response: IaxiosResponse = await updatePassword({
+      const response: IAxiosResponse = await updatePassword({
         userId: storUserData?.id as string,
         currentPassword: data.currentPassword,
         newPassword: data.newPassword,
@@ -103,13 +103,13 @@ const Profile = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response: IaxiosResponse = await fetchProfileData(
+        const response: IAxiosResponse = await fetchProfileData(
           storUserData!.id
         );
         if (response.data.data) {
           setUsers(response.data.data);
           if (response.data.data.avatar) {
-            const imageUrl: IaxiosResponse = await fetchProfileImages([
+            const imageUrl: IAxiosResponse = await fetchProfileImages([
               `MentorProfiles/${response.data.data.avatar}`,
             ]);
             if (imageUrl.data.imageUrl) {
@@ -456,7 +456,7 @@ const Profile = () => {
             </DialogTitle>
           </DialogHeader>
           <EditMentorProfile
-            users={users as Imentor}
+            users={users as IMentor}
             setIsOpen={setIsEditProfileOpen}
             setUsers={setUsers}
           />

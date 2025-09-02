@@ -1,4 +1,4 @@
-export class Iadv {
+export class IAdv {
   constructor(
     public image: string,
     public title: string,

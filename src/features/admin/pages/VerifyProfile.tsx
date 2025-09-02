@@ -1,4 +1,4 @@
-import { Imentor } from "@/@types/interface/Imentor";
+import { IMentor } from "@/@types/interface/IMentor";
 import { useVerifyProfile } from "@/hooks/useAdminVerifyProfile";
 import { VerifyProfileHeader } from "../components/VerifyProfileHeader";
 import { VerifyProfileCard } from "../components/VerifyProfileCard";
@@ -43,7 +43,7 @@ const VerifyProfilePage = () => {
               </h2>
             </div>
           ) : (
-            profileData.map((profile:Imentor) => (
+            profileData.map((profile: IMentor) => (
               <VerifyProfileCard
                 key={profile.id}
                 profile={profile}

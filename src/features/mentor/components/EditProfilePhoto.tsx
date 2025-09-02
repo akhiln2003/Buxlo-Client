@@ -1,5 +1,5 @@
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
-import { Imentor } from "@/@types/interface/Imentor";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
+import { IMentor } from "@/@types/interface/IMentor";
 import { Button } from "@/components/ui/button";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
 import {
@@ -26,7 +26,7 @@ function EditProfilePhoto({
   profileImage: string;
   setProfileImage: (isPhotoDialogOpen: string) => void;
   setIsPhotoDialogOpen: (isPhotoDialogOpen: boolean) => void;
-  setUsers: React.Dispatch<React.SetStateAction<Partial<Imentor>>>;
+  setUsers: React.Dispatch<React.SetStateAction<Partial<IMentor>>>;
   avatar: string;
 }) {
   const [newProfileImage, setNewProfileImage] = useState<File | null>(null);
@@ -57,7 +57,7 @@ function EditProfilePhoto({
     if (!newProfileImage) return;
 
     try {
-      const response: IaxiosResponse = await updateProfile({
+      const response: IAxiosResponse = await updateProfile({
         id,
         newProfileImage,
         currentProfileImage: avatar,
@@ -72,7 +72,7 @@ function EditProfilePhoto({
           dispatch(addUser({ ...mentor, avatar: response.data.data.avatar }));
         }
 
-        const imageUrl: IaxiosResponse = await fetchProfileImages([
+        const imageUrl: IAxiosResponse = await fetchProfileImages([
           `MentorProfiles/${response.data.data.avatar}`,
         ]);
 
@@ -98,7 +98,7 @@ function EditProfilePhoto({
   };
 
   const handleCancel = async () => {
-    const response: IaxiosResponse = await deleteProfileImages({
+    const response: IAxiosResponse = await deleteProfileImages({
       id,
       key: avatar,
     });

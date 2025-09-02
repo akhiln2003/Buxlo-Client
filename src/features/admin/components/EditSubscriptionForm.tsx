@@ -11,11 +11,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IndianRupee, Info, Loader, Percent, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Isubscription } from "@/@types/interface/Isubscription";
+import { ISubscription } from "@/@types/interface/ISubscription";
 import { useEffect, RefObject, useState } from "react";
 import { subscriptionSchema } from "../zodeSchema/subscriptionSchema";
 import { useUpdateSubscriptionPlanMutation } from "@/services/apis/AdminApis";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
 
 const EditSubscriptionForm = ({
@@ -24,8 +24,8 @@ const EditSubscriptionForm = ({
   offerInputRef,
   setIsOpen,
 }: {
-  subscription: Isubscription;
-  setPlans: React.Dispatch<React.SetStateAction<Isubscription[]>>;
+  subscription: ISubscription;
+  setPlans: React.Dispatch<React.SetStateAction<ISubscription[]>>;
   offerInputRef?: RefObject<HTMLInputElement>;
   setIsOpen: (setIsOpen: boolean) => void;
 }) => {
@@ -70,13 +70,13 @@ const EditSubscriptionForm = ({
       const updatedData = { offer: data.offer };
       const id = subscription.id;
 
-      const response: IaxiosResponse = await updatePlan({ id, updatedData });
+      const response: IAxiosResponse = await updatePlan({ id, updatedData });
       if (response.data.updatedData) {
-        setPlans((prev: Isubscription[]) =>
-          prev.map((sub: Isubscription) =>
-            sub.type == data.type ? {...response.data.updatedData} : sub
+        setPlans((prev: ISubscription[]) =>
+          prev.map((sub: ISubscription) =>
+            sub.type == data.type ? { ...response.data.updatedData } : sub
           )
-        )
+        );
         setIsOpen(false);
         successToast("succesfull", "Subscription plan updated succefully");
       } else {

@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { ContactPageFormSchema } from "../../zodeSchema/ContactPageFormSchema";
 import { useContactUsMutation } from "@/services/apis/CommonApis";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { Loader } from "lucide-react";
 
 function ContactPageForm() {
@@ -36,11 +36,10 @@ function ContactPageForm() {
 
   const onSubmit = async (data: z.infer<typeof ContactPageFormSchema>) => {
     try {
-
-      const response: IaxiosResponse = await contactUs(data);
+      const response: IAxiosResponse = await contactUs(data);
 
       if (response.data.message) {
-      successToast("succesfull", response.data.message);        
+        successToast("succesfull", response.data.message);
       } else {
         errorTost(
           "Somthing when wrong ",
@@ -145,22 +144,21 @@ function ContactPageForm() {
 
         {/* Submit Button */}
         <div className="flex justify-end gap-4">
-          {
-            isLoading ? 
+          {isLoading ? (
             <Button
-            type="submit"
-            className=" w-2/6 bg-zinc-900 text-white dark:hover:bg-zinc-800"
-          >
-            < Loader className=" animate-spin" />
-          </Button>
-          :
-          <Button
-            type="submit"
-            className=" w-2/6 bg-zinc-900 text-white dark:hover:bg-zinc-800"
-          >
-            Submit
-          </Button>
-          }
+              type="submit"
+              className=" w-2/6 bg-zinc-900 text-white dark:hover:bg-zinc-800"
+            >
+              <Loader className=" animate-spin" />
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              className=" w-2/6 bg-zinc-900 text-white dark:hover:bg-zinc-800"
+            >
+              Submit
+            </Button>
+          )}
         </div>
       </form>
     </Form>

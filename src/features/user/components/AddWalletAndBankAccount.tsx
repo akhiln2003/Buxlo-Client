@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { useGetUser } from "@/hooks/useGetUser";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { errorTost } from "@/components/ui/tosastMessage";
 import {
   useCreateWalletMutation,
@@ -65,7 +65,7 @@ function AddWalletAndBankAccount() {
 
   const fetchWallet = async () => {
     try {
-      const response: IaxiosResponse = await fetchWalletData(user?.id);
+      const response: IAxiosResponse = await fetchWalletData(user?.id);
       if (response.data) {
         setWallet(response.data);
       } else {
@@ -83,7 +83,7 @@ function AddWalletAndBankAccount() {
   const handilChangeWalletName = async () => {
     try {
       const data = { name: changeWalletName.name };
-      const response: IaxiosResponse = await updateWalletName({
+      const response: IAxiosResponse = await updateWalletName({
         name: changeWalletName.currentName as string,
         id: changeWalletName.id,
         data,
@@ -117,7 +117,7 @@ function AddWalletAndBankAccount() {
   const handleCreateWallet = async () => {
     try {
       newWallet.userId = user?.id as string;
-      const response: IaxiosResponse = await createWallet(newWallet);
+      const response: IAxiosResponse = await createWallet(newWallet);
       if (response.data) {
         setWallet((prev) => [...(prev || []), response.data]);
         setNewWallet({
@@ -198,14 +198,16 @@ function AddWalletAndBankAccount() {
                   onOpenChange={setIsEditDialogOpen}
                 >
                   <DialogTrigger asChild>
-                    {w.name != "Primary" && (<Pencil
-                      size={18}
-                      className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer"
-                      aria-label="Edit wallet"
-                      onClick={() => {
-                        setChangeWalletName({ id: w.id, name: w.name   });
-                      }}
-                    />)}
+                    {w.name != "Primary" && (
+                      <Pencil
+                        size={18}
+                        className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer"
+                        aria-label="Edit wallet"
+                        onClick={() => {
+                          setChangeWalletName({ id: w.id, name: w.name });
+                        }}
+                      />
+                    )}
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-md">
                     <DialogHeader>

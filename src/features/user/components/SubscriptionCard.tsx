@@ -1,5 +1,5 @@
-import { Isubscription } from "@/@types/interface/Isubscription";
-import { Iuser } from "@/@types/interface/Iuser";
+import { ISubscription } from "@/@types/interface/ISubscription";
+import { IUser } from "@/@types/interface/IUser";
 import {
   Calendar,
   CheckCircle,
@@ -13,8 +13,8 @@ import {
 } from "lucide-react";
 
 interface SubscriptionCardProps {
-  users: Partial<Iuser>;
-  subscription: Isubscription | null;
+  users: Partial<IUser>;
+  subscription: ISubscription | null;
   fetchSubscriptionIsloading: boolean;
   handleSubscriptionClick: () => void;
   formatDate: (dateString: string) => string;

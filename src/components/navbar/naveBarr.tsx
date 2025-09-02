@@ -44,7 +44,7 @@ import { addUser } from "@/redux/slices/userSlice";
 import { useSignOutUserMutation } from "@/services/apis/AuthApis";
 import { errorTost } from "../ui/tosastMessage";
 import { USER_ROLE } from "@/@types/userRoleEnum";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import NotificationDropdown from "../common/notification/notificationDropdown";
 import { UserUrls } from "@/@types/urlEnums/UserUrls";
 import { MentorUrl } from "@/@types/urlEnums/MentorUrl";
@@ -81,7 +81,7 @@ interface NavbarProps {
   navigationItems?: NavigationItem[];
   pageCategories?: PageCategory[];
   showCenterNavigation?: boolean;
-  customSignOutMutation?: (email: string) => Promise<IaxiosResponse>;
+  customSignOutMutation?: (email: string) => Promise<IAxiosResponse>;
 }
 
 // Default navigation items for different roles
@@ -204,7 +204,7 @@ function ReusableNavbar({
   const handleSignOutUser = async (): Promise<void> => {
     try {
       const signOutFunction = customSignOutMutation || signOut;
-      const response: IaxiosResponse = await signOutFunction(user?.email || "");
+      const response: IAxiosResponse = await signOutFunction(user?.email || "");
       if (response.data) {
         dispatch(addUser(null));
         navigate(signInUrl);
@@ -246,7 +246,7 @@ function ReusableNavbar({
           const folderName =
             user.role == "user" ? "UserProfiles/" : "MentorProfiles/";
 
-          const imageUrl: IaxiosResponse = await fetchProfileImage([
+          const imageUrl: IAxiosResponse = await fetchProfileImage([
             `${folderName}${user.avatar}`,
           ]);
           if (imageUrl.data.imageUrl) {
@@ -275,13 +275,12 @@ function ReusableNavbar({
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response: IaxiosResponse =
+        const response: IAxiosResponse =
           user?.role == USER_ROLE.USER
             ? await fetchUserProfileData(user!.id)
             : await fetchMentorProfileData(user!.id);
 
         if (response.data.data) {
-
           setPremium(response.data.data.premiumId ? true : false);
         }
       } catch (err) {

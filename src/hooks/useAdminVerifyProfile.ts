@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
-import { Imentor } from "@/@types/interface/Imentor";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IMentor } from "@/@types/interface/IMentor";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import {
   useAdminUpdateVerifyProfileMutation,
   useFetchVerifyProfileDataMutation,
@@ -24,7 +24,7 @@ export const useVerifyProfile = () => {
     url: string;
     side: string;
   } | null>(null);
-  const [profileData, setProfileData] = useState<Imentor[]>([]);
+  const [profileData, setProfileData] = useState<IMentor[]>([]);
 
   const [fetchProfileData] = useFetchVerifyProfileDataMutation();
   const [fetchAadhaarImages] = useFethAadhaarImagesMutation();
@@ -39,13 +39,10 @@ export const useVerifyProfile = () => {
     verified = "verified"
   ) => {
     try {
-      console.log("top verifiy", id, name, verified);
-
-      const response: IaxiosResponse = await updateVerifyStatus({
+      const response: IAxiosResponse = await updateVerifyStatus({
         id,
         verified,
       });
-      console.log("response in verify ", response);
 
       if (response.data) {
         setProfileData((prevData) =>
@@ -100,7 +97,7 @@ export const useVerifyProfile = () => {
         aadhaarNumber: user.aadhaarNumber,
       };
 
-      const response: IaxiosResponse = await updateVerifyStatus({
+      const response: IAxiosResponse = await updateVerifyStatus({
         id,
         verified,
         unsetData,
@@ -143,9 +140,9 @@ export const useVerifyProfile = () => {
     }
   };
 
-  const openModal = async (profile: Imentor) => {
+  const openModal = async (profile: IMentor) => {
     try {
-      const response: IaxiosResponse = await fetchAadhaarImages([
+      const response: IAxiosResponse = await fetchAadhaarImages([
         `Kyc/${profile.aadhaarFrontImage}`,
         `Kyc/${profile.aadhaarBackImage}`,
       ]);
@@ -175,7 +172,7 @@ export const useVerifyProfile = () => {
     page = 1,
     searchData = undefined
   ) => {
-    const response: IaxiosResponse = await fetchProfileData({
+    const response: IAxiosResponse = await fetchProfileData({
       page,
       searchData,
       verified,

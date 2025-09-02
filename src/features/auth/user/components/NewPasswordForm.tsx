@@ -18,7 +18,7 @@ import { errorTost, successToast } from "@/components/ui/tosastMessage";
 import { useSetNewPasswordUserMutation } from "@/services/apis/AuthApis";
 import { useNavigate, useParams } from "react-router-dom";
 import { UserUrls } from "@/@types/urlEnums/UserUrls";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 
 export function NewPasswordForm() {
   const [isFormFilled, setIsFormFilled] = useState<boolean>(false);
@@ -50,7 +50,7 @@ export function NewPasswordForm() {
   const onSubmit = async (data: z.infer<typeof NewPasswordFormSchema>) => {
     const { password } = data;
 
-    const response: IaxiosResponse = await setNewPassword({ password, token });
+    const response: IAxiosResponse = await setNewPassword({ password, token });
     if (response.data) {
       setButtStage(!buttonStage);
       successToast("succesfull", response.data.message);

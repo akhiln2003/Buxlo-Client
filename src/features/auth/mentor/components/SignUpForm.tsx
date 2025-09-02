@@ -19,7 +19,7 @@ import { Loader } from "lucide-react";
 import { signUpFormSchema } from "../../zodeSchema/authSchema";
 import { useSignUpMentorMutation } from "@/services/apis/AuthApis";
 import { MentorUrl } from "@/@types/urlEnums/MentorUrl";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 
 // Zod Schema
 
@@ -69,7 +69,7 @@ export function SignUnForm() {
         password,
       };
 
-      const response: IaxiosResponse = await signUp(newUser);
+      const response: IAxiosResponse = await signUp(newUser);
 
       if (response.data) {
         navigate(MentorUrl.otp, { state: { name, email } });

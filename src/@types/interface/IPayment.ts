@@ -1,6 +1,6 @@
 import { IpaymentStatus } from "./PaymentStatus.enum";
 
-export class Ipayment {
+export class IPayment {
   constructor(
     public amount: number,
     public mentorId: string,

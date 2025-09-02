@@ -15,8 +15,8 @@ import {
 import { useState } from "react";
 import { TrustedUsForm } from "./TrustedUsForm";
 import { AdvForm } from "./AdvForm";
-import { ItrustedUs } from "@/@types/interface/ItrustedUs";
-import { Iadv } from "@/@types/interface/Iadv";
+import { ITrustedUs } from "@/@types/interface/ITrustedUs";
+import { IAdv } from "@/@types/interface/IAdv";
 
 export const CreateModal = ({
   isOpen,
@@ -24,15 +24,14 @@ export const CreateModal = ({
   setTrustedUsImage,
   setTrustedUsData,
   setAdvData,
-  setAdvImage
+  setAdvImage,
 }: {
   isOpen: boolean;
   setIsOpen: (setIsOpen: boolean) => void;
   setTrustedUsImage: React.Dispatch<React.SetStateAction<string[]>>;
-  setTrustedUsData: React.Dispatch<React.SetStateAction<ItrustedUs[]>>;
-  setAdvData: React.Dispatch<React.SetStateAction<Iadv[]>>;
+  setTrustedUsData: React.Dispatch<React.SetStateAction<ITrustedUs[]>>;
+  setAdvData: React.Dispatch<React.SetStateAction<IAdv[]>>;
   setAdvImage: React.Dispatch<React.SetStateAction<string[]>>;
-
 }) => {
   const [selectedOption, setSelectedOption] = useState("");
 
@@ -65,9 +64,19 @@ export const CreateModal = ({
           </Select>
 
           {selectedOption === "trusted" && (
-            <TrustedUsForm setIsOpen={setIsOpen} setTrustedUsImage={setTrustedUsImage} setTrustedUsData={setTrustedUsData}/>
+            <TrustedUsForm
+              setIsOpen={setIsOpen}
+              setTrustedUsImage={setTrustedUsImage}
+              setTrustedUsData={setTrustedUsData}
+            />
           )}
-          {selectedOption === "adv" && <AdvForm setIsOpen={setIsOpen} setAdvData={setAdvData} setAdvImage={setAdvImage} />}
+          {selectedOption === "adv" && (
+            <AdvForm
+              setIsOpen={setIsOpen}
+              setAdvData={setAdvData}
+              setAdvImage={setAdvImage}
+            />
+          )}
         </div>
       </DialogContent>
     </Dialog>

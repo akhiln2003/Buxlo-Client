@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { useFetchMessageFromS3Mutation } from "@/services/apis/CommonApis";
 import { errorTost } from "@/components/ui/tosastMessage";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { SocketContext } from "@/contexts/socketContext";
 import { InewMessage } from "@/pages/chat";
 
@@ -350,7 +350,7 @@ export const ChatMessages = ({
         const mediaKeys = mediaMessages.map(
           (msg) => `${msg.contentType}/${msg.content}`
         );
-        const response: IaxiosResponse = await fetchMedia(mediaKeys);
+        const response: IAxiosResponse = await fetchMedia(mediaKeys);
         if (response.data?.imageUrl) {
           setMediaUrls((prev) => ({
             ...prev,

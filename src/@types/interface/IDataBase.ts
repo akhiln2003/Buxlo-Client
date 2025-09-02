@@ -1,4 +1,4 @@
-export interface IuserDB {
+export interface IUserDB {
   id: string;
   createdAt: string;
   email: string;

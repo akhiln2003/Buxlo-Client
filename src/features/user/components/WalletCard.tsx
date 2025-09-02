@@ -1,4 +1,4 @@
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { errorTost } from "@/components/ui/tosastMessage";
 import {
   useCreateWalletMutation,
@@ -51,7 +51,7 @@ const WalletCard: React.FC<WalletCardProps> = ({ userId, isPremium }) => {
   const fetchWallet = async () => {
     try {
       if (!userId) return;
-      const response: IaxiosResponse = await fetchWalletData(userId);
+      const response: IAxiosResponse = await fetchWalletData(userId);
       if (response.data) {
         setWallet(response.data);
       } else {
@@ -72,9 +72,8 @@ const WalletCard: React.FC<WalletCardProps> = ({ userId, isPremium }) => {
   const handleCreateWallet = async () => {
     try {
       newWallet.userId = userId as string;
-      const response: IaxiosResponse = await createWallet(newWallet);
+      const response: IAxiosResponse = await createWallet(newWallet);
       if (response.data) {
-        console.log("dsfdsf ", response.data);
 
         setWallet((prev) => [...(prev || []), response.data.newWallet]);
         setNewWallet({

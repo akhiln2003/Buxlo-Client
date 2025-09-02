@@ -6,9 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ImagePlus, Loader, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import { Iadv } from "@/@types/interface/Iadv";
+import { IAdv } from "@/@types/interface/IAdv";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import {
   useCreateAdvMutation,
   useEditAdvMutation,
@@ -22,7 +22,7 @@ import { z } from "zod";
 
 type FormInputs = z.infer<typeof CreateAdvFormSchema>;
 
-interface IeditData extends Iadv {
+interface IeditData extends IAdv {
   currentImageUrl: string;
 }
 
@@ -34,7 +34,7 @@ export const AdvForm = ({
   editData,
 }: {
   setIsOpen: (setIsOpen: boolean) => void;
-  setAdvData: React.Dispatch<React.SetStateAction<Iadv[]>>;
+  setAdvData: React.Dispatch<React.SetStateAction<IAdv[]>>;
   setAdvImage: React.Dispatch<React.SetStateAction<string[]>>;
   editMode?: boolean;
   editData?: IeditData;
@@ -138,27 +138,22 @@ export const AdvForm = ({
       if (data.title?.trim() !== initialValues?.title) {
         formData.append("data[title]", data.title.trim());
       }
-      if ( editMode && 
-        data.title?.trim() !== initialValues?.title ||
+      if (
+        (editMode && data.title?.trim() !== initialValues?.title) ||
         data.description?.trim() !== initialValues?.description ||
-        data.image?.length > 0 
+        data.image?.length > 0
       ) {
         formData.append("data[id]", editData?.id as string);
         formData.append("data[currentImage]", editData?.image as string);
-
       }
 
       if (data.description?.trim() !== initialValues?.description) {
         formData.append("data[description]", data.description.trim());
       }
 
-
-      
-
       // Only append image if it exists and has changed
       if (data.image?.length > 0) {
         formData.append("image", data.image[0]);
-        
       }
 
       // Check if FormData is empty
@@ -167,17 +162,17 @@ export const AdvForm = ({
         return;
       }
 
-      const response: IaxiosResponse =
+      const response: IAxiosResponse =
         editMode && editData
           ? await updateAdv(formData)
           : await createAdv(formData);
 
       if (response.data.responseData) {
-        const value: Iadv = response.data.responseData;
+        const value: IAdv = response.data.responseData;
 
         if (value.image) {
           const keys: string[] = [`Adv/${value.image}`];
-          const imageUrls: IaxiosResponse = await fetchAdvImages({
+          const imageUrls: IAxiosResponse = await fetchAdvImages({
             keys: keys,
           });
 
@@ -197,10 +192,14 @@ export const AdvForm = ({
                 return newImages;
               });
             } else {
-              
-
-              setAdvImage((prev) => [ ...imageUrls.data.imageUrl , ...(prev.length >= 5 ? prev.slice(1) : prev),]);
-              setAdvData((prev) => [ value, ...(prev.length >= 5 ? prev.slice(1) : prev),]);
+              setAdvImage((prev) => [
+                ...imageUrls.data.imageUrl,
+                ...(prev.length >= 5 ? prev.slice(1) : prev),
+              ]);
+              setAdvData((prev) => [
+                value,
+                ...(prev.length >= 5 ? prev.slice(1) : prev),
+              ]);
             }
           } else {
             errorTost("Error fetching Images", imageUrls.error.data.error);

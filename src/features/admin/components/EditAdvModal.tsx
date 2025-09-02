@@ -6,17 +6,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { AdvForm } from "./AdvForm"; // Your existing form component
-import { Iadv } from "@/@types/interface/Iadv";
+import { IAdv } from "@/@types/interface/IAdv";
 
 interface EditAdvModalProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   advData: IeditData;
-  setAdvData: React.Dispatch<React.SetStateAction<Iadv[]>>;
+  setAdvData: React.Dispatch<React.SetStateAction<IAdv[]>>;
   setAdvImage: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-interface IeditData extends Iadv {
+interface IeditData extends IAdv {
   currentImageUrl: string;
 }
 export const EditAdvModal = ({

@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import {
   Form,
   FormControl,
@@ -16,7 +16,7 @@ import { EditProfileSchema } from "../zodeSchema/EditProfileSchema";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { Loader } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
-import { Imentor } from "@/@types/interface/Imentor";
+import { IMentor } from "@/@types/interface/IMentor";
 import { useUpdateMentorProfileMutation } from "@/services/apis/MentorApis";
 
 export function EditMentorProfile({
@@ -24,9 +24,9 @@ export function EditMentorProfile({
   setIsOpen,
   setUsers,
 }: {
-  users: Imentor;
+  users: IMentor;
   setIsOpen: (isOpen: boolean) => void;
-  setUsers: React.Dispatch<React.SetStateAction<Partial<Imentor>>>;
+  setUsers: React.Dispatch<React.SetStateAction<Partial<IMentor>>>;
 }) {
   const [updateProfile, { isLoading }] = useUpdateMentorProfileMutation();
   const form = useForm<z.infer<typeof EditProfileSchema>>({
@@ -57,7 +57,7 @@ export function EditMentorProfile({
             ? data.yearsOfExperience
             : undefined,
       };
-      const response: IaxiosResponse = await updateProfile({ id, updatedData });
+      const response: IAxiosResponse = await updateProfile({ id, updatedData });
 
       if (response.data) {
         setIsOpen(false);

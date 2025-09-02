@@ -6,8 +6,8 @@ import {
   useFetchMentorsMutation,
 } from "@/services/apis/AuthApis";
 import { errorTost } from "@/components/ui/tosastMessage";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
-import { IuserDB } from "@/@types/interface/IdataBase";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
+import { IUserDB } from "@/@types/interface/IDataBase";
 import { ColumnConfig, TableList } from "@/components/ui/tableList";
 import SearchInput from "@/components/ui/searchInput";
 
@@ -59,10 +59,10 @@ function MentorManagement() {
     totalPages: 0,
   });
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [users, setUsers] = useState<IuserDB[]>([]);
+  const [users, setUsers] = useState<IUserDB[]>([]);
 
   const handileBlock = async (id: string, isBlocked: boolean) => {
-    const response: IaxiosResponse = await userAction({ id, isBlocked });
+    const response: IAxiosResponse = await userAction({ id, isBlocked });
     if (response.data) {
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
@@ -81,7 +81,7 @@ function MentorManagement() {
 
   const fetchUserData = async (page = 1, searchData = searchQuery) => {
     try {
-      const response: IaxiosResponse = await fetchUsers({ page, searchData }); // `unwrap` gets the raw response
+      const response: IAxiosResponse = await fetchUsers({ page, searchData }); // `unwrap` gets the raw response
 
       if (response.data) {
         setUsers(response.data.data.users);

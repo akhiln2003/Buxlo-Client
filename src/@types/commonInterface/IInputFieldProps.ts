@@ -1,6 +1,6 @@
 import React from 'react'
 
-export interface IinputFieldProps{
+export interface IInputFieldProps{
     value: string | number;
     label?:string; 
     name: string; 

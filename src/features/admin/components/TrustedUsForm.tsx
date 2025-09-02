@@ -3,13 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ImagePlus, Loader, X } from "lucide-react";
 import { useState } from "react";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import {
   useCreateTrustedUsMutation,
   useFetchTrustedUsImageMutation,
 } from "@/services/apis/AdminApis";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
-import { ItrustedUs } from "@/@types/interface/ItrustedUs";
+import { ITrustedUs } from "@/@types/interface/ITrustedUs";
 
 interface FormInputs {
   image: FileList;
@@ -22,7 +22,7 @@ export const TrustedUsForm = ({
 }: {
   setIsOpen: (setIsOpen: boolean) => void;
   setTrustedUsImage: React.Dispatch<React.SetStateAction<string[]>>;
-  setTrustedUsData: React.Dispatch<React.SetStateAction<ItrustedUs[]>>;
+  setTrustedUsData: React.Dispatch<React.SetStateAction<ITrustedUs[]>>;
 }) => {
   const { register, handleSubmit, setValue } = useForm<FormInputs>();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -54,13 +54,13 @@ export const TrustedUsForm = ({
 
     try {
       const image = data.image[0];
-      const response: IaxiosResponse = await uploadImage({ image });
+      const response: IAxiosResponse = await uploadImage({ image });
       if (response.data.data) {
-        const value: ItrustedUs = response.data.data;
+        const value: ITrustedUs = response.data.data;
 
         if (value.image) {
           const keys: string[] = [`TrustedUs/${value.image}`];
-          const trustedUsImageUrls: IaxiosResponse = await fetchTrustedUsImages(
+          const trustedUsImageUrls: IAxiosResponse = await fetchTrustedUsImages(
             {
               keys: keys,
             }

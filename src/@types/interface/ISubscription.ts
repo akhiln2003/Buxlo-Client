@@ -1,4 +1,4 @@
-export class Isubscription {
+export class ISubscription {
   constructor(
     public price: number,
     public type: string,

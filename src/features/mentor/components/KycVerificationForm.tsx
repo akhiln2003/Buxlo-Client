@@ -15,10 +15,10 @@ import {
 import { Loader } from "lucide-react";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
 import { KycVerificationSchema } from "../zodeSchema/KycVerificationSchema";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { useKycVerificationMutation } from "@/services/apis/MentorApis";
 import { KycImageUploader } from "./KycImageUploader";
-import { Imentor } from "@/@types/interface/Imentor";
+import { IMentor } from "@/@types/interface/IMentor";
 import { SocketContext } from "@/contexts/socketContext";
 import { useGetUser } from "@/hooks/useGetUser";
 import { useCreateNotificationMutation } from "@/services/apis/CommonApis";
@@ -30,7 +30,7 @@ export function KycVerificationForm({
 }: {
   id: string;
   setVerifyIsOpen: (isOpen: boolean) => void;
-  setUsers: React.Dispatch<React.SetStateAction<Partial<Imentor>>>;
+  setUsers: React.Dispatch<React.SetStateAction<Partial<IMentor>>>;
 }) {
   const [frontImagePreview, setFrontImagePreview] = useState<string | null>(
     null
@@ -106,7 +106,7 @@ export function KycVerificationForm({
       if (data.backImage) {
         formData.append("backImage", data.backImage);
       }
-      const response: IaxiosResponse = await kycVerify(formData);
+      const response: IAxiosResponse = await kycVerify(formData);
 
       if (response.data.responseData) {
         setUsers((prev) => ({

@@ -24,13 +24,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EditSubscriptionModal } from "../components/EditSubscriptionModal";
 import { useAddSubscriptionPlanMutation } from "@/services/apis/AdminApis";
-import { Isubscription } from "@/@types/interface/Isubscription";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { ISubscription } from "@/@types/interface/ISubscription";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { useFetchSubscriptionPlanMutation } from "@/services/apis/CommonApis";
 
 const Dashboard = () => {
-  const [plans, setPlans] = useState<Isubscription[]>([]);
+  const [plans, setPlans] = useState<ISubscription[]>([]);
   const [fetchPlan] = useFetchSubscriptionPlanMutation();
   const [addPlans] = useAddSubscriptionPlanMutation();
 
@@ -80,7 +80,7 @@ const Dashboard = () => {
     );
     if (filteredPlans.length) {
       try {
-        const planResponse: IaxiosResponse = await addPlans(filteredPlans);
+        const planResponse: IAxiosResponse = await addPlans(filteredPlans);
 
         if (planResponse.data.newPlans) {
           setPlans(planResponse.data.newPlans);
@@ -97,7 +97,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const planResponse: IaxiosResponse = await fetchPlan();
+        const planResponse: IAxiosResponse = await fetchPlan();
         const newPlans = planResponse.data.data;
         if (planResponse.data.data) {
           setPlans(planResponse.data.data);

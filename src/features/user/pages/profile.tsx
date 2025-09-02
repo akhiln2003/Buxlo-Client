@@ -7,9 +7,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { EditUserProfile } from "../components/EditProfileForm";
-import { Iuser } from "@/@types/interface/Iuser";
+import { IUser } from "@/@types/interface/IUser";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { useGetUser } from "@/hooks/useGetUser";
 import {
   useFetchUserProfileImageMutation,
@@ -49,7 +49,7 @@ const Profile = () => {
   const [profileImage, setProfileImage] = useState("");
   const [subscription, setSubscription] = useState<ISubscription | null>(null);
   const [fetchProfileImages] = useFetchUserProfileImageMutation();
-  const [users, setUsers] = useState<Partial<Iuser>>({});
+  const [users, setUsers] = useState<Partial<IUser>>({});
   const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
   const [updatePassword, { isLoading: isLoadingChangePassword }] =
     useChanegePasswordMutation();
@@ -61,7 +61,7 @@ const Profile = () => {
 
   const onSubmitChangePassword = async (data: ChangePasswordType) => {
     try {
-      const response: IaxiosResponse = await updatePassword({
+      const response: IAxiosResponse = await updatePassword({
         userId: storUserData?.id as string,
         currentPassword: data.currentPassword,
         newPassword: data.newPassword,
@@ -91,13 +91,13 @@ const Profile = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response: IaxiosResponse = await fetchProfileData(
+        const response: IAxiosResponse = await fetchProfileData(
           storUserData!.id
         );
         if (response.data.data) {
           setUsers(response.data.data);
           if (response.data.data.avatar) {
-            const imageUrl: IaxiosResponse = await fetchProfileImages([
+            const imageUrl: IAxiosResponse = await fetchProfileImages([
               `UserProfiles/${response.data.data.avatar}`,
             ]);
             if (imageUrl.data.imageUrl) {
@@ -134,7 +134,7 @@ const Profile = () => {
     const fetchSubscription = async () => {
       try {
         if (!users.premiumId) return;
-        const response: IaxiosResponse = await fetchSubscriptionData(
+        const response: IAxiosResponse = await fetchSubscriptionData(
           users.premiumId
         );
 
@@ -245,10 +245,6 @@ const Profile = () => {
         return ["Premium features"];
     }
   };
-
-
-  
-
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-blue-50 dark:from-zinc-900 dark:to-zinc-800 py-4 px-4 sm:py-8">

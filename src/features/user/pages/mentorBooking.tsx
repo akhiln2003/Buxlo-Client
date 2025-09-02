@@ -10,10 +10,10 @@ import {
   Star,
   Loader,
 } from "lucide-react";
-import {  useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { errorTost } from "@/components/ui/tosastMessage";
-import { Imentor } from "@/@types/interface/Imentor";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IMentor } from "@/@types/interface/IMentor";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import {
   useFetchMentorProfileImageMutation,
   useFetchMentorProfileMutation,
@@ -43,7 +43,7 @@ const MentorBooking = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [bookingStep, setBookingStep] = useState("calendar");
   const { mentorId } = useParams();
-  const [mentor, setMentor] = useState<Partial<Imentor>>({});
+  const [mentor, setMentor] = useState<Partial<IMentor>>({});
   const [fetchProfileData] = useFetchMentorProfileMutation();
   const [fetchProfileImages] = useFetchMentorProfileImageMutation();
   const [createChecKoutSession, { isLoading: createChecKoutSessionIsloading }] =
@@ -53,13 +53,13 @@ const MentorBooking = () => {
   // Fetch mentor data
   const fetchMentor = async (id: string) => {
     try {
-      const response: IaxiosResponse = await fetchProfileData(id);
+      const response: IAxiosResponse = await fetchProfileData(id);
 
       if (response.data.data) {
         const mentorData = { ...response.data.data };
 
         if (mentorData.avatar) {
-          const imageUrl: IaxiosResponse = await fetchProfileImages([
+          const imageUrl: IAxiosResponse = await fetchProfileImages([
             `MentorProfiles/${mentorData.avatar}`,
           ]);
 
@@ -80,7 +80,7 @@ const MentorBooking = () => {
 
   const fetchSlots = async () => {
     try {
-      const response: IaxiosResponse = await findSlots(mentor.id);
+      const response: IAxiosResponse = await findSlots(mentor.id);
       if (response.data) {
         setSlots(response.data.slots);
       } else {
@@ -163,10 +163,10 @@ const MentorBooking = () => {
         name: mentor.name,
         ...selectedSlot,
       };
-      const response: IaxiosResponse = await createChecKoutSession({
+      const response: IAxiosResponse = await createChecKoutSession({
         data,
         userId: user?.id as string,
-        type:"booking"
+        type: "booking",
       });
 
       if (response.data) {

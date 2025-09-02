@@ -7,7 +7,7 @@ import { SlotCard } from "../components/SlotCard";
 import { recurringFormSchema } from "../zodeSchema/RecurringFormSchema";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
 import { useGetUser } from "@/hooks/useGetUser";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import {
   useCreateOneSlotMutation,
   useCreateRecurringSlotMutation,
@@ -33,7 +33,7 @@ export interface AvailabilityRule {
   startTime: string;
   duration: number;
   startDate: string;
-  salary:number;
+  salary: number;
   endDate: string;
   description?: string;
 }
@@ -162,7 +162,7 @@ const Appointment: React.FC = () => {
         status: "available",
       };
       if (oneTimeSlot.duration) newSlot.description = oneTimeSlot.description;
-      const response: IaxiosResponse = await createOneSlot(newSlot);
+      const response: IAxiosResponse = await createOneSlot(newSlot);
 
       if (response.data) {
         const newSlot = response.data.newSlot;
@@ -192,7 +192,6 @@ const Appointment: React.FC = () => {
   };
 
   const addRecurringRule = async () => {
-    
     const result = recurringFormSchema.safeParse(recurringForm);
     if (!result.success) {
       errorTost("Something wrong", [
@@ -214,7 +213,7 @@ const Appointment: React.FC = () => {
       newRule.description = recurringForm.description;
 
     try {
-      const response: IaxiosResponse = await createRecurringSlot(newRule);
+      const response: IAxiosResponse = await createRecurringSlot(newRule);
       if (response.data) {
         const newSlot = response.data.newSlot;
         if (newSlot.length) {
@@ -269,7 +268,7 @@ const Appointment: React.FC = () => {
 
   const fetchDatas = async () => {
     try {
-      const response: IaxiosResponse = await fetchSlots(user?.id);
+      const response: IAxiosResponse = await fetchSlots(user?.id);
       if (response.data) {
         setSlots(response.data.slots);
       } else {

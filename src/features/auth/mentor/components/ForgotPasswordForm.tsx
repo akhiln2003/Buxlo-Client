@@ -16,7 +16,7 @@ import { Loader } from "lucide-react";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
 import { ForgotPasswordFormSchema } from "../../zodeSchema/authSchema";
 import { useForgotPasswordMentorMutation } from "@/services/apis/AuthApis";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 
 export function ForgotPasswordForm() {
   const [isFormFilled, setIsFormFilled] = useState<boolean>(false);
@@ -42,7 +42,7 @@ export function ForgotPasswordForm() {
   const onSubmit = async (data: z.infer<typeof ForgotPasswordFormSchema>) => {
     const { email } = data;
 
-    const response: IaxiosResponse = await forgotPassword({ email });
+    const response: IAxiosResponse = await forgotPassword({ email });
 
     if (response.data) {
       setButtStage(!buttonStage);

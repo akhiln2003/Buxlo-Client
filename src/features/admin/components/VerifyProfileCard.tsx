@@ -1,14 +1,17 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { User, CheckCircle, XCircle } from "lucide-react";
-import { Imentor } from "@/@types/interface/Imentor";
+import { IMentor } from "@/@types/interface/IMentor";
 
 interface ProfileCardProps {
-  profile: Imentor;
-  onViewDetails: (profile: Imentor) => void;
+  profile: IMentor;
+  onViewDetails: (profile: IMentor) => void;
 }
 
-export const VerifyProfileCard = ({ profile, onViewDetails }: ProfileCardProps) => (
+export const VerifyProfileCard = ({
+  profile,
+  onViewDetails,
+}: ProfileCardProps) => (
   <Card className="bg-white dark:bg-zinc-800 hover:shadow-lg transition-shadow relative">
     <CardContent className="p-6">
       <div className="absolute top-4 right-4">
@@ -38,14 +41,19 @@ export const VerifyProfileCard = ({ profile, onViewDetails }: ProfileCardProps) 
               {profile.aadhaarName ? profile.aadhaarName : profile.name}
             </h2>
             <p className="mt-1 text-sm text-gray-600 dark:text-zinc-400 break-all">
-              Aadhaar: {profile.aadhaarNumber ? profile.aadhaarNumber : "XXX XXX XXX"}
+              Aadhaar:{" "}
+              {profile.aadhaarNumber ? profile.aadhaarNumber : "XXX XXX XXX"}
             </p>
           </div>
         </div>
 
         <div className="flex justify-end mt-auto pt-4">
           {profile.verified === "verificationPending" && (
-            <Button variant="outline" size="sm" onClick={() => onViewDetails(profile)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onViewDetails(profile)}
+            >
               View Details
             </Button>
           )}

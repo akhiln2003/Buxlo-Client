@@ -3,9 +3,9 @@ import { Button } from "@/components/ui/button";
 import { MentorListSideBar } from "../components/MentorListSide";
 import { MentorListCard } from "../components/MentorListCard";
 import { useFetchMentorsListMutation } from "@/services/apis/UserApis";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { errorTost } from "@/components/ui/tosastMessage";
-import { Imentor } from "@/@types/interface/Imentor";
+import { IMentor } from "@/@types/interface/IMentor";
 import { PageNation } from "@/components/ui/pageNation";
 import SearchInput from "@/components/ui/searchInput";
 import { Menu } from "lucide-react";
@@ -30,7 +30,7 @@ const STORAGE_KEY = "mentorFilters";
 const ListMentors = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [mentors, setMentors] = useState<Imentor[]>([]);
+  const [mentors, setMentors] = useState<IMentor[]>([]);
   const [loading, setLoading] = useState(false);
   const [pageNationData, setPageNationData] = useState({
     pageNum: 1,
@@ -93,18 +93,18 @@ const ListMentors = () => {
     ) => {
       try {
         setLoading(true);
-        const response: IaxiosResponse = await fetchMentors({
+        const response: IAxiosResponse = await fetchMentors({
           page,
           experience,
           rating,
           salary,
           searchData,
         });
-        
+
         if (response.data) {
           // Extract only required fields
           const filteredMentors = response.data.datas.map(
-            (mentor: Imentor) => ({
+            (mentor: IMentor) => ({
               id: mentor.id,
               name: mentor.name,
               email: mentor.email,

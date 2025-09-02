@@ -1,8 +1,8 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { axiosBaseQuery } from "../axios/axiosBaseQuery";
-import { IcontactUsData } from "@/@types/interface/IuserApisQuery";
+import { IContactUsData } from "@/@types/interface/IUserApisQuery";
 import { CommonApiEndPoints } from "../endPoints/CommonEndPoints";
-import { Inotification } from "@/@types/interface/Inotification";
+import { INotification } from "@/@types/interface/INotification";
 
 export const commonApi = createApi({
   reducerPath: "commonApi",
@@ -26,7 +26,7 @@ export const commonApi = createApi({
 
     // signUp new
     contactUs: builder.mutation({
-      query: (data: IcontactUsData) => ({
+      query: (data: IContactUsData) => ({
         url: CommonApiEndPoints.countactUs,
         method: "POST",
         data: data,
@@ -103,7 +103,7 @@ export const commonApi = createApi({
 
     // Create Notification
     createNotification: builder.mutation({
-      query: (data: Inotification) => ({
+      query: (data: INotification) => ({
         url: CommonApiEndPoints.createNotification,
         method: "POST",
         data: { data },

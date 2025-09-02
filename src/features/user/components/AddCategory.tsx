@@ -33,7 +33,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { DialogTrigger } from "@radix-ui/react-dialog";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { useMoneyCategorizeMutation } from "@/services/apis/UserApis";
 import { Icategory } from "../pages/dashBord";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
@@ -64,7 +64,7 @@ function AddCategory({
   const [updateNewCategory] = useMoneyCategorizeMutation();
   const handleSubmit = async () => {
     try {
-      const response: IaxiosResponse = await updateNewCategory({
+      const response: IAxiosResponse = await updateNewCategory({
         name,
         amount,
         chartType,

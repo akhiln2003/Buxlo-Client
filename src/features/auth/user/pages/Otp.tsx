@@ -13,7 +13,7 @@ import {
   useVerifyUserMutation,
 } from "@/services/apis/AuthApis";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { useDispatch } from "react-redux";
 import { addUser } from "@/redux/slices/userSlice";
 import { otpFormSchema } from "../../zodeSchema/authSchema";
@@ -56,7 +56,7 @@ function Otp() {
 
   const onSubmit = async (data: z.infer<typeof otpFormSchema>) => {
     const otp = data.otpOne + data.otpTwo + data.otpThree + data.otpFour;
-    const response: IaxiosResponse = await verifyOtp({ otp, email });
+    const response: IAxiosResponse = await verifyOtp({ otp, email });
 
     if (response.data?.user) {
       const user = response.data.user;
@@ -102,7 +102,7 @@ function Otp() {
   const handilResendOtp = async () => {
     setresendTimer(false);
     setTimeout(() => setresendTimer(true), 100000);
-    const response: IaxiosResponse = await resendOtp({ email, name });
+    const response: IAxiosResponse = await resendOtp({ email, name });
     if (response.data) {
       successToast("OTP sended", response.data.message);
     } else {

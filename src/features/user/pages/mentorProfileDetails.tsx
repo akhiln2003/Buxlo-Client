@@ -3,12 +3,12 @@ import { ThumbsDown, ThumbsUp } from "lucide-react";
 import dummyProfileImage from "@/assets/images/dummy-profile.webp";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import {
   useFetchMentorProfileImageMutation,
   useFetchMentorProfileMutation,
 } from "@/services/apis/MentorApis";
-import { Imentor } from "@/@types/interface/Imentor";
+import { IMentor } from "@/@types/interface/IMentor";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useGetUser } from "@/hooks/useGetUser";
@@ -24,7 +24,7 @@ interface FeedbackCardProps {
 const AccountantProfile = () => {
   const [fetchProfileData] = useFetchMentorProfileMutation();
   const [fetchProfileImages] = useFetchMentorProfileImageMutation();
-  const [mentor, setMentor] = useState<Partial<Imentor>>({});
+  const [mentor, setMentor] = useState<Partial<IMentor>>({});
   const [profileImage, setProfileImage] = useState("");
   const { mentorId } = useParams();
   const navigate = useNavigate();
@@ -34,11 +34,11 @@ const AccountantProfile = () => {
   const fetchMentor = async (id: string) => {
     try {
       if (!id) navigate("/notfount");
-      const response: IaxiosResponse = await fetchProfileData(id);
+      const response: IAxiosResponse = await fetchProfileData(id);
       if (response.data.data) {
         setMentor(response.data.data);
         if (response.data.data.avatar) {
-          const imageUrl: IaxiosResponse = await fetchProfileImages([
+          const imageUrl: IAxiosResponse = await fetchProfileImages([
             `MentorProfiles/${response.data.data.avatar}`,
           ]);
           if (imageUrl.data.imageUrl) {
@@ -63,7 +63,7 @@ const AccountantProfile = () => {
 
   const contactMentor = async (userId: string, mentorId: string) => {
     try {
-      const response: IaxiosResponse = await connectMentor({
+      const response: IAxiosResponse = await connectMentor({
         userId,
         mentorId,
       });

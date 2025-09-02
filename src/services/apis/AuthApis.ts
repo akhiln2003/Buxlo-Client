@@ -2,11 +2,11 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { axiosBaseQuery } from "../axios/axiosBaseQuery";
 import { UserApiEndPoints } from "../endPoints/UserEndPoints";
 import {
-  InewUserData,
-  IresendOtpData,
-  IsignInData,
-  IverifyOtpData,
-} from "@/@types/interface/IuserApisQuery";
+  INewUserData,
+  IResendOtpData,
+  ISignInData,
+  IVerifyOtpData,
+} from "@/@types/interface/IUserApisQuery";
 import { MentorApiEndPoints } from "../endPoints/MentorEndPoints";
 import { AdminApiEndPoints } from "../endPoints/AdminEndPoints";
 
@@ -19,7 +19,7 @@ export const authApi = createApi({
 
     // signUp new
     signUpUser: builder.mutation({
-      query: (newUser: InewUserData) => ({
+      query: (newUser: INewUserData) => ({
         url: UserApiEndPoints.signUp,
         method: "POST",
         data: newUser,
@@ -28,7 +28,7 @@ export const authApi = createApi({
 
     // signUp new user Otp verification
     verifyUser: builder.mutation({
-      query: (data: IverifyOtpData) => ({
+      query: (data: IVerifyOtpData) => ({
         url: UserApiEndPoints.verifyOtp,
         method: "POST",
         data: data,
@@ -37,7 +37,7 @@ export const authApi = createApi({
 
     // Resend OTP
     resendOtpUser: builder.mutation({
-      query: (data: IresendOtpData) => ({
+      query: (data: IResendOtpData) => ({
         url: UserApiEndPoints.resendOtp,
         method: "POST",
         data: data,
@@ -46,7 +46,7 @@ export const authApi = createApi({
 
     // signIn
     signInUser: builder.mutation({
-      query: (data: IsignInData) => ({
+      query: (data: ISignInData) => ({
         url: UserApiEndPoints.signIn,
         method: "POST",
         data: data,
@@ -94,7 +94,7 @@ export const authApi = createApi({
 
     // signUp
     signUpMentor: builder.mutation({
-      query: (newUser: InewUserData) => ({
+      query: (newUser: INewUserData) => ({
         url: MentorApiEndPoints.signUp,
         method: "POST",
         data: newUser,
@@ -103,7 +103,7 @@ export const authApi = createApi({
 
     // signUp Otp verification
     verifyMentor: builder.mutation({
-      query: (data: IverifyOtpData) => ({
+      query: (data: IVerifyOtpData) => ({
         url: MentorApiEndPoints.verifyOtp,
         method: "POST",
         data: data,
@@ -112,7 +112,7 @@ export const authApi = createApi({
 
     // Resend OTP
     resendOtpMentor: builder.mutation({
-      query: (data: IresendOtpData) => ({
+      query: (data: IResendOtpData) => ({
         url: MentorApiEndPoints.resendOtp,
         method: "POST",
         data: data,
@@ -129,7 +129,7 @@ export const authApi = createApi({
 
     // signIn
     signInMentor: builder.mutation({
-      query: (data: IsignInData) => ({
+      query: (data: ISignInData) => ({
         url: MentorApiEndPoints.signIn,
         method: "POST",
         data: data,
@@ -177,7 +177,7 @@ export const authApi = createApi({
 
     // signIn
     signInAdmin: builder.mutation({
-      query: (data: IsignInData) => ({
+      query: (data: ISignInData) => ({
         url: AdminApiEndPoints.signIn,
         method: "POST",
         data: data,
@@ -186,7 +186,7 @@ export const authApi = createApi({
 
     // Fetch users
     fetchUsers: builder.mutation({
-      query: ({page,searchData}) => ({
+      query: ({ page, searchData }) => ({
         url: `${AdminApiEndPoints.fetchUsers}?page=${page}&&searchData=${searchData}`,
         method: "GET",
       }),
@@ -194,22 +194,20 @@ export const authApi = createApi({
 
     // Fetch mentors
     fetchMentors: builder.mutation({
-      query: ({page , searchData}) => ({
-        url:   `${AdminApiEndPoints.fetchMentors}?page=${page}&&searchData=${searchData}`,
+      query: ({ page, searchData }) => ({
+        url: `${AdminApiEndPoints.fetchMentors}?page=${page}&&searchData=${searchData}`,
         method: "GET",
       }),
     }),
 
-     // Block and  unblock user
-     blockandunblock: builder.mutation({
+    // Block and  unblock user
+    blockandunblock: builder.mutation({
       query: (data) => ({
         url: AdminApiEndPoints.blockandunblock,
         method: "PUT",
-        data:data
+        data: data,
       }),
     }),
-
-
 
     ///////////////////////////////--Mentor end--///////////////////////////
   }),

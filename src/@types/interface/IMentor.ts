@@ -1,4 +1,4 @@
-export class Imentor {
+export class IMentor {
     constructor(
       public name: string,
       public email: string,

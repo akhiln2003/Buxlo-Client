@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { useGetUser } from "@/hooks/useGetUser";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { useFetchUserProfileImageMutation } from "@/services/apis/UserApis";
 import { useFetchMentorProfileImageMutation } from "@/services/apis/MentorApis";
@@ -8,7 +8,10 @@ import { USER_ROLE } from "@/@types/userRoleEnum";
 import { ChatHeader } from "@/components/common/chat/ChatHeader";
 import { ChatMessages } from "@/components/common/chat/ChatMessages";
 import { ChatInputContainer } from "@/components/common/chat/ChatInput";
-import { useFetchContactsMutation, useFetchMessageMutation } from "@/services/apis/CommonApis";
+import {
+  useFetchContactsMutation,
+  useFetchMessageMutation,
+} from "@/services/apis/CommonApis";
 import { MessageCircle } from "lucide-react";
 import { SocketContext } from "@/contexts/socketContext";
 import { useCall } from "@/contexts/videoCallContext";
@@ -72,7 +75,7 @@ export default function Chat() {
 
   const fetchContacts = async (id: string) => {
     try {
-      const response: IaxiosResponse = await getContacts(id);
+      const response: IAxiosResponse = await getContacts(id);
       if (response.data) {
         setContacts(response.data.constats);
         const avatars: string[] = response.data.constats.flatMap(
@@ -86,7 +89,7 @@ export default function Chat() {
             )
         );
         if (avatars.length) {
-          const imageUrl: IaxiosResponse = await fetchMentorProfileImages(
+          const imageUrl: IAxiosResponse = await fetchMentorProfileImages(
             avatars
           );
           if (imageUrl.data) {
@@ -114,7 +117,7 @@ export default function Chat() {
 
   const fetchMyProfile = async () => {
     try {
-      const imageUrl: IaxiosResponse =
+      const imageUrl: IAxiosResponse =
         user?.role === USER_ROLE.MENTOR
           ? await fetchMentorProfileImages([`MentorProfiles/${user?.avatar}`])
           : await fetchUserProfileImages([`UserProfiles/${user?.avatar}`]);
@@ -197,7 +200,7 @@ export default function Chat() {
         )
       );
 
-      const response: IaxiosResponse = await getMessages({
+      const response: IAxiosResponse = await getMessages({
         id: contact.id,
         receiverId: user?.id,
       });

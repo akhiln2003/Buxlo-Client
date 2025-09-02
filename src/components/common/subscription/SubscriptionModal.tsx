@@ -5,7 +5,7 @@ import {
   useCreateSubscriptionCheckoutSessionMutation,
   useFetchSubscriptionPlanMutation,
 } from "@/services/apis/CommonApis";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { useGetUser } from "@/hooks/useGetUser";
 
@@ -166,16 +166,13 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
   const handlePurchase = async (plan: SubscriptionPlan) => {
     setIsLoading(true);
     try {
-      const select = rowPlans.filter((data)=>data.id == plan.id)
-      console.log("::::: " , select);
-      
+      const select = rowPlans.filter((data) => data.id == plan.id);
 
-      const response: IaxiosResponse = await createChecKoutSession({
+      const response: IAxiosResponse = await createChecKoutSession({
         userId: user?.id as string,
         data: select[0],
         type: "subscription",
       });
-      console.log("ddeecdeddre ", response);
 
       if (response.data) {
         window.location.href = response.data.url;
@@ -196,10 +193,10 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
 
   const fetchSubscriptions = async () => {
     try {
-      const response: IaxiosResponse = await fetchPlan();
+      const response: IAxiosResponse = await fetchPlan();
 
       if (response.data.data && Array.isArray(response.data.data)) {
-        setRowPlans(response.data.data)
+        setRowPlans(response.data.data);
         const transformedPlans = transformBackendData(response.data.data);
 
         const sortedPlans = transformedPlans.sort((a, b) => {

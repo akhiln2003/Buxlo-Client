@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Iadv } from "@/@types/interface/Iadv";
+import { useState } from "react";
+import { IAdv } from "@/@types/interface/IAdv";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { EllipsisVertical, Pencil, Trash2 } from "lucide-react";
-import { EditAdvModal } from './EditAdvModal';
+import { EditAdvModal } from "./EditAdvModal";
 
 type DeleteData = {
   id: string;
@@ -25,12 +25,12 @@ const EditAndDeleteDropdownMenu = ({
   currentImageUrl,
   setAdvImage,
 }: {
-  item: Iadv;
+  item: IAdv;
   index: number;
-  currentImageUrl:string
+  currentImageUrl: string;
   setDeleteData: (data: DeleteData) => void;
   setDeleteIsOpen: (setDeleteIsOpen: boolean) => void;
-  setAdvData: React.Dispatch<React.SetStateAction<Iadv[]>>;
+  setAdvData: React.Dispatch<React.SetStateAction<IAdv[]>>;
   setAdvImage: React.Dispatch<React.SetStateAction<string[]>>;
 }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -86,7 +86,7 @@ const EditAndDeleteDropdownMenu = ({
       <EditAdvModal
         isOpen={isEditModalOpen}
         setIsOpen={setIsEditModalOpen}
-        advData={{...item , currentImageUrl}}
+        advData={{ ...item, currentImageUrl }}
         setAdvData={setAdvData}
         setAdvImage={setAdvImage}
       />

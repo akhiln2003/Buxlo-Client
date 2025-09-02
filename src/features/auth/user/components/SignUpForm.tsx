@@ -17,7 +17,7 @@ import { useSignUpUserMutation } from "@/services/apis/AuthApis";
 import { UserUrls } from "@/@types/urlEnums/UserUrls";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { signUpFormSchema } from "../../zodeSchema/authSchema";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { Loader } from "lucide-react";
 
 // Zod Schema
@@ -68,7 +68,7 @@ export function SignUnForm() {
         password,
       };
 
-      const response: IaxiosResponse = await signUp(newUser);
+      const response: IAxiosResponse = await signUp(newUser);
 
       if (response.data) {
         navigate(UserUrls.otp, { state: { name, email } });

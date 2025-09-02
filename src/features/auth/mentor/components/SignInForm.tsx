@@ -21,7 +21,7 @@ import { addUser } from "@/redux/slices/userSlice";
 import { useNavigate } from "react-router-dom";
 import { signInFormSchema } from "../../zodeSchema/authSchema";
 import { MentorUrl } from "@/@types/urlEnums/MentorUrl";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 
 export function SigninForm() {
   const [passwordVisibility, setPasswordVisibility] = useState<boolean>(false);
@@ -52,7 +52,7 @@ export function SigninForm() {
 
   const onSubmit = async (data: z.infer<typeof signInFormSchema>) => {
     const { email, password } = data;
-    const response: IaxiosResponse = await signIn({ email, password });
+    const response: IAxiosResponse = await signIn({ email, password });
 
     if (response.data?.user) {
       const user = response.data.user;

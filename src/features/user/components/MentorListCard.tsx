@@ -3,14 +3,14 @@ import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
 import { UserUrls } from "@/@types/urlEnums/UserUrls";
 import { useEffect, useState } from "react";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { errorTost } from "@/components/ui/tosastMessage";
 import dummyProfileImage from "@/assets/images/dummy-profile.webp";
 import { useFetchMentorProfileImageMutation } from "@/services/apis/MentorApis";
-import { Imentor } from "@/@types/interface/Imentor";
+import { IMentor } from "@/@types/interface/IMentor";
 
 interface MentorCardProps {
-  mentor: Imentor;
+  mentor: IMentor;
   rating: number;
   availability: string;
 }
@@ -27,7 +27,7 @@ export const MentorListCard: React.FC<MentorCardProps> = ({
     const fetchUserData = async () => {
       try {
         if (mentor.avatar) {
-          const imageUrl: IaxiosResponse = await fetchProfileImages([
+          const imageUrl: IAxiosResponse = await fetchProfileImages([
             `MentorProfiles/${mentor.avatar}`,
           ]);
           if (imageUrl.data.imageUrl) {

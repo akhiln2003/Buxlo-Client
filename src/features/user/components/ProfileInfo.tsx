@@ -1,12 +1,11 @@
-import { Iuser } from "@/@types/interface/Iuser";
+import { IUser } from "@/@types/interface/IUser";
 import { Mail } from "lucide-react";
 
 interface ProfileInfoProps {
-  users: Partial<Iuser>;
+  users: Partial<IUser>;
 }
 
-
-const ProfileInfo = ({ users }:ProfileInfoProps) => {
+const ProfileInfo = ({ users }: ProfileInfoProps) => {
   return (
     <div className="pt-16 sm:pt-20 px-4 sm:px-8 pb-8">
       <div className="space-y-4">

@@ -1,5 +1,5 @@
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
-import { Imentor } from "@/@types/interface/Imentor";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
+import { IMentor } from "@/@types/interface/IMentor";
 import { Button } from "@/components/ui/button";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { useUpdateMentorProfileMutation } from "@/services/apis/MentorApis";
@@ -18,7 +18,7 @@ function EditProfileBanner({
   profileImage: string;
   setProfileImage: (isPhotoDialogOpen: string) => void;
   setIsPhotoDialogOpen: (isPhotoDialogOpen: boolean) => void;
-  setUsers: React.Dispatch<React.SetStateAction<Partial<Imentor>>>;
+  setUsers: React.Dispatch<React.SetStateAction<Partial<IMentor>>>;
 }) {
   const [newProfileImage, setNewProfileImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(profileImage);
@@ -44,7 +44,7 @@ function EditProfileBanner({
     if (!newProfileImage) return;
 
     try {
-      const response: IaxiosResponse = await updateProfile({
+      const response: IAxiosResponse = await updateProfile({
         id,
         newProfileImage,
       });
@@ -53,9 +53,9 @@ function EditProfileBanner({
           ...prev,
           avatar: response.data.data.avatar,
         }));
-        const imageUrl: IaxiosResponse = await fetchProfileImages(
-         [`UserProfiles/${ response.data.data.avatar}`]
-        );
+        const imageUrl: IAxiosResponse = await fetchProfileImages([
+          `UserProfiles/${response.data.data.avatar}`,
+        ]);
         if (imageUrl.data) {
           setProfileImage(imageUrl.data.imageUrl[0]);
           setIsPhotoDialogOpen(false);

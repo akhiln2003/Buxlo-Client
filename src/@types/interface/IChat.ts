@@ -1,6 +1,6 @@
 import { InewMessage } from "@/pages/chat";
 
-export class Ichat {
+export class IChat {
   constructor(
     public participants: string[],
     public unreadCount: number,

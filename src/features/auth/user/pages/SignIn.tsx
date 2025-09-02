@@ -13,7 +13,7 @@ import { useDispatch } from "react-redux";
 import { addUser } from "@/redux/slices/userSlice";
 import { errorTost } from "@/components/ui/tosastMessage";
 import { GoogleCredentialResponse, GoogleLogin } from "@react-oauth/google";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 
 function SignIn() {
   const { isDarkMode } = useTheme();
@@ -25,7 +25,7 @@ function SignIn() {
     try {
       if (respons?.credential) {
         // Call your API to handle Google login or signup
-        const response: IaxiosResponse = await googleAuth({
+        const response: IAxiosResponse = await googleAuth({
           token: respons.credential,
         });
 
@@ -34,7 +34,7 @@ function SignIn() {
           dispatch(addUser(user));
 
           navigate(UserUrls.home);
-        } else {          
+        } else {
           errorTost(
             "Somthing when wrong ",
             response.error.data.error || [

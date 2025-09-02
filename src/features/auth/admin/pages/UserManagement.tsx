@@ -5,7 +5,7 @@ import {
   useFetchUsersMutation,
 } from "@/services/apis/AuthApis";
 import { errorTost } from "@/components/ui/tosastMessage";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { ColumnConfig, TableList } from "@/components/ui/tableList";
 import SearchInput from "@/components/ui/searchInput";
 
@@ -60,7 +60,7 @@ function UserManagement() {
   });
 
   const handileBlock = async (id: string, isBlocked: boolean) => {
-    const response: IaxiosResponse = await userAction({ id, isBlocked });
+    const response: IAxiosResponse = await userAction({ id, isBlocked });
     if (response.data) {
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
@@ -78,7 +78,7 @@ function UserManagement() {
   };
   const fetchUserData = async (page = 1, searchData = searchQuery) => {
     try {
-      const response: IaxiosResponse = await fetchUsers({ page, searchData }); // `unwrap` gets the raw response
+      const response: IAxiosResponse = await fetchUsers({ page, searchData });
 
       if (response.data) {
         setUsers(response.data.data.users);

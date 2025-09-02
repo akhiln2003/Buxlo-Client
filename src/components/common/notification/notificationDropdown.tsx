@@ -9,8 +9,8 @@ import {
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { useTheme } from "@/contexts/themeContext";
-import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
-import { Inotification } from "@/@types/interface/Inotification";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
+import { INotification } from "@/@types/interface/INotification";
 import {
   useFetchNotificationsMutation,
   useReadNotificationsMutation,
@@ -27,7 +27,7 @@ export default function NotificationDropdown({
   notificationsUrl,
   onNotificationClick,
 }: NotificationDropdownProps) {
-  const [notifications, setNotifications] = useState<Inotification[]>([]);
+  const [notifications, setNotifications] = useState<INotification[]>([]);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [fetchNotifications] = useFetchNotificationsMutation();
   const [readNotification] = useReadNotificationsMutation();
@@ -53,7 +53,7 @@ export default function NotificationDropdown({
   const fetchNotificationDatas = async () => {
     if (!user?.id) return;
     try {
-      const response: IaxiosResponse = await fetchNotifications({
+      const response: IAxiosResponse = await fetchNotifications({
         userId: user.id,
         page: 1,
         status: "unread",
@@ -72,7 +72,7 @@ export default function NotificationDropdown({
 
   const markNotificationAsRead = async (id: string) => {
     try {
-      const response: IaxiosResponse = await readNotification([
+      const response: IAxiosResponse = await readNotification([
         { id, status: "read" },
       ]);
       if (response.data) {
@@ -128,7 +128,7 @@ export default function NotificationDropdown({
     const socket = socketContext.notificationSocket;
     if (!socket) return;
 
-    const handleNotification = (data: Inotification) => {
+    const handleNotification = (data: INotification) => {
       if (audioUnlocked && notificationSoundRef.current) {
         notificationSoundRef.current
           .play()
