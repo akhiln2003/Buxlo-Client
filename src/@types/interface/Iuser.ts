@@ -7,6 +7,6 @@ export class Iuser {
     public id?: string,
     public avatar?: string,
     public premiumId?: boolean,
-    public premiumEndDate?: Date
+    public premiumEndDate?: string
   ) {}
 }

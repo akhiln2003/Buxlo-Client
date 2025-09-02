@@ -143,6 +143,13 @@ export const commonApi = createApi({
         method: "GET",
       }),
     }),
+    //  fetch by id SubscriptionPlan
+    fetchSubscriptionPlanById: builder.mutation({
+      query: (id) => ({
+        url: `${CommonApiEndPoints.fetchSubscriptionPlanById}/${id}`,
+        method: "GET",
+      }),
+    }),
 
     // Create Bookingn Checkout Session
     createBookingCheckoutSession: builder.mutation({
@@ -207,6 +214,7 @@ export const {
   useReadNotificationsMutation,
   useDeleteNotificationsMutation,
   useFetchSubscriptionPlanMutation,
+  useFetchSubscriptionPlanByIdMutation,
   useCreateBookingCheckoutSessionMutation,
   useCreateSubscriptionCheckoutSessionMutation,
   useUseUpdateBookingPlanMutation,
