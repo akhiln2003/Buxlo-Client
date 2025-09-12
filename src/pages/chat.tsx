@@ -31,7 +31,7 @@ export interface IparticipantDetails {
 
 export interface Icontacts {
   id: string;
-  participantDetails: IparticipantDetails[];
+  participants: IparticipantDetails[];
   lastMessage: InewMessage;
   unreadCount: number;
 }
@@ -80,7 +80,7 @@ export default function Chat() {
         setContacts(response.data.constats);
         const avatars: string[] = response.data.constats.flatMap(
           (contact: Icontacts) =>
-            contact.participantDetails.map((participant: IparticipantDetails) =>
+            contact.participants.map((participant: IparticipantDetails) =>
               participant.avatar
                 ? participant.role === USER_ROLE.MENTOR
                   ? `MentorProfiles/${participant.avatar}`
@@ -208,7 +208,7 @@ export default function Chat() {
       if (response.data) {
         setMessages(response.data.messages);
         if (response.data.messages.length > 0) {
-          const receiverId = contact.participantDetails[0].id;
+          const receiverId = contact.participants[0].id;
 
           socketContext?.socket?.emit("mark_messages_read", {
             chatId: response.data.messages[0].chatId,
@@ -233,7 +233,7 @@ export default function Chat() {
   };
 
   const handleStartVideoCall = (contact: Icontacts) => {
-    const remoteUser = contact.participantDetails[0];
+    const remoteUser = contact.participants[0];
     startVideoCall(
       remoteUser.id,
       remoteUser.name,
@@ -280,13 +280,13 @@ export default function Chat() {
                 setMessages={setMessages}
                 userId={user?.id as string}
                 chatId={activeChat.id}
-                receiverId={activeChat.participantDetails[0].id}
+                receiverId={activeChat.participants[0].id}
               />
             </div>
             <ChatInputContainer
               setMessages={setMessages}
               chatId={activeChat.id}
-              receiverId={activeChat.participantDetails[0].id}
+              receiverId={activeChat.participants[0].id}
               senderId={user?.id as string}
             />
           </div>

@@ -276,7 +276,7 @@ const Profile = () => {
             />
           </div>
           <div className="w-full mt-8">
-            <MentorCard />
+            <MentorCard userId={users.id} />
           </div>
         </div>
 

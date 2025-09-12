@@ -20,4 +20,5 @@ export enum CommonApiEndPoints {
   fetchOnePaymet = "/payment/common/fetchonepaymet",
   updateSubscriptionPaymet = "payment/common/updatesubscriptionpaymet",
   updateBookingPaymet = "payment/common/updatesubbookingpaymet",
+  fetchBookings = "/payment/common/fetchbookings",
 }

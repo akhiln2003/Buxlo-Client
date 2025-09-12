@@ -111,12 +111,12 @@ export function ChatSidebar({
                       ? profileImage[i]
                       : dummyProfileImage
                   }
-                  alt={contact.participantDetails[0].name}
+                  alt={contact.participants[0].name}
                   className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
                 />
                 <div
                   className={`absolute bottom-0 right-0 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full border-2 border-white dark:border-zinc-900 ${
-                    onlineUsers.has(contact.participantDetails[0].id)
+                    onlineUsers.has(contact.participants[0].id)
                       ? "bg-green-500"
                       : "bg-gray-400"
                   }`}
@@ -126,7 +126,7 @@ export function ChatSidebar({
                 <div className="flex justify-between items-start">
                   <div className="flex-1 min-w-0 pr-2">
                     <h3 className="font-semibold text-xs sm:text-sm text-gray-900 dark:text-white truncate mb-1">
-                      {contact.participantDetails[0].name}
+                      {contact.participants[0].name}
                     </h3>
                     <p className="text-xs text-gray-500 dark:text-zinc-400 truncate">
                       {contact.lastMessage ? (

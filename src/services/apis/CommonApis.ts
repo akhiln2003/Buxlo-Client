@@ -195,6 +195,14 @@ export const commonApi = createApi({
       }),
     }),
 
+    // fetch  Bookings
+    fetchBookings: builder.mutation({
+      query: ({ userId, page }: { userId: string; page: number }) => ({
+        url: `${CommonApiEndPoints.fetchBookings}/${userId}/${page}`,
+        method: "GET",
+      }),
+    }),
+
     //////////////////////////////////////////////////////////////////////////////////
   }),
 });
@@ -220,4 +228,5 @@ export const {
   useUseUpdateBookingPlanMutation,
   useUseUpdateSubscriptionPlanMutation,
   useFetchOnePaymetMutation,
+  useFetchBookingsMutation,
 } = commonApi;

@@ -33,6 +33,8 @@ const ListMentors = lazy(() => import("@/features/user/pages/listMentors"));
 const UserMentorProfile = lazy(
   () => import("@/features/user/pages/mentorProfileDetails")
 );
+const UserListBookingsPage = lazy(()=>import("@/features/user/pages/listBookings"))
+
 ////////////////////////--User side--///////////////////////
 ////////////////////////--Mentor side--/////////////////////
 
@@ -248,6 +250,16 @@ const routes = createBrowserRouter(
             <UserProtected>
               <Suspense fallback={<div>Loading ....</div>}>
                 <MentorBooking />
+              </Suspense>
+            </UserProtected>
+          ),
+        },
+        {
+          path: UserUrls.listBookings,
+          element: (
+            <UserProtected>
+              <Suspense fallback={<div>Loading ....</div>}>
+                <UserListBookingsPage />
               </Suspense>
             </UserProtected>
           ),

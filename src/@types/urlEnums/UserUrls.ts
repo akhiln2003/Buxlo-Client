@@ -20,5 +20,6 @@ export enum UserUrls  {
     bookingSucess = '/bookingsuccess',
     subscriptionSucess = "/subscriptionsuccess",
     notifications = '/notifications',
-    paymetnCalcel = '/cancel'
+    paymetnCalcel = '/cancel',
+    listBookings = '/listbookings'
 }

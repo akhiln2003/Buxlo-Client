@@ -27,12 +27,12 @@ export function ChatHeader({
   };
 
   const handleVideoCall = () => {
-    if (isInCall) return; 
+    if (isInCall) return;
     onStartVideoCall();
   };
 
   const isUserOnline = onlineUsers.has(
-    activeChat?.participantDetails[0].id as string
+    activeChat?.participants[0].id as string
   );
 
   return (
@@ -65,7 +65,7 @@ export function ChatHeader({
         </div>
         <div className="min-w-0">
           <h2 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white truncate max-w-[120px] sm:max-w-[180px] md:max-w-[250px]">
-            {activeChat?.participantDetails[0].name}
+            {activeChat?.participants[0].name}
           </h2>
           <span className="text-xs sm:text-sm text-gray-500 dark:text-zinc-400">
             {isUserOnline ? "Online" : "Offline"}
