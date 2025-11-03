@@ -240,16 +240,14 @@ const SubscriptionCard = ({
             ))}
           </div>
         </div>
-        {!isActive && (
-          <div className="flex flex-col sm:flex-row gap-3 pt-2">
-            <button className="flex-1 py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg font-semibold text-sm transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-              Renew Subscription
-            </button>
-            <button className="flex-1 py-3 px-4 border-2 border-green-300 dark:border-zinc-500 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-zinc-700 rounded-lg font-semibold text-sm transition-all duration-200">
-              View All Plans
-            </button>
-          </div>
-        )}
+        
+         <button
+            onClick={handleSubscriptionClick}
+            className="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-lg font-semibold text-sm transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+          >
+            Upgrade Your Plan
+          </button>
+        
       </div>
     </div>
   );

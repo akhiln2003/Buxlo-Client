@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Plus, Calendar } from "lucide-react";
 import { TabNavigation } from "../components/TabNavigation";
 import { RecurringAvailabilityForm } from "../components/RecurringAvailabilityForm";
-// import { AvailabilityRulesList } from "../components/AvailabilityRulesList";
 import { SlotCard } from "../components/SlotCard";
 import { recurringFormSchema } from "../zodeSchema/RecurringFormSchema";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
@@ -14,8 +13,11 @@ import {
   useFetchSlotsMutation,
 } from "@/services/apis/MentorApis";
 import { OneTimeSlotForm } from "../components/OneTimeSlotForm";
+import { PageNation } from "@/components/ui/pageNation";
+import SearchInput from "@/components/ui/searchInput";
 
 export interface Slot {
+  id?: string;
   mentorId: string;
   date: string;
   startTime: string;
@@ -126,6 +128,8 @@ const formatDuration = (minutes: number): string => {
 // Main Appointment Component
 const Appointment: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("manage");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [loading, setLoading] = useState(false);
   const user = useGetUser();
   const [createOneSlot, { isLoading: createOneSlotLoading }] =
     useCreateOneSlotMutation();
@@ -133,6 +137,10 @@ const Appointment: React.FC = () => {
     useCreateRecurringSlotMutation();
   const [fetchSlots] = useFetchSlotsMutation();
   const [slots, setSlots] = useState<Slot[] | []>([]);
+  const [pageNationData, setPageNationData] = useState({
+    pageNum: 1,
+    totalPages: 0,
+  });
   const [oneTimeSlot, setOneTimeSlot] = useState<IoneTimeSlotForm>({
     date: "",
     startTime: "",
@@ -175,6 +183,8 @@ const Appointment: React.FC = () => {
           description: "",
         });
         successToast("Created", "One-time slot created successfully");
+        // Refresh the slots list
+        fetchDatas(pageNationData.pageNum, searchQuery);
       } else {
         errorTost(
           "Something went wrong ",
@@ -228,6 +238,8 @@ const Appointment: React.FC = () => {
             description: "",
           });
           successToast("Created", "Recurring rule created successfully");
+          // Refresh the slots list
+          fetchDatas(pageNationData.pageNum, searchQuery);
         } else {
           setRecurringForm({
             days: [],
@@ -258,38 +270,72 @@ const Appointment: React.FC = () => {
     }
   };
 
-  // const deleteRule = (id: string) => {
-  //   setAvailabilityRules((prev) => prev.filter((rule) => rule.mentorId !== id));
-  // };
+  // Fetch slots data with pagination and search
+  const fetchDatas = useCallback(
+    async (page: number = 1, searchData: string = "") => {
+      try {
+        setLoading(true);
+        const response: IAxiosResponse = await fetchSlots({
+          mentorId: user?.id,
+          page,
+          searchData,
+        });
 
-  const deleteSlot = (id: string) => {
-    setSlots((prev) => prev.filter((slot) => slot.mentorId !== id));
-  };
-
-  const fetchDatas = async () => {
-    try {
-      const response: IAxiosResponse = await fetchSlots(user?.id);
-      if (response.data) {
-        setSlots(response.data.slots);
-      } else {
-        errorTost(
-          "Something went wrong ",
-          response.error.data.error || [
-            { message: "Something went wrong please try again" },
-          ]
-        );
+        if (response.data) {
+          setSlots(response.data.slots || []);
+          setPageNationData({
+            pageNum: page,
+            totalPages: response.data.totalPages || 0,
+          });
+        } else {
+          errorTost(
+            "Something went wrong ",
+            response.error?.data?.error || [
+              { message: "Something went wrong please try again" },
+            ]
+          );
+          setSlots([]);
+        }
+      } catch (err) {
+        console.error("Error fetching slots:", err);
+        errorTost("Something wrong", [
+          { message: "Something went wrong please try again" },
+        ]);
+        setSlots([]);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error("Error fetching users:", err);
-      errorTost("Something wrong", [
-        { message: "Something went wrong please try again" },
-      ]);
-    }
-  };
+    },
+    [fetchSlots, user?.id]
+  );
 
-  useEffect(() => {
-    fetchDatas();
+  // Handle pagination
+  const handlePageChange = useCallback(
+    async (page: number) => {
+      await fetchDatas(page, searchQuery);
+    },
+    [fetchDatas, searchQuery]
+  );
+
+  // Handle search with debouncing (handled by SearchInput component)
+  const handleSearch = useCallback((value: string) => {
+    setSearchQuery(value);
+    setPageNationData((prev) => ({ ...prev, pageNum: 1 }));
   }, []);
+
+  // Effect to fetch data when search query changes
+  useEffect(() => {
+    if (searchQuery !== undefined && user?.id) {
+      fetchDatas(1, searchQuery);
+    }
+  }, [searchQuery, fetchDatas, user?.id]);
+
+  // Initial data fetch
+  useEffect(() => {
+    if (user?.id) {
+      fetchDatas(1, "");
+    }
+  }, [user?.id, fetchDatas]);
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -327,52 +373,82 @@ const Appointment: React.FC = () => {
               timeSlots={timeSlots}
               createRecurringSlotLoading={createRecurringSlotLoading}
             />
-            {/* <AvailabilityRulesList
-              availabilityRules={availabilityRules}
-              deleteRule={deleteRule}
-              calculateEndTime={calculateEndTime}
-              formatDuration={formatDuration}
-            /> */}
           </div>
         )}
 
         {activeTab === "slots" && (
           <div>
-            <div className="flex justify-between items-center mb-6">
+            {/* Search Section */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
               <h2 className="text-2xl font-bold text-gray-900">My Slots</h2>
-              <div className="text-sm text-gray-600">
-                Total slots: {slots.length}
+              <div className="w-full sm:w-80">
+                <SearchInput
+                  onSearch={handleSearch}
+                  debounceDelay={400}
+                  placeholder="Search slots by date, time, or description..."
+                  className=""
+                />
               </div>
             </div>
 
-            {slots.length === 0 ? (
+            {/* Loading state */}
+            {loading && (
+              <div className="flex justify-center items-center py-16">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              </div>
+            )}
+
+            {/* Slots Grid */}
+            {!loading && slots.length === 0 ? (
               <div className="text-center py-16 bg-white rounded-lg shadow-sm border border-gray-200">
                 <Calendar size={64} className="mx-auto text-gray-300 mb-4" />
                 <h3 className="text-xl font-medium text-gray-500 mb-2">
-                  No slots available
+                  {searchQuery ? "No slots found" : "No slots available"}
                 </h3>
                 <p className="text-gray-400 mb-6">
-                  Create your first appointment slot to get started
+                  {searchQuery
+                    ? "Try adjusting your search query"
+                    : "Create your first appointment slot to get started"}
                 </p>
-                <button
-                  onClick={() => setActiveTab("manage")}
-                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-                >
-                  <Plus size={20} />
-                  Add Your First Slot
-                </button>
+                {!searchQuery && (
+                  <button
+                    onClick={() => setActiveTab("manage")}
+                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                  >
+                    <Plus size={20} />
+                    Add Your First Slot
+                  </button>
+                )}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {slots.map((slot) => (
-                  <SlotCard
-                    key={slot.mentorId}
-                    slot={slot}
-                    deleteSlot={deleteSlot}
-                    calculateEndTime={calculateEndTime}
-                    formatDuration={formatDuration}
-                  />
-                ))}
+              !loading && (
+                <>
+                  <div className="mb-4 text-sm text-gray-600">
+                    Total slots: {slots.length}
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {slots.map((slot) => (
+                      <SlotCard
+                        key={slot.id}
+                        slot={slot}
+                        setSlots={setSlots}
+                        calculateEndTime={calculateEndTime}
+                        formatDuration={formatDuration}
+                      />
+                    ))}
+                  </div>
+                </>
+              )
+            )}
+
+            {/* Pagination */}
+            {!loading && slots.length > 0 && pageNationData.totalPages > 1 && (
+              <div className="w-full h-14 py-2 flex justify-center pr-[2rem] mt-6">
+                <PageNation
+                  pageNationData={pageNationData}
+                  fetchUserData={handlePageChange}
+                  setpageNationData={setPageNationData}
+                />
               </div>
             )}
           </div>

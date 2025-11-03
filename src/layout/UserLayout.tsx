@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import UserNavbar from '@/components/navbar/UserNavbar'; 
 import { UserUrls } from '@/@types/urlEnums/UserUrls';
+import UserFooter from '@/components/footer/UserFooter';
 
   function UserLayout() {
     const {pathname} = useLocation();
@@ -10,6 +11,7 @@ import { UserUrls } from '@/@types/urlEnums/UserUrls';
     <>
         {!higeNavbar && < UserNavbar /> }
        <div className={ higeNavbar ? "":'pt-16'}>  < Outlet /></div>
+      {!higeNavbar &&  < UserFooter />}
     </>
   )
   }

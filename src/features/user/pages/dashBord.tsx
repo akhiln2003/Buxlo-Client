@@ -1,23 +1,16 @@
-import {  useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import AddWalletAndBankAccount from "../components/AddWalletAndBankAccount";
 import AddCategory from "../components/AddCategory";
-import { Areachart } from "../components/AreaChart";
-import { Barchart } from "../components/BarChart";
-import { Piechart } from "../components/PieChart ";
-import { FilterSection } from "../components/FilterSection"; // Import FilterSection directly
-
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-// import { IaxiosResponse } from "@/@types/interface/IaxiosResponse";
-// import { useFetchMoneyCategorizeMutation } from "@/services/apis/UserApis";
-// import { errorTost } from "@/components/ui/tosastMessage";
+import { Areachart } from "../../../components/common/charts/AreaChart";
+import { Barchart } from "../../../components/common/charts/BarChart";
+import { FilterSection } from "../components/FilterSection";
+import { TrendingUp, TrendingDown, X } from "lucide-react";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
+import { useGetUser } from "@/hooks/useGetUser";
+import { useFetchPaymentHistorySummaryMutation } from "@/services/apis/UserApis";
+import { Piechart } from "../../../components/common/charts/PieChart ";
+import { Button } from "@/components/ui/button";
+import { errorTost, successToast } from "@/components/ui/tosastMessage";
 
 export interface Icategory {
   id?: string;
@@ -27,8 +20,60 @@ export interface Icategory {
   chartType: "Pie" | "Area" | "Bar";
 }
 
+interface BackendPaymentSummary {
+  totalCredit: number;
+  totalDebit: number;
+  categoryWise: Array<{
+    category: string;
+    totalDebit: number;
+    totalCredit?: number;
+  }>;
+}
+
+interface SavedChart {
+  id: string;
+  categoryName: string;
+  chartType: "Pie" | "Area" | "Bar";
+}
+
+// Storage Helper Functions
+const STORAGE_KEY_PREFIX = "dashboard-charts-";
+
+const loadChartsFromStorage = (userId: string): SavedChart[] => {
+  try {
+    const storageKey = STORAGE_KEY_PREFIX + userId;
+    const stored = localStorage.getItem(storageKey);
+
+    if (stored) {
+      const charts = JSON.parse(stored);
+      console.log("✅ Loaded charts from localStorage:", charts);
+      return charts;
+    }
+
+    console.log("ℹ️ No charts found in localStorage");
+    return [];
+  } catch (error) {
+    console.error("❌ Error loading charts from localStorage:", error);
+    return [];
+  }
+};
+
+const saveChartsToStorage = (userId: string, charts: SavedChart[]): void => {
+  try {
+    const storageKey = STORAGE_KEY_PREFIX + userId;
+    localStorage.setItem(storageKey, JSON.stringify(charts));
+    console.log("💾 Saved charts to localStorage:", charts);
+  } catch (error) {
+    console.error("❌ Error saving charts to localStorage:", error);
+  }
+};
+
 function Dashboard() {
-  const [categories, setCategories] = useState<Icategory[]>([]);
+  const user = useGetUser();
+  const [savedCharts, setSavedCharts] = useState<SavedChart[]>([]);
+  const [paymentData, setPaymentData] = useState<BackendPaymentSummary | null>(
+    null
+  );
   const [filterType, setFilterType] = useState<"day" | "month" | "year" | "">(
     ""
   );
@@ -36,60 +81,327 @@ function Dashboard() {
   const [selectedMonth, setSelectedMonth] = useState<string>("");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
-  // const [fetchCategory] = useFetchMoneyCategorizeMutation();
+  const [fetchPaymentSummery] = useFetchPaymentHistorySummaryMutation();
 
-  const renderChart = (category: Icategory) => {
-    switch (category.chartType) {
+  // Summary statistics state
+  const [summaryStats, setSummaryStats] = useState({
+    totalIncome: 0,
+    totalExpenses: 0,
+    totalSavings: 0,
+    monthlyChange: 0,
+  });
+
+  // Load charts from localStorage on mount
+  useEffect(() => {
+    if (user?.id) {
+      const loadedCharts = loadChartsFromStorage(user.id);
+      setSavedCharts(loadedCharts);
+    }
+  }, [user?.id]);
+
+  // Get available categories from backend data
+  const availableCategories =
+    paymentData?.categoryWise
+      .filter((cat) => cat.category !== "Credit" && cat.category !== "Debit")
+      .map((cat) => cat.category) || [];
+
+  // Transform backend data to frontend format
+  const transformPaymentData = (data: BackendPaymentSummary) => {
+    const totalIncome = data.totalCredit || 0;
+    const totalExpenses = Math.abs(data.totalDebit || 0);
+    const totalSavings = totalIncome - totalExpenses;
+    const monthlyChange = 0;
+
+    return {
+      totalIncome,
+      totalExpenses,
+      totalSavings,
+      monthlyChange,
+    };
+  };
+
+  const fetchData = useCallback(async () => {
+    if (!user?.id) return;
+
+    try {
+      const queryParams: {
+        userId: string;
+        year?: number;
+        startMonth?: string;
+        endMonth?: string;
+        startDate?: string;
+        endDate?: string;
+      } = {
+        userId: user.id,
+      };
+
+      if (filterType === "year" && selectedYear) {
+        queryParams.year = parseInt(selectedYear);
+      } else if (filterType === "month" && selectedMonth && selectedYear) {
+        queryParams.year = parseInt(selectedYear);
+        queryParams.startMonth = selectedMonth;
+        queryParams.endMonth = selectedMonth;
+      } else if (filterType === "day" && startDate && endDate) {
+        queryParams.startDate = startDate;
+        queryParams.endDate = endDate;
+      }
+
+      console.log("📊 Fetching payment data with params:", queryParams);
+
+      const response: IAxiosResponse = await fetchPaymentSummery(queryParams);
+
+      if (response.data) {
+        // Store the raw backend data
+        setPaymentData(response.data as BackendPaymentSummary);
+
+        // Transform the backend data
+        const transformed = transformPaymentData(
+          response.data as BackendPaymentSummary
+        );
+
+        // Update summary stats
+        setSummaryStats({
+          totalIncome: transformed.totalIncome,
+          totalExpenses: transformed.totalExpenses,
+          totalSavings: transformed.totalSavings,
+          monthlyChange: transformed.monthlyChange,
+        });
+      } else {
+        console.error("Payment history error:", response.error);
+        errorTost("Booking Load Failed", [
+          { message: response.error.data?.error || "Please try again later" },
+        ]);
+      }
+    } catch (error) {
+      console.error("Error fetching payments:", error);
+      errorTost("Fetch Paymets Failed", [
+        { message: "Failed to fetch payment summery. Please try again." },
+      ]);
+    }
+  }, [
+    fetchPaymentSummery,
+    user?.id,
+    filterType,
+    selectedYear,
+    selectedMonth,
+    startDate,
+    endDate,
+  ]);
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchData();
+    }
+  }, [user?.id, fetchData]);
+
+  const handleApplyFilter = () => {
+    fetchData();
+  };
+
+  const handleClearFilter = () => {
+    setFilterType("");
+    setSelectedYear("");
+    setSelectedMonth("");
+    setStartDate("");
+    setEndDate("");
+    setTimeout(() => {
+      fetchData();
+    }, 0);
+  };
+
+  const handleAddChart = (chart: SavedChart) => {
+    if (!user?.id) {
+      console.error("❌ No user ID available");
+      return;
+    }
+
+    console.log("➕ Adding new chart:", chart);
+
+    // Check for duplicates
+    const isDuplicate = savedCharts.some(
+      (c) =>
+        c.categoryName === chart.categoryName && c.chartType === chart.chartType
+    );
+
+    if (isDuplicate) {
+      console.log("⚠️ Chart already exists");
+      errorTost("Chart already exists", [
+        { message: "This category chart alredy exists" },
+      ]);
+      return;
+    }
+
+    // Add to array
+    const updatedCharts = [...savedCharts, chart];
+
+    // Update state
+    setSavedCharts(updatedCharts);
+
+    // Save to localStorage immediately
+    saveChartsToStorage(user.id, updatedCharts);
+    successToast("Chart added", "Successfully new chart added");
+  };
+
+  const handleRemoveChart = (chartId: string) => {
+    if (!user?.id) {
+      console.error("❌ No user ID available");
+      return;
+    }
+
+    console.log("🗑️ Removing chart:", chartId);
+
+    // Filter out the removed chart
+    const updatedCharts = savedCharts.filter((chart) => chart.id !== chartId);
+
+    // Update state
+    setSavedCharts(updatedCharts);
+
+    // Save to localStorage immediately
+    saveChartsToStorage(user.id, updatedCharts);
+  };
+
+  const renderChart = (chart: SavedChart) => {
+    // Find category data from backend
+    const categoryData = paymentData?.categoryWise.find(
+      (cat) => cat.category === chart.categoryName
+    );
+
+    const categoryDebit = Math.abs(categoryData?.totalDebit || 0);
+    const categoryCredit =
+      categoryData?.totalCredit || paymentData?.totalCredit || 0;
+
+    switch (chart.chartType) {
       case "Pie":
-        return <Piechart title={category.name} />;
+        return (
+          <Piechart
+            title={chart.categoryName}
+            data={{
+              debit: categoryDebit,
+              credit: categoryCredit,
+            }}
+          />
+        );
       case "Area":
-        return <Areachart title={category.name} />;
+        return (
+          <Areachart
+            title={chart.categoryName}
+            data={{
+              debit: categoryDebit,
+              credit: categoryCredit,
+            }}
+          />
+        );
       case "Bar":
-        return <Barchart title={category.name} />;
+        return (
+          <Barchart
+            title={chart.categoryName}
+            data={{
+              debit: categoryDebit,
+              credit: categoryCredit,
+            }}
+          />
+        );
       default:
         return null;
     }
   };
 
-  // async function fetchCategories() {
-  //   try {
-  //     const response: IaxiosResponse = await fetchCategory();
-  //     if (response.data) {
-  //       setCategories(response.data.data);
-  //     } else {
-  //       errorTost(
-  //         "Something went wrong ",
-  //         response.error.data.error || [
-  //           { message: `${response.error.data} please try again later` },
-  //         ]
-  //       );
-  //       console.error("Error fetching categories:", response.error);
-  //     }
-  //   } catch (error) {
-  //     errorTost("Something wrong", [
-  //       { message: "Something went wrong please try again" },
-  //     ]);
-  //     console.error("Error fetching categories:", error);
-  //   }
-  // }
+  // Get top 3 categories by spending
+  const getTop3Categories = () => {
+    if (!paymentData?.categoryWise) return [];
 
-  // useEffect(() => {
-  //   fetchCategories();
-  // }, []);
+    return paymentData.categoryWise
+      .filter((cat) => cat.category !== "Credit" && cat.category !== "Debit")
+      .sort((a, b) => Math.abs(b.totalDebit) - Math.abs(a.totalDebit))
+      .slice(0, 3);
+  };
+
   return (
-    <div className="w-full min-h-screen flex flex-col bg-zinc-100 dark:bg-zinc-950">
-      {/* Header Section with Wallet/Bank */}
+    <div className="w-full min-h-screen flex flex-col bg-zinc-50 dark:bg-zinc-950">
+      {/* Header Section */}
       <div className="w-full p-4 sm:p-6 md:p-8">
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+            Dashboard
+          </h1>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
+            Track your finances and manage your budget
+          </p>
+        </div>
+
         <AddWalletAndBankAccount />
+
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+          {/* Total Income */}
+          <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-800 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                  Total Income
+                </p>
+                <h3 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-2">
+                  ₹{summaryStats.totalIncome.toLocaleString()}
+                </h3>
+              </div>
+              <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full">
+                <TrendingUp
+                  className="text-green-600 dark:text-green-400"
+                  size={24}
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-1 mt-4 text-sm">
+              <TrendingUp size={16} className="text-green-600" />
+              <span className="text-green-600 font-medium">
+                +{summaryStats.monthlyChange}%
+              </span>
+              <span className="text-zinc-600 dark:text-zinc-400">
+                vs last period
+              </span>
+            </div>
+          </div>
+
+          {/* Total Expenses */}
+          <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-800 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                  Total Expenses
+                </p>
+                <h3 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-2">
+                  ₹{summaryStats.totalExpenses.toLocaleString()}
+                </h3>
+              </div>
+              <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-full">
+                <TrendingDown
+                  className="text-red-600 dark:text-red-400"
+                  size={24}
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-1 mt-4 text-sm">
+              <TrendingDown size={16} className="text-red-600" />
+              <span className="text-red-600 font-medium">+2.3%</span>
+              <span className="text-zinc-600 dark:text-zinc-400">
+                vs last period
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Statistics Heading with Filter Button */}
-      <div className="w-full px-4 sm:px-6 md:px-8 mb-2 sm:mb-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl sm:text-2xl font-semibold text-zinc-800 dark:text-zinc-200">
-            Statistics
-          </h2>
-          {/* Filter button positioned at the right end of the heading */}
+      {/* Statistics Section with Filter */}
+      <div className="w-full px-4 sm:px-6 md:px-8 mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-semibold text-zinc-800 dark:text-zinc-200">
+              Category Analytics
+            </h2>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
+              Monitor your spending across different categories
+            </p>
+          </div>
           <FilterSection
             filterType={filterType}
             setFilterType={setFilterType}
@@ -101,91 +413,74 @@ function Dashboard() {
             setStartDate={setStartDate}
             endDate={endDate}
             setEndDate={setEndDate}
+            onApplyFilter={handleApplyFilter}
+            onClearFilter={handleClearFilter}
           />
         </div>
       </div>
 
       {/* Charts Section */}
-      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 p-4 sm:p-6 md:p-8 pt-0 sm:pt-0 md:pt-0">
-        {/* Fixed Charts */}
-        <div className="w-full bg-white dark:bg-zinc-900 rounded-lg shadow-sm p-4">
-          <Piechart title="Pie Chart - Donut" />
-        </div>
-        <div className="w-full bg-white dark:bg-zinc-900 rounded-lg shadow-sm p-4">
-          <Areachart title="Area Chart - Legend" />
-        </div>
-        <div className="w-full bg-white dark:bg-zinc-900 rounded-lg shadow-sm p-4">
-          <Barchart title="Bar Chart - Mixed" />
-        </div>
-        {/* Dynamic Category Charts */}
-        {categories.map((category) => (
-          <div
-            key={category.id}
-            className="w-full bg-white dark:bg-zinc-900 rounded-lg shadow-sm p-4"
-          >
-            {renderChart(category)}
-          </div>
-        ))}
-        {/* Add Category */}
-        <div className="w-full bg-white dark:bg-zinc-900 rounded-lg shadow-sm p-4">
-          <AddCategory setCategories={setCategories}/>
-        </div>
-      </div>
+      <div className="w-full px-4 sm:px-6 md:px-8 pb-8">
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              {/* Fixed Overview Charts */}
 
-      {/* Table Section */}
-      <div className="w-full p-4 sm:p-6 md:p-8">
-        <div className="overflow-x-auto rounded-lg shadow-sm">
-          <Table className="w-full bg-white dark:bg-zinc-900">
-            <TableCaption className="text-zinc-600 dark:text-zinc-400 text-sm sm:text-base">
-              A list of registered users
-            </TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-left text-sm sm:text-base">
-                  User ID
-                </TableHead>
-                <TableHead className="text-left text-sm sm:text-base">
-                  Name
-                </TableHead>
-                <TableHead className="text-left text-sm sm:text-base">
-                  Email
-                </TableHead>
-                <TableHead className="text-left text-sm sm:text-base">
-                  Status
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell className="text-sm sm:text-base">1</TableCell>
-                <TableCell className="text-sm sm:text-base">John Doe</TableCell>
-                <TableCell className="text-sm sm:text-base">
-                  john.doe@example.com
-                </TableCell>
-                <TableCell className="text-sm sm:text-base">Active</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="text-sm sm:text-base">2</TableCell>
-                <TableCell className="text-sm sm:text-base">
-                  Jane Smith
-                </TableCell>
-                <TableCell className="text-sm sm:text-base">
-                  jane.smith@example.com
-                </TableCell>
-                <TableCell className="text-sm sm:text-base">Inactive</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="text-sm sm:text-base">3</TableCell>
-                <TableCell className="text-sm sm:text-base">
-                  Bob Johnson
-                </TableCell>
-                <TableCell className="text-sm sm:text-base">
-                  bob.johnson@example.com
-                </TableCell>
-                <TableCell className="text-sm sm:text-base">Active</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+              {/* 1. All Transactions Summary (Pie) */}
+              <div className="w-full bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+                <Piechart
+                  title="All Transactions"
+                  data={{
+                    credit: paymentData?.totalCredit || 0,
+                    debit: Math.abs(paymentData?.totalDebit || 0),
+                    categories: paymentData?.categoryWise || [],
+                  }}
+                />
+              </div>
+
+              {/* 2. Income vs Expenses (Area) */}
+              <div className="w-full bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+                <Areachart
+                  title="Income vs Expenses"
+                  data={{
+                    income: paymentData?.totalCredit || 0,
+                    expenses: Math.abs(paymentData?.totalDebit || 0),
+                  }}
+                />
+              </div>
+
+              {/* 3. Top 3 Categories (Bar) */}
+              <div className="w-full bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+                <Barchart title="Top 3 Categories" data={getTop3Categories()} />
+              </div>
+
+              {/* Dynamic Category Charts */}
+              {savedCharts.map((chart) => (
+                <div
+                  key={chart.id}
+                  className="w-full bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden relative group"
+                >
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8"
+                    onClick={() => handleRemoveChart(chart.id)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                  {renderChart(chart)}
+                </div>
+              ))}
+
+              {/* Add Category Card */}
+              <div className="w-full bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+                <AddCategory
+                  onAddChart={handleAddChart}
+                  availableCategories={availableCategories}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

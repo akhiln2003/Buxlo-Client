@@ -154,7 +154,7 @@ function AddWalletAndBankAccount() {
             <Wallet size={18} className="mr-2" />
             Wallets
           </button>
-          <button
+          {/* <button
             onClick={() => setActiveTab("bank")}
             className={`px-4 py-2 flex items-center text-sm font-medium ${
               activeTab === "bank"
@@ -164,7 +164,7 @@ function AddWalletAndBankAccount() {
           >
             <Database size={18} className="mr-2" />
             Bank Accounts
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -193,7 +193,7 @@ function AddWalletAndBankAccount() {
                 </div>
 
                 {/* Edit Dialog Per Wallet */}
-                <Dialog
+                {/* <Dialog
                   open={isEditDialogOpen}
                   onOpenChange={setIsEditDialogOpen}
                 >
@@ -249,7 +249,7 @@ function AddWalletAndBankAccount() {
                       </button>
                     </div>
                   </DialogContent>
-                </Dialog>
+                </Dialog> */}
               </div>
             ))}
 

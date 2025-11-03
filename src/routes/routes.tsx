@@ -33,7 +33,9 @@ const ListMentors = lazy(() => import("@/features/user/pages/listMentors"));
 const UserMentorProfile = lazy(
   () => import("@/features/user/pages/mentorProfileDetails")
 );
-const UserListBookingsPage = lazy(()=>import("@/features/user/pages/listBookings"))
+const UserListBookingsPage = lazy(
+  () => import("@/features/user/pages/listBookings")
+);
 
 ////////////////////////--User side--///////////////////////
 ////////////////////////--Mentor side--/////////////////////
@@ -53,6 +55,13 @@ const MentorAppointmentPange = lazy(
   () => import("@/features/mentor/pages/appointment")
 );
 const MentorBooking = lazy(() => import("@/features/user/pages/mentorBooking"));
+const MentorFeedBackPage = lazy(
+  () => import("@/features/mentor/pages/feedBack")
+);
+
+const MentorDashbordPage = lazy(
+  () => import("@/features/mentor/pages/dashboard")
+);
 
 ////////////////////////--Mentor side--/////////////////////
 ////////////////////////--Admin side--/////////////////////
@@ -90,12 +99,15 @@ const Notification = lazy(
 const BookingPaymentSuccess = lazy(
   () => import("@/components/common/payment/bookingSucess")
 );
-
 const SubscriptionPaymentPage = lazy(
   () => import("@/components/common/payment/subscriptionSucess")
 );
-
-const PaymentCancelPage = lazy(()=>import("@/components/common/payment/cancel"))
+const PaymentCancelPage = lazy(
+  () => import("@/components/common/payment/cancel")
+);
+const PaymentHistoryPage = lazy(
+  () => import("@/components/common/payment/paymentHistory")
+);
 ////////////////////////--Common side--////////////////////
 
 const routes = createBrowserRouter(
@@ -264,6 +276,16 @@ const routes = createBrowserRouter(
             </UserProtected>
           ),
         },
+        {
+          path: UserUrls.paymentHistory,
+          element: (
+            <UserProtected>
+              <Suspense fallback={<div>Loading ....</div>}>
+                <PaymentHistoryPage />
+              </Suspense>
+            </UserProtected>
+          ),
+        },
       ],
     },
 
@@ -344,6 +366,16 @@ const routes = createBrowserRouter(
           ),
         },
         {
+          path: MentorUrl.dashboard,
+          element: (
+            <MentorProtected>
+              <Suspense fallback={<div>Loading...</div>}>
+                <MentorDashbordPage />
+              </Suspense>
+            </MentorProtected>
+          ),
+        },
+        {
           path: MentorUrl.contact,
           element: (
             <MentorProtected>
@@ -390,6 +422,26 @@ const routes = createBrowserRouter(
             <MentorProtected>
               <Suspense fallback={<div>Loading...</div>}>
                 <MentorAppointmentPange />
+              </Suspense>
+            </MentorProtected>
+          ),
+        },
+        {
+          path: MentorUrl.paymentHistory,
+          element: (
+            <MentorProtected>
+              <Suspense fallback={<div>Loading...</div>}>
+                <PaymentHistoryPage />
+              </Suspense>
+            </MentorProtected>
+          ),
+        },
+        {
+          path: MentorUrl.feedBack,
+          element: (
+            <MentorProtected>
+              <Suspense fallback={<div>Loading...</div>}>
+                <MentorFeedBackPage />
               </Suspense>
             </MentorProtected>
           ),

@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Star,
   Loader,
+  IndianRupee,
 } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { errorTost } from "@/components/ui/tosastMessage";
@@ -17,17 +18,21 @@ import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import {
   useFetchMentorProfileImageMutation,
   useFetchMentorProfileMutation,
-  useFetchSlotsMutation,
 } from "@/services/apis/MentorApis";
 import dummyProfileImage from "@/assets/images/dummy-profile.webp";
 import { useCreateBookingCheckoutSessionMutation } from "@/services/apis/CommonApis";
 import { useGetUser } from "@/hooks/useGetUser";
+import {
+  useLockSlotMutation,
+  useUserFetchSlotsMutation,
+} from "@/services/apis/UserApis";
 
 export interface Slot {
   mentorId: string;
   date: string;
   startTime: string;
   duration: number;
+  salary: number;
   isBooked: boolean;
   description?: string;
   recurringDays?: string[];
@@ -39,7 +44,7 @@ const MentorBooking = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const [slots, setSlots] = useState<Slot[]>([]);
-  const [findSlots] = useFetchSlotsMutation();
+  const [findSlots] = useUserFetchSlotsMutation();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [bookingStep, setBookingStep] = useState("calendar");
   const { mentorId } = useParams();
@@ -48,6 +53,7 @@ const MentorBooking = () => {
   const [fetchProfileImages] = useFetchMentorProfileImageMutation();
   const [createChecKoutSession, { isLoading: createChecKoutSessionIsloading }] =
     useCreateBookingCheckoutSessionMutation();
+  const [lockSlot] = useLockSlotMutation();
   const user = useGetUser();
 
   // Fetch mentor data
@@ -81,6 +87,7 @@ const MentorBooking = () => {
   const fetchSlots = async () => {
     try {
       const response: IAxiosResponse = await findSlots(mentor.id);
+
       if (response.data) {
         setSlots(response.data.slots);
       } else {
@@ -159,20 +166,33 @@ const MentorBooking = () => {
   const handleBooking = async () => {
     try {
       if (createChecKoutSessionIsloading) return;
-      const data = {
-        name: mentor.name,
-        ...selectedSlot,
-      };
-      const response: IAxiosResponse = await createChecKoutSession({
-        data,
+      const response: IAxiosResponse = await lockSlot({
+        slotId: selectedSlot?.id,
         userId: user?.id as string,
-        type: "booking",
       });
-
       if (response.data) {
-        window.location.href = response.data.url;
+        const data = {
+          name: mentor.name,
+          ...selectedSlot,
+        };
+        const response: IAxiosResponse = await createChecKoutSession({
+          data,
+          userId: user?.id as string,
+          type: "booking",
+        });
+
+        if (response.data) {
+          window.location.href = response.data.url;
+        } else {
+          errorTost("Error", [
+            {
+              message:
+                response.error?.data?.error[0].message || "Booking failed.",
+            },
+          ]);
+        }
       } else {
-        errorTost("Error", [
+        errorTost("Booking faild", [
           {
             message:
               response.error?.data?.error[0].message || "Booking failed.",
@@ -417,6 +437,12 @@ const MentorBooking = () => {
                           selectedSlot.startTime,
                           selectedSlot.duration
                         )}
+                    </span>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-2xl flex justify-between">
+                    <IndianRupee className="w-6 h-6 mr-2 text-gray-600" />
+                    <span className="font-bold text-black">
+                      {selectedSlot.salary}
                     </span>
                   </div>
                 </div>

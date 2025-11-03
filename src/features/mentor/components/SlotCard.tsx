@@ -1,20 +1,28 @@
-import { Calendar, CheckCircle, Trash2 } from "lucide-react";
+import { Calendar, CheckCircle, Loader, Trash2, X } from "lucide-react";
 import { Slot } from "../pages/appointment";
+import { useCancelBookingMutation, useDeleteSlotMutation } from "@/services/apis/MentorApis";
+import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
+import { errorTost, successToast } from "@/components/ui/tosastMessage";
 
 // SlotCard Component
 interface SlotCardProps {
   slot: Slot;
-  deleteSlot: (id: string) => void;
+  setSlots: React.Dispatch<React.SetStateAction<Slot[]>>;
   formatDuration: (duration: number) => string;
   calculateEndTime: (startTime: string, duration: number) => string;
 }
 
 export const SlotCard = ({
   slot,
-  deleteSlot,
+  setSlots,
   formatDuration,
   calculateEndTime,
 }: SlotCardProps) => {
+  const [slotDelete, { isLoading: deleteSlotIsLoading }] =
+    useDeleteSlotMutation();
+  const [cancelBooking, { isLoading: cancelBookingIsLoading }] =
+    useCancelBookingMutation();
+
   const getStatusColor = (status: string): string => {
     switch (status) {
       case "available":
@@ -35,6 +43,66 @@ export const SlotCard = ({
       month: "long",
       day: "numeric",
     });
+  };
+
+  const isTimeGreaterThan24Hours = (): boolean => {
+    const slotDateTime = new Date(`${slot.date}T${slot.startTime}`);
+    const currentDateTime = new Date();
+    const timeDifference = slotDateTime.getTime() - currentDateTime.getTime();
+    const hoursRemaining = timeDifference / (1000 * 60 * 60);
+    return hoursRemaining > 24;
+  };
+
+  const shouldShowCancelButton = (): boolean => {
+    return slot.isBooked && isTimeGreaterThan24Hours();
+  };
+
+  const shouldShowDeleteButton = (): boolean => {
+    return slot.status !== "booked" || isTimeGreaterThan24Hours();
+  };
+
+  const deleteSlot = async (id: string) => {
+    try {
+      const response: IAxiosResponse = await slotDelete(id);
+      if (response.data) {
+        successToast("Deleted", "Slot deletion successful");
+        setSlots((prev) => prev.filter((slot) => slot.id !== id));
+      } else {
+        errorTost(
+          "Something went wrong",
+          response.error.data.error || [
+            { message: "Something went wrong please try again" },
+          ]
+        );
+      }
+    } catch (error) {
+      console.error("Error deleting slot:", error);
+      errorTost("Something wrong", [
+        { message: "Failed to delete slot please try again" },
+      ]);
+    }
+  };
+
+  const cancelSlot = async (id: string) => {
+    try {
+      const response: IAxiosResponse = await cancelBooking(id);
+      if (response.data) {
+        successToast("Cancelled", "Slot cancellation successful");
+        setSlots((prev) => prev.filter((slot) => slot.id !== id));
+      } else {
+        errorTost(
+          "Something went wrong",
+          response.error.data.error || [
+            { message: "Something went wrong please try again" },
+          ]
+        );
+      }
+    } catch (error) {
+      console.error("Error cancelling slot:", error);
+      errorTost("Something wrong", [
+        { message: "Failed to cancel slot please try again" },
+      ]);
+    }
   };
 
   return (
@@ -94,15 +162,39 @@ export const SlotCard = ({
           </div>
         </div>
 
-        <div className="flex gap-2 mt-6 pt-4 border-t border-gray-100">
-          {/* <button
-            onClick={() => deleteSlot(slot.id)}
-            className="flex-1 inline-flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-medium transition-colors"
-          >
-            <Trash2 size={16} />
-            Delete
-          </button> */}
-        </div>
+        {shouldShowDeleteButton() && (
+          <div className="flex gap-2 mt-6 pt-4 border-t border-gray-100">
+            {shouldShowCancelButton() ? (
+              <button
+                onClick={() => cancelSlot(slot.id as string)}
+                className="flex-1 inline-flex items-center justify-center gap-2 bg-yellow-50 hover:bg-yellow-100 text-yellow-600 px-4 py-2 rounded-lg font-medium transition-colors"
+              >
+                {cancelBookingIsLoading ? (
+                  <Loader className="animate-spin" />
+                ) : (
+                  <>
+                    <X size={16} />
+                    Cancel Booking
+                  </>
+                )}
+              </button>
+            ) : (
+              <button
+                onClick={() => deleteSlot(slot.id as string)}
+                className="flex-1 inline-flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-medium transition-colors"
+              >
+                {deleteSlotIsLoading ? (
+                  <Loader className="animate-spin" />
+                ) : (
+                  <>
+                    <Trash2 size={16} />
+                    Delete
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

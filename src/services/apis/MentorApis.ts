@@ -73,9 +73,23 @@ export const mentorApi = createApi({
     }),
     // Fetch slots
     fetchSlots: builder.mutation({
-      query: (mentorId) => ({
-        url: `${MentorApiEndPoints.fetchSlots}/${mentorId}`,
+      query: ({ mentorId, page, searchData }) => ({
+        url: `${MentorApiEndPoints.fetchSlots}?mentorId=${mentorId}&&page=${page}&&searchData=${searchData}`,
         method: "GET",
+      }),
+    }),
+
+    deleteSlot: builder.mutation({
+      query: (mentorId) => ({
+        url: `${MentorApiEndPoints.deleteSlot}/${mentorId}`,
+        method: "DELETE",
+      }),
+    }),
+
+    cancelBooking: builder.mutation({
+      query: (id) => ({
+        url: `${MentorApiEndPoints.cancelBooking}/${id}`,
+        method: "PATCH",
       }),
     }),
   }),
@@ -91,4 +105,6 @@ export const {
   useCreateOneSlotMutation,
   useCreateRecurringSlotMutation,
   useFetchSlotsMutation,
+  useDeleteSlotMutation,
+  useCancelBookingMutation
 } = mentorApi;

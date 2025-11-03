@@ -1,4 +1,4 @@
-import { IpaymentStatus } from "./PaymentStatus.enum";
+import { PaymentStatus } from "../paymentEnum";
 
 export class IPayment {
   constructor(
@@ -6,7 +6,7 @@ export class IPayment {
     public mentorId: string,
     public userId: string,
     public slotId: string, 
-    public status: IpaymentStatus,
+    public status: PaymentStatus,
     public paymentId: string,
     public id?: string,
     public transactionDate?: string,

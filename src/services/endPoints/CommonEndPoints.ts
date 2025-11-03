@@ -21,4 +21,12 @@ export enum CommonApiEndPoints {
   updateSubscriptionPaymet = "payment/common/updatesubscriptionpaymet",
   updateBookingPaymet = "payment/common/updatesubbookingpaymet",
   fetchBookings = "/payment/common/fetchbookings",
+  cancelBooking = "/payment/common/cancelbooking",
+  fetchPaymentHistory = "/payment/common/fetchpaymenthistory",
+  uploadBankStatement = "/payment/common/uploadbankstatement",
+  addPaymetHistory = "/payment/common/addpaymenthistory",
+  fetchFeedback = "/user/common/fetchfeedback",
+  fetchAllAdvs = "/adv/common/fetchalladvs",
+  fetchAllTrustedus = "/adv/common/fetchalltrustedus"
+
 }

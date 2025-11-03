@@ -6,7 +6,7 @@ export enum MentorUrl {
   signOut = "/mentor/signout",
   forgotPassword = "/mentor/forgotpassword",
   setNewPassword = "/mentor/resetpassword/:token",
-  appointment = "/mentor/appointment",
+  appointment = "/mentor/appointments",
   notifications = "/mentor/notifications",
   profile = "/mentor/profile",
   subscription = "/mentor/subscription",
@@ -15,4 +15,7 @@ export enum MentorUrl {
   call = "/mentor/call",
   about = "/mentor/about",
   videoCall = "/mentor/videoCall",
+  paymentHistory = "/mentor/paymethistory",
+  dashboard = "",
+  feedBack = "/mentor/feedback",
 }

@@ -109,10 +109,10 @@ export const MentorListCard: React.FC<MentorCardProps> = ({
         <Separator className="my-3 sm:my-4" />
 
         <div className="flex flex-col sm:flex-row justify-between items-center">
-          <p className="font-medium mb-3 sm:mb-0 text-center sm:text-left">
+          {/* <p className="font-medium mb-3 sm:mb-0 text-center sm:text-left">
             Salary:
             <span className="text-primary">₹ {mentor.salary || 0}/hr</span>
-          </p>
+          </p> */}
           <div className="flex gap-2 w-full sm:w-auto">
             <Link
               className="flex-1 sm:flex-initial sm:w-24 bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 hover:dark:bg-gray-900 flex items-center justify-center rounded-md text-sm "

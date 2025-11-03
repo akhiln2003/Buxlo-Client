@@ -284,7 +284,7 @@ const ListMentors = () => {
             <div>
               <h1 className="text-xl font-bold">Chartered Accountants</h1>
               <p className="text-sm text-gray-500">
-                Find the right CA for your financial needs.
+                Find the right mentor for your financial needs.
               </p>
             </div>
 

@@ -95,8 +95,6 @@ export const adminApi = createApi({
       }),
     }),
 
-  
-
     // Add subscription plans
     addSubscriptionPlan: builder.mutation({
       query: (data) => ({
@@ -106,12 +104,20 @@ export const adminApi = createApi({
       }),
     }),
 
+    // Delete subscription plan
+    deleteSubscriptionPlan: builder.mutation({
+      query: (id) => ({
+        url: `${AdminApiEndPoints.deleteSubscriptionPlan}/${id}`,
+        method: "DELETE",
+      }),
+    }),
+
     //  Update SubscriptionPlan
     UpdateSubscriptionPlan: builder.mutation({
       query: (data) => ({
         url: AdminApiEndPoints.updateSubscriptionPlan,
         method: "PUT",
-        data: {data},
+        data: { data },
       }),
     }),
     // Fetch verify profile data
@@ -140,6 +146,30 @@ export const adminApi = createApi({
       }),
     }),
 
+    // Fetch user summery
+    fetchUserSummery: builder.mutation({
+      query: () => ({
+        url: AdminApiEndPoints.fetchUserSummery,
+        method: "GET",
+      }),
+    }),
+
+    // Fetch mentor summery
+    fetchMentorSummery: builder.mutation({
+      query: () => ({
+        url: AdminApiEndPoints.fetchMentorSummery,
+        method: "GET",
+      }),
+    }),
+
+    // Fetch incom summery
+    fetchIncomSummery: builder.mutation({
+      query: () => ({
+        url: AdminApiEndPoints.fetchIncomSummery,
+        method: "GET",
+      }),
+    }),
+
     ///////////////////////////////////////////////////////////////////////////////
   }),
 });
@@ -156,8 +186,12 @@ export const {
   useDeleteAdvImageMutation,
   useEditAdvMutation,
   useAddSubscriptionPlanMutation,
+  useDeleteSubscriptionPlanMutation,
   useUpdateSubscriptionPlanMutation,
   useFetchVerifyProfileDataMutation,
   useFethAadhaarImagesMutation,
   useAdminUpdateVerifyProfileMutation,
+  useFetchIncomSummeryMutation,
+  useFetchMentorSummeryMutation,
+  useFetchUserSummeryMutation,
 } = adminApi;

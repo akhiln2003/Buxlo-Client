@@ -32,6 +32,8 @@ interface FilterDropdownProps {
   setStartDate: (date: string) => void;
   endDate: string;
   setEndDate: (date: string) => void;
+  onApplyFilter: () => void;
+  onClearFilter: () => void;
 }
 
 export function FilterSection({
@@ -44,7 +46,9 @@ export function FilterSection({
   startDate,
   setStartDate,
   endDate,
-  setEndDate
+  setEndDate,
+  onApplyFilter,
+  onClearFilter
 }: FilterDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   // Create a local state for active tab to manage UI independently
@@ -72,17 +76,11 @@ export function FilterSection({
 
   const handleFilterTypeChange = (type: "day" | "month" | "year") => {
     setActiveTab(type); // Update the UI tab
-    
-    // Only update the actual filter type when applying filters
-    // This prevents premature filter changes
   };
 
   const clearAllFilters = () => {
-    setFilterType("");
-    setSelectedYear("");
-    setSelectedMonth("");
-    setStartDate("");
-    setEndDate("");
+    onClearFilter(); // Call the parent's clear handler
+    setIsOpen(false);
   };
 
   const hasActiveFilters = filterType !== "" || 
@@ -92,8 +90,39 @@ export function FilterSection({
     endDate !== "";
 
   const applyFilters = () => {
+    // Validate based on active tab
+    if (activeTab === "year" && !selectedYear) {
+      alert("Please select a year");
+      return;
+    }
+    
+    if (activeTab === "month" && (!selectedYear || !selectedMonth)) {
+      alert("Please select both year and month");
+      return;
+    }
+    
+    if (activeTab === "day" && (!startDate || !endDate)) {
+      alert("Please select both start and end dates");
+      return;
+    }
+
+    // Validate date range if day filter
+    if (activeTab === "day" && startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      if (start > end) {
+        alert("Start date must be before end date");
+        return;
+      }
+    }
+
     // Apply the active tab as filter type when user clicks "Apply"
     setFilterType(activeTab);
+    
+    // Call the parent's apply handler to fetch data
+    onApplyFilter();
+    
+    // Close the popover
     setIsOpen(false);
   };
 
@@ -131,7 +160,7 @@ export function FilterSection({
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
                       className="w-full h-9 pl-10 pr-3 border rounded-md text-sm"
-                      onClick={(e) => e.stopPropagation()} // Prevent closing on click
+                      onClick={(e) => e.stopPropagation()}
                     />
                   </div>
                 </div>
@@ -144,7 +173,7 @@ export function FilterSection({
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
                       className="w-full h-9 pl-10 pr-3 border rounded-md text-sm"
-                      onClick={(e) => e.stopPropagation()} // Prevent closing on click
+                      onClick={(e) => e.stopPropagation()}
                     />
                   </div>
                 </div>
@@ -157,7 +186,6 @@ export function FilterSection({
                     value={selectedMonth} 
                     onValueChange={setSelectedMonth} 
                     onOpenChange={(open) => {
-                      // Prevent propagation when Select is opened or closed
                       if (!open) {
                         setTimeout(() => setIsOpen(true), 0);
                       }
@@ -171,7 +199,7 @@ export function FilterSection({
                         <SelectItem 
                           key={month.value} 
                           value={month.value}
-                          onClick={(e) => e.stopPropagation()} // Prevent closing on click
+                          onClick={(e) => e.stopPropagation()}
                         >
                           {month.label}
                         </SelectItem>
@@ -185,7 +213,6 @@ export function FilterSection({
                     value={selectedYear} 
                     onValueChange={setSelectedYear}
                     onOpenChange={(open) => {
-                      // Prevent propagation when Select is opened or closed
                       if (!open) {
                         setTimeout(() => setIsOpen(true), 0);
                       }
@@ -199,7 +226,7 @@ export function FilterSection({
                         <SelectItem 
                           key={year} 
                           value={year}
-                          onClick={(e) => e.stopPropagation()} // Prevent closing on click
+                          onClick={(e) => e.stopPropagation()}
                         >
                           {year}
                         </SelectItem>
@@ -216,7 +243,6 @@ export function FilterSection({
                     value={selectedYear} 
                     onValueChange={setSelectedYear}
                     onOpenChange={(open) => {
-                      // Prevent propagation when Select is opened or closed
                       if (!open) {
                         setTimeout(() => setIsOpen(true), 0);
                       }
@@ -230,7 +256,7 @@ export function FilterSection({
                         <SelectItem 
                           key={year} 
                           value={year}
-                          onClick={(e) => e.stopPropagation()} // Prevent closing on click
+                          onClick={(e) => e.stopPropagation()}
                         >
                           {year}
                         </SelectItem>
@@ -251,7 +277,7 @@ export function FilterSection({
                       size="icon" 
                       className="h-4 w-4 p-0 ml-1"
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent closing on click
+                        e.stopPropagation();
                         setSelectedYear("");
                       }}
                     >
@@ -268,7 +294,7 @@ export function FilterSection({
                       size="icon" 
                       className="h-4 w-4 p-0 ml-1"
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent closing on click
+                        e.stopPropagation();
                         setSelectedMonth("");
                       }}
                     >
@@ -285,7 +311,7 @@ export function FilterSection({
                       size="icon" 
                       className="h-4 w-4 p-0 ml-1"
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent closing on click
+                        e.stopPropagation();
                         setStartDate("");
                       }}
                     >
@@ -302,7 +328,7 @@ export function FilterSection({
                       size="icon" 
                       className="h-4 w-4 p-0 ml-1"
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent closing on click
+                        e.stopPropagation();
                         setEndDate("");
                       }}
                     >
@@ -320,7 +346,7 @@ export function FilterSection({
                 variant="ghost" 
                 size="sm" 
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevent closing on click
+                  e.stopPropagation();
                   clearAllFilters();
                 }}
                 className="text-red-500"

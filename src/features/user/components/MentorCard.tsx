@@ -39,8 +39,10 @@ const MentorCard: React.FC<MentorCardProps> = ({ userId }) => {
       const response: IAxiosResponse = await fetchBookings({
         userId,
         page: pageNationData.pageNum,
+        status:"all"
       });
-
+      console.log("dfdsfdf " , response);
+      
       if (response.data) {
         setBookings(response.data.bookings);
         setPageNationData((prev) => ({

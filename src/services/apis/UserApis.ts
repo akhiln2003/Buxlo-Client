@@ -61,8 +61,6 @@ export const userApi = createApi({
       }),
     }),
 
-  
-
     // Add a new category
     moneyCategorize: builder.mutation({
       query: (data) => ({
@@ -80,6 +78,76 @@ export const userApi = createApi({
       }),
     }),
 
+    //fetchSlots
+    userFetchSlots: builder.mutation({
+      query: (mentorId) => ({
+        url: `${UserApiEndPoints.fetchSlots}/${mentorId}`,
+        method: "GET",
+      }),
+    }),
+
+    // sendFeedback
+    sendFeedback: builder.mutation({
+      query: (data) => ({
+        url: UserApiEndPoints.sendFeedback,
+        method: "POST",
+        data: data,
+      }),
+    }),
+
+    // Lik and dislike Feedback
+    likeAndDislike: builder.mutation({
+      query: ({
+        id,
+        userId,
+        option,
+        remove,
+      }: {
+        id: string;
+        userId: string;
+        option: "like" | "disLike";
+        remove: boolean;
+      }) => ({
+        url: UserApiEndPoints.likeAndDislike,
+        method: "PATCH",
+        data: {
+          id,
+          userId,
+          option,
+          remove,
+        },
+      }),
+    }),
+
+    // Lock slot
+    lockSlot: builder.mutation({
+      query: ({ slotId, userId }) => ({
+        url: `${UserApiEndPoints.lockSlot}/${slotId}/${userId}`,
+        method: "PATCH",
+      }),
+    }),
+
+    // Fetch paymet history summary
+    fetchPaymentHistorySummary: builder.mutation({
+      query: ({
+        userId,
+        year,
+        startMonth,
+        endMonth,
+        startDate,
+        endDate,
+      }: {
+        userId: string;
+        year?: number;
+        startMonth?: string;
+        endMonth?: string;
+        startDate?: string;
+        endDate?: string;
+      }) => ({
+        url: `${UserApiEndPoints.fetchPaymentHistorySummary}?userId=${userId}&&year=${year}&&startMonth=${startMonth}&&endMonth=${endMonth}&&startDate=${startDate}&&endDate=${endDate}`,
+        method: "GET",
+      }),
+    }),
     /////////////////////////////////////////////////////////////////////////
   }),
 });
@@ -94,4 +162,9 @@ export const {
   useConnectMentorMutation,
   useMoneyCategorizeMutation,
   useFetchMoneyCategorizeMutation,
+  useUserFetchSlotsMutation,
+  useSendFeedbackMutation,
+  useLikeAndDislikeMutation,
+  useLockSlotMutation,
+  useFetchPaymentHistorySummaryMutation,
 } = userApi;

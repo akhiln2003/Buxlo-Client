@@ -37,24 +37,33 @@ interface SubscriptionModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentSubscription?: string;
+  currentSubscriptionType?: string; // Add this prop to pass current plan type
 }
+
+// Plan hierarchy: Day < Month < Year
+const PLAN_HIERARCHY: { [key: string]: number } = {
+  day: 1,
+  month: 2,
+  year: 3,
+};
 
 const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
   isOpen,
   onClose,
   currentSubscription,
+  currentSubscriptionType,
 }) => {
   const [selectedPlan, setSelectedPlan] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [rowPlans, setRowPlans] = useState<SubscriptionPlan[]>([]);
+  const [filteredPlans, setFilteredPlans] = useState<SubscriptionPlan[]>([]);
 
   const [fetchPlan] = useFetchSubscriptionPlanMutation();
   const [createChecKoutSession] =
     useCreateSubscriptionCheckoutSessionMutation();
   const user = useGetUser();
 
-  // Function to transform backend data to frontend format
   // Function to transform backend data to frontend format with percentage-based offers
   const transformBackendData = (
     backendPlans: BackendSubscriptionPlan[]
@@ -163,6 +172,27 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
     });
   };
 
+  // Filter plans based on current subscription
+  const filterUpgradeablePlans = (
+    allPlans: SubscriptionPlan[],
+    currentType?: string
+  ): SubscriptionPlan[] => {
+    if (!currentType) {
+      // No current subscription, show all plans
+      return allPlans;
+    }
+
+    const currentTypeKey = currentType.toLowerCase();
+    const currentHierarchy = PLAN_HIERARCHY[currentTypeKey] || 0;
+
+    // Filter plans that are higher in hierarchy
+    return allPlans.filter((plan) => {
+      const planTypeKey = plan.period.split(" ").pop()?.toLowerCase() || "";
+      const planHierarchy = PLAN_HIERARCHY[planTypeKey] || 0;
+      return planHierarchy > currentHierarchy;
+    });
+  };
+
   const handlePurchase = async (plan: SubscriptionPlan) => {
     setIsLoading(true);
     try {
@@ -188,6 +218,8 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
     } catch (error) {
       console.error("Error during booking:", error);
       errorTost("Error", [{ message: "Something went wrong while booking." }]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -206,6 +238,13 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
         });
 
         setPlans(sortedPlans);
+
+        // Filter plans based on current subscription
+        const filtered = filterUpgradeablePlans(
+          sortedPlans,
+          currentSubscriptionType
+        );
+        setFilteredPlans(filtered);
       } else {
         errorTost(
           "Something went wrong",
@@ -231,6 +270,9 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
 
   if (!isOpen) return null;
 
+  const plansToDisplay = filteredPlans.length > 0 ? filteredPlans : plans;
+  const hasNoUpgrades = currentSubscriptionType && filteredPlans.length === 0;
+
   return (
     <AnimatePresence>
       <motion.div
@@ -252,10 +294,12 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
             <div>
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 <Crown className="w-8 h-8 text-yellow-500" />
-                Choose Your Plan
+                {hasNoUpgrades ? "Your Plan" : "Choose Your Plan"}
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mt-1">
-                Unlock premium features and accelerate your learning journey
+                {hasNoUpgrades
+                  ? "You already have the highest tier subscription"
+                  : "Unlock premium features and accelerate your learning journey"}
               </p>
             </div>
             <button
@@ -279,7 +323,9 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                     {plans.find((p) => p.id === currentSubscription)?.name}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Your subscription is active and renews automatically
+                    {hasNoUpgrades
+                      ? "You have the highest tier plan available"
+                      : "Your subscription is active and renews automatically"}
                   </p>
                 </div>
               </div>
@@ -288,7 +334,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
 
           {/* Plans Grid */}
           <div className="p-6">
-            {plans.length === 0 ? (
+            {plansToDisplay.length === 0 ? (
               <div className="text-center py-12">
                 <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
                 <p className="text-gray-600 dark:text-gray-400">
@@ -297,7 +343,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
               </div>
             ) : (
               <div className="grid lg:grid-cols-3 gap-8">
-                {plans.map((plan) => (
+                {plansToDisplay.map((plan) => (
                   <motion.div
                     key={plan.id}
                     whileHover={{ scale: 1.02 }}
@@ -400,7 +446,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                         ) : selectedPlan === plan.id ? (
                           <>
                             <CreditCard className="w-4 h-4" />
-                            Purchase {plan.name}
+                            Upgrade to {plan.name}
                           </>
                         ) : (
                           <>Select Plan</>
@@ -409,6 +455,22 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                     </div>
                   </motion.div>
                 ))}
+              </div>
+            )}
+
+            {/* No Upgrades Available Message */}
+            {hasNoUpgrades && (
+              <div className="text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-xl">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white mb-4">
+                  <Crown className="w-8 h-8" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  Premium Member
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+                  You already have the highest tier subscription. Enjoy all the
+                  premium features!
+                </p>
               </div>
             )}
 

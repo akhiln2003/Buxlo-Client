@@ -1,7 +1,7 @@
 export enum PaymentStatus {
   AVAILABLE = "available",
   BOOKED = "booked",
-  CANCELED = "cancelled",
+  CANCELLED = "cancelled",
   PENDING = "pending",
   FAILD = "failed",
 }

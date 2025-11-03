@@ -15,6 +15,7 @@ import {
   FolderOpen,
   HelpCircle,
   Crown,
+  History,
 } from "lucide-react";
 import profileImage from "@/assets/images/dummy-profile.webp";
 import { motion, AnimatePresence } from "framer-motion";
@@ -37,7 +38,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
 import { useTheme } from "@/contexts/themeContext";
 import { useDispatch } from "react-redux";
 import { addUser } from "@/redux/slices/userSlice";
@@ -115,16 +115,18 @@ const getDefaultPageCategories = (
           name: "User Dashboard",
           icon: <FolderOpen size={16} />,
           routes: [
-            { name: "Profile", url: UserUrls.profile },
-            { name: "Subscription", url: UserUrls.subscription },
             { name: "Dashboard", url: UserUrls.dashboard },
+            { name: "Profile", url: UserUrls.profile },
             { name: "Mentor List", url: UserUrls.listMentors },
           ],
         },
         {
-          name: "Communication",
-          icon: <MessageCircle size={16} />,
-          routes: [{ name: "Chat", url: UserUrls.chat }],
+          name: "History",
+          icon: <History size={16} />,
+          routes: [
+            { name: "Payment History", url: UserUrls.paymentHistory },
+            { name: "Booking History", url: UserUrls.listBookings },
+          ],
         },
         {
           name: "Support",
@@ -133,6 +135,11 @@ const getDefaultPageCategories = (
             { name: "Contact", url: UserUrls.contact },
             { name: "About Us", url: UserUrls.about },
           ],
+        },
+        {
+          name: "Communication",
+          icon: <MessageCircle size={16} />,
+          routes: [{ name: "Chat", url: UserUrls.chat }],
         },
       ];
     case USER_ROLE.MENTOR:
@@ -144,7 +151,7 @@ const getDefaultPageCategories = (
             { name: "Profile", url: MentorUrl.profile },
             { name: "Appointment", url: MentorUrl.appointment },
             { name: "Students", url: MentorUrl.signIn },
-            { name: "Sessions", url: MentorUrl.signIn },
+            { name: "FeedBack", url: MentorUrl.feedBack },
           ],
         },
         {
@@ -185,6 +192,8 @@ function ReusableNavbar({
   );
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] =
     useState<boolean>(false);
+  const [profilePhoto, setProfilePhoto] = useState<string>("");
+  const [isSubscription, setSubscription] = useState<boolean>(false);
 
   const { isDarkMode, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -192,7 +201,6 @@ function ReusableNavbar({
   const user = useGetUser();
   const dispatch = useDispatch();
   const [fetchProfileImage] = useFetchMentorProfileImageMutation();
-  const [profilePhoto, setProfilePhoto] = useState<string>("");
   const [fetchUserProfileData] = useFetchUserProfileMutation();
   const [fetchMentorProfileData] = useFetchMentorProfileMutation();
 
@@ -201,10 +209,80 @@ function ReusableNavbar({
     navigationItems || getDefaultNavigationItems(role);
   const finalPageCategories = pageCategories || getDefaultPageCategories(role);
 
+  // Determine if user is authenticated
+  const isAuthenticated = user?.role === role;
+
+  // Get the correct home URL based on role
+  const getHomeUrl = (): string => {
+    if (!isAuthenticated) return homeUrl;
+    return role === USER_ROLE.USER ? "/" : "/mentor";
+  };
+
+  const userAvatar = profilePhoto || profileImage;
+
+  // Fetch user profile image
+  useEffect(() => {
+    const fetchUserProfileImage = async () => {
+      if (!user?.avatar) return;
+
+      try {
+        const folderName =
+          user.role === "user" ? "UserProfiles/" : "MentorProfiles/";
+        const imageUrl: IAxiosResponse = await fetchProfileImage([
+          `${folderName}${user.avatar}`,
+        ]);
+
+        if (imageUrl.data?.imageUrl?.[0]) {
+          setProfilePhoto(imageUrl.data.imageUrl[0]);
+        } else {
+          errorTost(
+            "Image Load Failed",
+            imageUrl.error?.data?.error || [
+              { message: `${imageUrl.error?.data} please try again later` },
+            ]
+          );
+        }
+      } catch (err) {
+        console.error("Error while fetching profile image:", err);
+        errorTost("Data Load Failed", [
+          { message: "Failed to fetch profile image" },
+        ]);
+      }
+    };
+
+    fetchUserProfileImage();
+  }, [user, fetchProfileImage]);
+
+  // Fetch user subscription status
+  useEffect(() => {
+    const fetchUserSubscriptionStatus = async () => {
+      if (!user?.id) return;
+
+      try {
+        const response: IAxiosResponse =
+          user.role === USER_ROLE.USER
+            ? await fetchUserProfileData(user.id)
+            : await fetchMentorProfileData(user.id);
+
+        if (response.data?.data) {
+          setSubscription(!!response.data.data.premiumId);
+        }
+      } catch (err) {
+        console.error("Error fetching user subscription status:", err);
+        errorTost("Data Load Failed", [
+          { message: "Something went wrong, please try again" },
+        ]);
+      }
+    };
+
+    fetchUserSubscriptionStatus();
+  }, [user, fetchUserProfileData, fetchMentorProfileData]);
+
   const handleSignOutUser = async (): Promise<void> => {
     try {
       const signOutFunction = customSignOutMutation || signOut;
       const response: IAxiosResponse = await signOutFunction(user?.email || "");
+
       if (response.data) {
         dispatch(addUser(null));
         navigate(signInUrl);
@@ -236,65 +314,6 @@ function ReusableNavbar({
     setIsSubscriptionModalOpen(true);
   };
 
-  const isAuthenticated = user?.role === role;
-  const userAvatar = profilePhoto || profileImage;
-  const [isPremium, setPremium] = useState<boolean>(false);
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        if (user?.avatar) {
-          const folderName =
-            user.role == "user" ? "UserProfiles/" : "MentorProfiles/";
-
-          const imageUrl: IAxiosResponse = await fetchProfileImage([
-            `${folderName}${user.avatar}`,
-          ]);
-          if (imageUrl.data.imageUrl) {
-            setProfilePhoto(imageUrl.data.imageUrl[0]);
-          } else {
-            errorTost(
-              "Image Load Failed",
-              imageUrl.error.data.error || [
-                { message: `${imageUrl.error.data} please try again later` },
-              ]
-            );
-          }
-        }
-      } catch (err) {
-        console.error("Error wile fetching profile image ", err);
-
-        errorTost("Data Load Failed", [
-          { message: "Faild to fetch profile image" },
-        ]);
-      }
-    };
-
-    fetchUserData();
-  }, [user]);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response: IAxiosResponse =
-          user?.role == USER_ROLE.USER
-            ? await fetchUserProfileData(user!.id)
-            : await fetchMentorProfileData(user!.id);
-
-        if (response.data.data) {
-          setPremium(response.data.data.premiumId ? true : false);
-        }
-      } catch (err) {
-        console.error("Error fetching users:", err);
-        errorTost("Data Load Failed", [
-          { message: "Something went wrong please try again" },
-        ]);
-      }
-    };
-    if (user) {
-      fetchUserData();
-    }
-  }, [user]);
-
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md z-50 border-b border-gray-200/20 dark:border-gray-800/20">
@@ -302,7 +321,7 @@ function ReusableNavbar({
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex-shrink-0">
-              <Link to={homeUrl} className="block">
+              <Link to={getHomeUrl()} className="block">
                 <img
                   src={isDarkMode ? logoWhite : logoBlack}
                   alt="BUXLo Logo"
@@ -314,24 +333,32 @@ function ReusableNavbar({
             {/* Desktop Navigation */}
             {showCenterNavigation && (
               <div className="hidden lg:flex items-center space-x-6 xl:space-x-8">
-                {/* Dashboard Link */}
-                {role === USER_ROLE.USER ? (
-                  dashboardUrl && (
-                    <Link
-                      to={dashboardUrl}
-                      className="text-sm font-extrabold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200 uppercase tracking-wide"
-                    >
-                      Dashboard
-                    </Link>
-                  )
-                ) : (
+                {/* Home Link - Always visible */}
+                <Link
+                  to={getHomeUrl()}
+                  className="text-sm font-extrabold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200 uppercase tracking-wide"
+                >
+                  Home
+                </Link>
+
+                {/* Dashboard/Appointment Link - Only when authenticated */}
+                {/* {isAuthenticated && role === USER_ROLE.USER && dashboardUrl && (
+                  <Link
+                    to={dashboardUrl}
+                    className="text-sm font-extrabold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200 uppercase tracking-wide"
+                  >
+                    Dashboard
+                  </Link>
+                )} */}
+
+                {/* {isAuthenticated && role === USER_ROLE.MENTOR && (
                   <Link
                     to={MentorUrl.appointment}
                     className="text-sm font-extrabold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200 uppercase tracking-wide"
                   >
                     Appointment
                   </Link>
-                )}
+                )} */}
 
                 {/* Pages Dropdown */}
                 {finalPageCategories.length > 0 && (
@@ -388,20 +415,18 @@ function ReusableNavbar({
             )}
 
             {/* Desktop Right Side */}
-            <div className="hidden md:flex items-center space-x-4 pr-0 mr-0">
-              {/* Subscription Icon */}
-              {!isPremium && (
+            <div className="hidden md:flex items-center space-x-4">
+              {/* Subscription Icon - Only show when authenticated */}
+              {isAuthenticated && !isSubscription && (
                 <motion.button
                   onClick={handleSubscriptionClick}
                   className="flex items-center space-x-1 px-3 py-2 bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-500 hover:from-yellow-500 hover:via-orange-500 hover:to-yellow-600 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-300"
-                  title="Upgrade to Premium"
+                  title="Purchase subscription plan"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <motion.div
-                    animate={{
-                      rotate: [0, -10, 10, -10, 0],
-                    }}
+                    animate={{ rotate: [0, -10, 10, -10, 0] }}
                     transition={{
                       duration: 2,
                       repeat: Infinity,
@@ -410,68 +435,67 @@ function ReusableNavbar({
                   >
                     <Crown className="w-4 h-4" />
                   </motion.div>
-                  <span className="text-xs font-semibold">Premium</span>
+                  <span className="text-xs font-semibold">Subscription</span>
                 </motion.button>
               )}
 
-              <NotificationDropdown
-                notificationsUrl={notificationsUrl}
-                onNotificationClick={() => {}}
-              />
+              {/* Notifications - Only show when authenticated */}
+              {isAuthenticated && (
+                <NotificationDropdown
+                  notificationsUrl={notificationsUrl}
+                  onNotificationClick={() => {}}
+                />
+              )}
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="flex items-center p-1 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200">
-                    <img
-                      src={userAvatar}
-                      alt="User profile"
-                      className="h-8 w-8 rounded-full object-cover"
-                    />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 mr-4">
-                  <DropdownMenuLabel>
-                    <div className="flex items-center space-x-3">
+              {/* User Menu */}
+              {isAuthenticated ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center p-1 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200">
                       <img
                         src={userAvatar}
                         alt="User profile"
                         className="h-8 w-8 rounded-full object-cover"
                       />
-                      <div className="flex flex-col">
-                        <p className="font-semibold capitalize">
-                          {user?.name || "User"}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {user?.email || ""}
-                        </p>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56 mr-4">
+                    <DropdownMenuLabel>
+                      <div className="flex items-center space-x-3">
+                        <img
+                          src={userAvatar}
+                          alt="User profile"
+                          className="h-8 w-8 rounded-full object-cover"
+                        />
+                        <div className="flex flex-col">
+                          <p className="font-semibold capitalize">
+                            {user?.name || "User"}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {user?.email || ""}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate(profileUrl)}>
-                    <User size={16} className="mr-2" />
-                    Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={toggleTheme}>
-                    {isDarkMode ? (
-                      <Sun size={16} className="mr-2" />
-                    ) : (
-                      <SunMoon size={16} className="mr-2" />
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate(profileUrl)}>
+                      <User size={16} className="mr-2" />
+                      Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={toggleTheme}>
+                      {isDarkMode ? (
+                        <Sun size={16} className="mr-2" />
+                      ) : (
+                        <SunMoon size={16} className="mr-2" />
+                      )}
+                      Theme
+                    </DropdownMenuItem>
+                    {!isSubscription && (
+                      <DropdownMenuItem onClick={handleSubscriptionClick}>
+                        <Crown size={16} className="mr-2" />
+                        Subscription
+                      </DropdownMenuItem>
                     )}
-                    Theme
-                  </DropdownMenuItem>
-                  {!isPremium && (
-                    <DropdownMenuItem onClick={handleSubscriptionClick}>
-                      <Crown size={16} className="mr-2" />
-                      Subscription
-                    </DropdownMenuItem>
-                  )}
-                  {!isAuthenticated ? (
-                    <DropdownMenuItem onClick={() => navigate(signInUrl)}>
-                      <LogIn size={16} className="mr-2" />
-                      Sign In
-                    </DropdownMenuItem>
-                  ) : (
                     <AlertDialog>
                       <DropdownMenuItem
                         onSelect={(e) => e.preventDefault()}
@@ -502,15 +526,23 @@ function ReusableNavbar({
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <button
+                  onClick={() => navigate(signInUrl)}
+                  className="flex items-center space-x-2 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-md hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors duration-200"
+                >
+                  <LogIn size={16} />
+                  <span className="text-sm font-semibold">Sign In</span>
+                </button>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
             <div className="md:hidden flex items-center space-x-2">
               {/* Mobile Subscription Icon */}
-              {!isPremium && (
+              {isAuthenticated && !isSubscription && (
                 <button
                   onClick={handleSubscriptionClick}
                   className="p-2 text-gray-600 dark:text-gray-400 hover:text-yellow-500 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors duration-200"
@@ -521,10 +553,12 @@ function ReusableNavbar({
               )}
 
               {/* Mobile Notifications */}
-              <NotificationDropdown
-                notificationsUrl={notificationsUrl}
-                onNotificationClick={() => {}}
-              />
+              {isAuthenticated && (
+                <NotificationDropdown
+                  notificationsUrl={notificationsUrl}
+                  onNotificationClick={() => {}}
+                />
+              )}
 
               <motion.button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -549,41 +583,68 @@ function ReusableNavbar({
                 className="md:hidden overflow-hidden border-t border-gray-200 dark:border-gray-800"
               >
                 <div className="px-2 pt-4 pb-6 space-y-1">
-                  {/* Mobile Profile Section */}
-                  <div
-                    className="bg-gray-50 dark:bg-zinc-800/50 p-4 rounded-lg mb-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200"
-                    onClick={() => {
-                      navigate(profileUrl);
-                      closeMobileMenu();
-                    }}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <img
-                        src={userAvatar}
-                        alt="User profile"
-                        className="h-12 w-12 rounded-full object-cover"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-gray-900 dark:text-white capitalize truncate">
-                          {user?.name || "User"}
-                        </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                          {user?.email || "Sign in to access your account"}
+                  {/* Mobile Profile Section - Only when authenticated */}
+                  {isAuthenticated && (
+                    <div
+                      className="bg-gray-50 dark:bg-zinc-800/50 p-4 rounded-lg mb-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200"
+                      onClick={() => {
+                        navigate(profileUrl);
+                        closeMobileMenu();
+                      }}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <img
+                          src={userAvatar}
+                          alt="User profile"
+                          className="h-12 w-12 rounded-full object-cover"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-gray-900 dark:text-white capitalize truncate">
+                            {user?.name || "User"}
+                          </div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                            {user?.email || ""}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Mobile Navigation Links */}
                   {showCenterNavigation && (
                     <>
-                      {dashboardUrl && (
+                      {/* Home Link */}
+                      {isAuthenticated && (
                         <Link
-                          to={dashboardUrl}
+                          to={getHomeUrl()}
                           className="block px-3 py-2 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors duration-200"
                           onClick={closeMobileMenu}
                         >
-                          Dashboard
+                          Home
+                        </Link>
+                      )}
+
+                      {/* Dashboard Link */}
+                      {isAuthenticated &&
+                        dashboardUrl &&
+                        role === USER_ROLE.USER && (
+                          <Link
+                            to={dashboardUrl}
+                            className="block px-3 py-2 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors duration-200"
+                            onClick={closeMobileMenu}
+                          >
+                            Dashboard
+                          </Link>
+                        )}
+
+                      {/* Appointment Link for Mentor */}
+                      {isAuthenticated && role === USER_ROLE.MENTOR && (
+                        <Link
+                          to={MentorUrl.appointment}
+                          className="block px-3 py-2 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors duration-200"
+                          onClick={closeMobileMenu}
+                        >
+                          Appointment
                         </Link>
                       )}
 
@@ -701,28 +762,19 @@ function ReusableNavbar({
                       <span className="text-sm">Toggle Theme</span>
                     </button>
 
-                    {!isPremium && (
-                      <motion.button
-                        onClick={handleSubscriptionClick}
-                        className="flex items-center space-x-1 px-3 py-2 bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-500 hover:from-yellow-500 hover:via-orange-500 hover:to-yellow-600 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-300"
-                        title="Upgrade to Premium"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                    {isAuthenticated && !isSubscription && (
+                      <button
+                        onClick={() => {
+                          handleSubscriptionClick();
+                          closeMobileMenu();
+                        }}
+                        className="flex items-center w-full px-3 py-2 bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-500 text-white hover:from-yellow-500 hover:via-orange-500 hover:to-yellow-600 rounded-md transition-all duration-300"
                       >
-                        <motion.div
-                          animate={{
-                            rotate: [0, -10, 10, -10, 0],
-                          }}
-                          transition={{
-                            duration: 2,
-                            repeat: Infinity,
-                            repeatDelay: 3,
-                          }}
-                        >
-                          <Crown className="w-4 h-4" />
-                        </motion.div>
-                        <span className="text-xs font-semibold">Premium</span>
-                      </motion.button>
+                        <Crown size={16} className="mr-3" />
+                        <span className="text-sm font-semibold">
+                          Purchase Subscription plan
+                        </span>
+                      </button>
                     )}
 
                     {!isAuthenticated ? (

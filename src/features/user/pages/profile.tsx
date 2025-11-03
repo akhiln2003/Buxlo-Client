@@ -333,6 +333,8 @@ const Profile = () => {
         <SubscriptionModal
           isOpen={isSubscriptionModalOpen}
           onClose={() => setIsSubscriptionModalOpen(false)}
+          currentSubscription={subscription?.id}
+          currentSubscriptionType={subscription?.type} // Add this line
         />
       </div>
     </div>

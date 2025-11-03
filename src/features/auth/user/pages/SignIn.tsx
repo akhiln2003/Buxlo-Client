@@ -4,8 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { UserUrls } from "@/@types/urlEnums/UserUrls";
 import { ArrowLeft, ChevronLeft } from "lucide-react";
 // import GitHubIcon from '@/assets/images/GitHubIcon.png';
-import FbIcon from "@/assets/images/fbIcon.png";
-import AppleIcon from "@/assets/images/AppleIcon.png";
+// import FbIcon from "@/assets/images/fbIcon.png";
+// import AppleIcon from "@/assets/images/AppleIcon.png";
 import { SigninForm } from "../components/SignInForm";
 import { useTheme } from "@/contexts/themeContext";
 import { useGoogleAuthUserMutation } from "@/services/apis/AuthApis";
@@ -116,7 +116,7 @@ function SignIn() {
                     theme={googlTheam}
                   />
                 </div>
-                <div className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-600 mt-[0.7rem] pl-[1rem] flex items-center overflow-hidden">
+                {/* <div className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-600 mt-[0.7rem] pl-[1rem] flex items-center overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-slate-100 dark:from-zinc-600 to-slate-100 dark:to-zinc-600  scale-x-0 group-hover:scale-x-125 transform origin-left transition-all duration-100"></div>
                   <div className="w-10 rounded overflow-hidden m-[0.3rem] relative z-10">
                     <img src={AppleIcon} alt="appleIcon" />
@@ -124,8 +124,8 @@ function SignIn() {
                   <p className="font-cabinet font-semibold text-sm ml-[1.9rem] relative z-10">
                     Continue with AppleId
                   </p>
-                </div>
-                <div className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-600 mt-[0.7rem] pl-[1rem] flex items-center overflow-hidden">
+                </div> */}
+                {/* <div className="relative group w-[21.5rem] h-14 border border-zinc-900 dark:border-zinc-600 mt-[0.7rem] pl-[1rem] flex items-center overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-slate-100 dark:from-zinc-600 to-slate-100 dark:to-zinc-600 scale-x-0 group-hover:scale-x-100 transform origin-left transition-all duration-100"></div>
                   <div className="w-6 rounded overflow-hidden m-[0.8rem] relative z-10">
                     <img src={FbIcon} alt="fbIcon" />
@@ -133,7 +133,7 @@ function SignIn() {
                   <p className="font-cabinet font-semibold text-sm ml-[1.9rem] relative z-10">
                     Continue with Facebook
                   </p>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

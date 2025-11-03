@@ -1,284 +1,122 @@
-import React, { useEffect, useState } from "react";
-import { ThumbsDown, ThumbsUp } from "lucide-react";
-import dummyProfileImage from "@/assets/images/dummy-profile.webp";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import MentorProfileDetails from "../components/MentorProfileDetails";
+import { useCallback, useEffect, useState } from "react";
 import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
-import {
-  useFetchMentorProfileImageMutation,
-  useFetchMentorProfileMutation,
-} from "@/services/apis/MentorApis";
-import { IMentor } from "@/@types/interface/IMentor";
+import { PageNation } from "@/components/ui/pageNation";
 import { errorTost } from "@/components/ui/tosastMessage";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { useGetUser } from "@/hooks/useGetUser";
-import { useConnectMentorMutation } from "@/services/apis/UserApis";
-import { UserUrls } from "@/@types/urlEnums/UserUrls";
+import FeedbackCard from "../../../components/common/feedback/FeedbackCard";
+import { useFetchFeedbackMutation } from "@/services/apis/CommonApis";
+import { useParams } from "react-router-dom";
+import { IFeedback } from "@/@types/interface/IFeedback";
 
-interface FeedbackCardProps {
-  name: string;
-  rating: number;
-  feedback: string;
-}
+// Main component
+const MentorProfile = () => {
+  const [feedbacks, setFeedbacks] = useState<IFeedback[]|[]>([]);
+  const [pageNationData, setPageNationData] = useState({
+    pageNum: 1,
+    totalPages: 0,
+  });
+  const [fetchFeedbacks, { isLoading: fetchFeedbacksIsLoading }] =
+    useFetchFeedbackMutation();
 
-const AccountantProfile = () => {
-  const [fetchProfileData] = useFetchMentorProfileMutation();
-  const [fetchProfileImages] = useFetchMentorProfileImageMutation();
-  const [mentor, setMentor] = useState<Partial<IMentor>>({});
-  const [profileImage, setProfileImage] = useState("");
   const { mentorId } = useParams();
-  const navigate = useNavigate();
-  const user = useGetUser();
-  const [connectMentor] = useConnectMentorMutation();
 
-  const fetchMentor = async (id: string) => {
-    try {
-      if (!id) navigate("/notfount");
-      const response: IAxiosResponse = await fetchProfileData(id);
-      if (response.data.data) {
-        setMentor(response.data.data);
-        if (response.data.data.avatar) {
-          const imageUrl: IAxiosResponse = await fetchProfileImages([
-            `MentorProfiles/${response.data.data.avatar}`,
-          ]);
-          if (imageUrl.data.imageUrl) {
-            setProfileImage(imageUrl.data.imageUrl[0]);
-          } else {
-            errorTost(
-              "Something went wrong ",
-              imageUrl.error.data.error || [
-                { message: `${imageUrl.error.data} please try again later` },
-              ]
-            );
-          }
+  const fetchFeedbackDatas = useCallback(
+    async (page: number = 1) => {
+      try {
+        if (!mentorId || mentorId == undefined) return;
+        const response: IAxiosResponse = await fetchFeedbacks({
+          page,
+          mentorId,
+        });
+
+        if (response.data) {
+          setFeedbacks(response.data.feedbacks);
+          setPageNationData((prev) => ({
+            ...prev,
+            totalPages: response.data.totalPages,
+            pageNum: page,
+          }));
+        } else {
+          const errorMessage = response.error?.data?.error || [
+            {
+              message: `${
+                response.error?.data || "Unknown error"
+              } please try again later`,
+            },
+          ];
+          errorTost("Something went wrong", errorMessage);
+          setFeedbacks([]);
         }
+      } catch (error) {
+        console.error("Error fetching feedbacks:", error);
+        errorTost("Something went wrong", [
+          { message: "Something went wrong please try again" },
+        ]);
+        setFeedbacks([]);
       }
-    } catch (err) {
-      console.error("Error fetching users:", err);
-      errorTost("Something wrong", [
-        { message: "Something went wrong please try again" },
-      ]);
-    }
-  };
-
-  const contactMentor = async (userId: string, mentorId: string) => {
-    try {
-      const response: IAxiosResponse = await connectMentor({
-        userId,
-        mentorId,
-      });
-      if (response.data) {
-        navigate(UserUrls.chat, { state: { Id: mentorId } });
-      } else {
-        errorTost(
-          "Something went wrong ",
-          response.error.data.error || [
-            { message: `${response.error.data} please try again later` },
-          ]
-        );
-      }
-    } catch (err) {
-      console.error("Error connecting to mentor:", err);
-      errorTost("Something wrong", [
-        { message: "Something went wrong please try again" },
-      ]);
-    }
-  };
-  useEffect(() => {
-    fetchMentor(mentorId as string);
-  }, []);
-
-  return (
-    <Card className="w-full bg-zinc-50 dark:bg-zinc-900 shadow-sm mb-6">
-      <CardContent className="p-8">
-        <div className="flex flex-col items-start">
-          <h1 className="text-2xl font-bold mb-6 w-full text-center">
-            Chartered Accountants
-          </h1>
-
-          <div className="flex flex-col md:flex-row w-full gap-6 mb-6">
-            {/* Profile image */}
-            <div className="mx-auto md:mx-0">
-              <div className="w-32 h-32 bg-gray-200 rounded-md overflow-hidden">
-                <img
-                  src={profileImage ? profileImage : dummyProfileImage}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-
-            {/* Accountant details */}
-            <div className="flex-1 text-left">
-              <div className="flex justify-between mb-2">
-                <div>
-                  <p className="text-lg mb-1">
-                    <span className="font-medium">Name: </span>
-                    <span>{mentor.name}</span>
-                  </p>
-                </div>
-                <div className="flex">
-                  {[...Array(5)].map((_, i) => (
-                    <span key={i} className="text-yellow-400 text-xl">
-                      ★
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <p className="text-lg mb-2">
-                <span className="font-medium">Title: </span>
-                <span>{mentor.bio}</span>
-              </p>
-
-              <p className="text-lg mb-2">
-                <span className="font-medium">Experience: </span>
-                <span>{mentor.yearsOfExperience}</span>
-              </p>
-
-              <p className="text-lg mb-2">
-                <span className="font-medium">Availability: </span>
-                <span className="text-green-600">{"availability"}</span>
-              </p>
-            </div>
-          </div>
-
-          <div className="flex justify-between items-center w-full border-t pt-4">
-            {/* find and show avrage salary of mentor */}
-            {/* <p className="text-xl font-medium">
-              Salary: <span className="text-primary">$ {mentor.salary}/hr</span>
-            </p> */}
-            <div className="flex gap-3 bg">
-              <Button
-                onClick={() =>
-                  contactMentor(user?.id as string, mentorId as string)
-                }
-                variant="outline"
-                size="lg"
-                className="w-32"
-              >
-                Contact
-              </Button>
-              <Link
-                to={`${UserUrls.booking}/${mentor.id}`}
-                className="flex-1 sm:flex-initial sm:w-24 text-white bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-800 hover:dark:bg-zinc-900 flex items-center justify-center rounded-md text-sm p-2 "
-              >
-                Book Now
-              </Link>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+    },
+    [fetchFeedbacks]
   );
-};
 
-// Individual feedback card component
-const FeedbackCard: React.FC<FeedbackCardProps> = ({
-  name,
-  rating,
-  feedback,
-}) => {
+  const handlePageChange = useCallback(
+    async (page: number) => {
+      await fetchFeedbackDatas(page);
+    },
+    [fetchFeedbackDatas]
+  );
+
+  useEffect(() => {
+    fetchFeedbackDatas(1);
+  }, [fetchFeedbackDatas, mentorId]);
+
   return (
-    <Card className="w-full bg-zinc-50 dark:bg-zinc-900 shadow-sm mb-4">
-      <CardContent className="p-6">
-        <div className="flex items-start gap-4">
-          {/* Small profile image */}
-          <div className="flex-shrink-0">
-            <div className="w-12 h-12 bg-gray-200 rounded-full overflow-hidden">
-              <img
-                src="/api/placeholder/48/48"
-                alt="Profile"
-                className="w-full h-full object-cover"
+    <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto">
+        {/* Main mentor profile */}
+        <div className="mb-8">
+          <MentorProfileDetails setFeedbacks={setFeedbacks}  />
+        </div>
+
+        {/* Feedback section header */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            Client Feedback
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            {feedbacks.length > 0 && `Showing ${feedbacks.length} reviews`}
+          </p>
+        </div>
+
+        {/* Feedback cards with loading state */}
+        {fetchFeedbacksIsLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100"></div>
+          </div>
+        ) : feedbacks.length > 0 ? (
+          <div className="space-y-4">
+            {feedbacks.map((feedback, index) => (
+              <FeedbackCard key={index} feedback={feedback} btnAcction={true} />
+            ))}
+
+            {/* Pagination */}
+            <div className="flex justify-center pt-8 pb-4">
+              <PageNation
+                pageNationData={pageNationData}
+                fetchUserData={handlePageChange}
+                setpageNationData={setPageNationData}
               />
             </div>
           </div>
-
-          <div className="flex-1">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-base font-medium">{name}</p>
-                <p className="text-sm text-gray-500">Feedback</p>
-              </div>
-              <div className="flex">
-                {[...Array(5)].map((_, i) => (
-                  <span
-                    key={i}
-                    className={`text-sm ${
-                      i < rating ? "text-yellow-400" : "text-gray-200"
-                    }`}
-                  >
-                    ★
-                  </span>
-                ))}
-              </div>
-            </div>
-            <p className="text-base mt-2">{feedback}</p>
-          </div>
-        </div>
-
-        <div className="flex justify-end mt-3 gap-3">
-          <Button variant="ghost" size="sm" className="h-10 w-10 p-0">
-            <ThumbsDown size={18} />
-          </Button>
-          <Button variant="ghost" size="sm" className="h-10 w-10 p-0">
-            <ThumbsUp size={18} />
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-// Main component
-const MentorProfile: React.FC = () => {
-  // Sample feedback data
-  const feedbacks = [
-    {
-      name: "Sarah Johnson",
-      rating: 5,
-      feedback:
-        "John helped me organize my business finances and saved me thousands in taxes. Highly recommended!",
-    },
-    {
-      name: "Michael Chen",
-      rating: 4,
-      feedback:
-        "Very professional and knowledgeable. Responds quickly to all questions.",
-    },
-    {
-      name: "Lisa Rodriguez",
-      rating: 5,
-      feedback:
-        "Excellent service! John made tax season so much less stressful for our small business.",
-    },
-    {
-      name: "Robert Williams",
-      rating: 5,
-      feedback:
-        "Best chartered accountant I've worked with. Very detail-oriented and explains complex concepts clearly.",
-    },
-  ];
-
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-zinc-800 py-8 px-6">
-      <div className="max-w-4xl mx-auto">
-        {/* Main accountant profile */}
-        <AccountantProfile />
-
-        <h2 className="text-xl font-bold my-6">Client Feedback</h2>
-
-        {/* Feedback cards */}
-        <div className="space-y-4 mt-4">
-          {feedbacks.map((feedback, index) => (
-            <FeedbackCard
-              key={index}
-              name={feedback.name}
-              rating={feedback.rating}
-              feedback={feedback.feedback}
-            />
-          ))}
-        </div>
+        ) : (
+          <Card className="w-full bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800">
+            <CardContent className="p-12 text-center">
+              <p className="text-gray-500 dark:text-gray-400 text-lg">
+                No feedback available yet
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

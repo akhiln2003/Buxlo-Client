@@ -1,9 +1,14 @@
 import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { IBooking } from "@/@types/interface/IBookings";
+import { PaymentStatus } from "@/@types/paymentEnum";
 import { UserUrls } from "@/@types/urlEnums/UserUrls";
 import { PageNation } from "@/components/ui/pageNation";
-import { errorTost } from "@/components/ui/tosastMessage";
-import { useFetchBookingsMutation } from "@/services/apis/CommonApis";
+import { errorTost, successToast } from "@/components/ui/tosastMessage";
+import { useGetUser } from "@/hooks/useGetUser";
+import {
+  useCancelBookingMutation,
+  useFetchBookingsMutation,
+} from "@/services/apis/CommonApis";
 import {
   Calendar,
   DollarSign,
@@ -19,32 +24,43 @@ import {
   RefreshCw,
   UserCheck,
   Filter,
-  Search,
   ArrowLeft,
+  Trash2,
 } from "lucide-react";
 import { useEffect, useState, useCallback } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
+import BookingCancelConfirmationModal from "../components/BookingCancelConfirmationModal";
 
 const ListBookings = () => {
   const [bookings, setBookings] = useState<IBooking[]>([]);
-  const [filteredBookings, setFilteredBookings] = useState<IBooking[]>([]);
   const [pageNationData, setPageNationData] = useState({
     pageNum: 1,
     totalPages: 0,
   });
-  const [selectedStatus, setSelectedStatus] = useState<string>("all");
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [selectedStatus, setSelectedStatus] = useState<PaymentStatus | "all">(
+    "all"
+  );
   const [fetchBookings, { isLoading }] = useFetchBookingsMutation();
+  const [cancelBooking] = useCancelBookingMutation();
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [selectedBookingForCancel, setSelectedBookingForCancel] = useState<
+    string | null
+  >(null);
 
-  const location = useLocation();
-  const userId = location.state;
+  const user = useGetUser();
+  const userId = user?.id;
 
-  const fetchBookedMentors = async (page: number = 1) => {
+  const fetchBookedMentors = async (
+    page: number = 1,
+    status: PaymentStatus | "all" = "all"
+  ) => {
     try {
       if (!userId) return;
       const response: IAxiosResponse = await fetchBookings({
         userId,
         page,
+        status,
       });
 
       if (response.data) {
@@ -70,43 +86,73 @@ const ListBookings = () => {
   const handlePageChange = useCallback(
     async (page: number) => {
       if (!userId) return;
-      await fetchBookedMentors(page);
+      await fetchBookedMentors(page, selectedStatus);
+    },
+    [userId, selectedStatus]
+  );
+
+  const handleStatusChange = useCallback(
+    async (status: PaymentStatus | "all") => {
+      setSelectedStatus(status);
+      if (!userId) return;
+      await fetchBookedMentors(1, status);
     },
     [userId]
   );
 
+  const handleOpenCancelModal = (bookingId: string) => {
+    setSelectedBookingForCancel(bookingId);
+    setShowCancelModal(true);
+  };
+
+  const handleCloseCancelModal = () => {
+    setShowCancelModal(false);
+    setSelectedBookingForCancel(null);
+  };
+
+  const handleCancelBooking = async (bookingId: string) => {
+    try {
+      const response: IAxiosResponse = await cancelBooking(bookingId);
+
+      if (response.data) {
+        successToast("Cancel Booking", "Booking cancellation successful");
+        setBookings((prev) =>
+          prev.map((b) =>
+            b.id === bookingId
+              ? { ...b, status: "cancelled" as PaymentStatus }
+              : b
+          )
+        );
+        handleCloseCancelModal();
+      } else {
+        console.error("Error fetching bookings:", response.error);
+        errorTost("Booking Load Failed", [
+          { message: response.error.data?.error || "Please try again later" },
+        ]);
+      }
+    } catch (error) {
+      console.error("Error cancel bookings:", error);
+      errorTost("Cancellation Failed", [
+        { message: "Failed to cancel booking. Please try again." },
+      ]);
+    } finally {
+      setCancellingId(null);
+    }
+  };
+
+  const isWithin24Hours = (transactionDate: Date): boolean => {
+    const now = new Date();
+    const bookingTime = new Date(transactionDate);
+    const differenceInMs = now.getTime() - bookingTime.getTime();
+    const differenceInHours = differenceInMs / (1000 * 60 * 60);
+    return differenceInHours < 24;
+  };
+
   useEffect(() => {
     if (userId) {
-      fetchBookedMentors();
+      fetchBookedMentors(1, selectedStatus);
     }
   }, [userId]);
-
-  // Filter and search functionality
-  useEffect(() => {
-    let filtered = bookings;
-
-    // Filter by status
-    if (selectedStatus !== "all") {
-      filtered = filtered.filter(
-        (booking) =>
-          booking.status.toLowerCase() === selectedStatus.toLowerCase()
-      );
-    }
-
-    // Search functionality
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (booking) =>
-          booking.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          booking.mentorId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          booking.slotId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (booking.paymentId &&
-            booking.paymentId.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
-    }
-
-    setFilteredBookings(filtered);
-  }, [bookings, selectedStatus, searchTerm]);
 
   const getStatusConfig = (status: string) => {
     switch (status.toLowerCase()) {
@@ -177,11 +223,6 @@ const ListBookings = () => {
     }).format(amount);
   };
 
-  const getUniqueStatuses = () => {
-    const statuses = bookings.map((booking) => booking.status.toLowerCase());
-    return [...new Set(statuses)];
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
@@ -194,10 +235,7 @@ const ListBookings = () => {
 
           {/* Loading Filters */}
           <div className="bg-white rounded-2xl p-6 mb-8 border border-gray-100">
-            <div className="flex flex-col lg:flex-row gap-4">
-              <div className="h-10 bg-gray-200 rounded-xl flex-1 animate-pulse"></div>
-              <div className="h-10 bg-gray-200 rounded-xl w-32 animate-pulse"></div>
-            </div>
+            <div className="h-10 bg-gray-200 rounded-xl w-48 animate-pulse"></div>
           </div>
 
           {/* Loading Cards */}
@@ -253,101 +291,59 @@ const ListBookings = () => {
             </div>
             <div className="bg-white px-4 py-2 rounded-full border border-gray-200">
               <span className="text-sm font-medium text-gray-700">
-                {filteredBookings.length} of {bookings.length} booking
+                {bookings.length} booking
                 {bookings.length !== 1 ? "s" : ""}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Filters and Search */}
-        <div className="bg-white rounded-2xl p-6 mb-8 border border-gray-100 shadow-sm">
-          <div className="flex flex-col lg:flex-row gap-4">
-            {/* Search */}
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search by booking ID, mentor ID, slot ID, or payment ID..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Status Filter */}
-            <div className="flex items-center space-x-2">
-              <Filter className="w-5 h-5 text-gray-400" />
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-              >
-                <option value="all">All Status</option>
-                {getUniqueStatuses().map((status) => (
-                  <option key={status} value={status}>
-                    {status.charAt(0).toUpperCase() + status.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
+        {/* Filter */}
+        <div className="bg-white rounded-2xl p-6 mb-8 border border-gray-100 shadow-sm flex justify-end">
+          <div className="flex items-center space-x-4">
+            <Filter className="w-5 h-5 text-gray-400" />
+            <select
+              value={selectedStatus}
+              onChange={(e) =>
+                handleStatusChange(e.target.value as PaymentStatus | "all")
+              }
+              className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+            >
+              <option value="all">All Status</option>
+              <option value="completed">Completed</option>
+              <option value="pending">Pending</option>
+              <option value="booked">Booked</option>
+              <option value="failed">Failed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
           </div>
         </div>
 
-        {/* Results Summary */}
-        {(searchTerm || selectedStatus !== "all") && (
-          <div className="mb-6 text-sm text-gray-600">
-            {filteredBookings.length > 0 ? (
-              <p>
-                Showing {filteredBookings.length} result
-                {filteredBookings.length !== 1 ? "s" : ""}
-                {searchTerm && ` for "${searchTerm}"`}
-                {selectedStatus !== "all" && ` with status "${selectedStatus}"`}
-              </p>
-            ) : (
-              <p>
-                No results found
-                {searchTerm && ` for "${searchTerm}"`}
-                {selectedStatus !== "all" && ` with status "${selectedStatus}"`}
-              </p>
-            )}
-          </div>
-        )}
-
         {/* Bookings List */}
-        {filteredBookings.length === 0 ? (
+        {bookings.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
             <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Receipt className="w-10 h-10 text-gray-400" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              {bookings.length === 0 ? "No Bookings Found" : "No Results Found"}
+              No Bookings Found
             </h3>
             <p className="text-gray-500 max-w-sm mx-auto">
-              {bookings.length === 0
-                ? "You haven't made any mentor bookings yet. Start exploring our mentors to book your first session."
-                : "Try adjusting your search criteria or filters to find what you're looking for."}
+              You haven't made any mentor bookings yet with this status. Try
+              selecting a different filter.
             </p>
-            {(searchTerm || selectedStatus !== "all") && (
-              <button
-                onClick={() => {
-                  setSearchTerm("");
-                  setSelectedStatus("all");
-                }}
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Clear Filters
-              </button>
-            )}
           </div>
         ) : (
           <div className="space-y-4">
-            {filteredBookings.map((booking) => {
+            {bookings.map((booking) => {
               const statusConfig = getStatusConfig(booking.status);
               const bookingDate = formatDate(booking.transactionDate as Date);
               const updatedDate = booking.updatedAt
                 ? formatDate(booking.updatedAt as Date)
                 : null;
+              const canCancel =
+                booking.status.toLowerCase() === "booked" &&
+                isWithin24Hours(booking.transactionDate as Date);
 
               return (
                 <div
@@ -463,7 +459,7 @@ const ListBookings = () => {
                       </div>
 
                       {/* Right Side - Amount & Date */}
-                      <div className="flex flex-col justify-center space-y-4">
+                      <div className="flex flex-col justify-between space-y-4">
                         {/* Amount */}
                         <div className="bg-white/70 rounded-xl p-4 border border-white/50">
                           <div className="flex items-center space-x-3">
@@ -500,6 +496,17 @@ const ListBookings = () => {
                             </div>
                           </div>
                         </div>
+
+                        {/* Cancel Button - 24 Hour Addon */}
+                        {canCancel && (
+                          <button
+                            onClick={() => handleOpenCancelModal(booking.id)}
+                            className="flex items-center justify-center space-x-2 bg-red-50 hover:bg-red-100 text-red-600 font-medium px-4 py-3 rounded-xl transition-all duration-200 border border-red-200"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            <span className="text-sm">Cancel Booking</span>
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -517,6 +524,15 @@ const ListBookings = () => {
           />
         </div>
       </div>
+
+      {/* Cancel Confirmation Modal */}
+      <BookingCancelConfirmationModal
+        isOpen={showCancelModal}
+        bookingId={selectedBookingForCancel as string}
+        isLoading={cancellingId === selectedBookingForCancel}
+        onConfirm={handleCancelBooking}
+        onCancel={handleCloseCancelModal}
+      />
     </div>
   );
 };

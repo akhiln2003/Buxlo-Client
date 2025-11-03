@@ -91,8 +91,9 @@ export function ChatInputContainer({
       return response;
     } catch (error) {
       console.error("Error sending message:", error);
-      alert("Failed to send message. Please try again.");
-      throw error;
+      errorTost("Something wrong", [
+        { message: "Failed to send message. Please try again." },
+      ]);
     }
   };
 
@@ -200,7 +201,9 @@ export function ChatInputContainer({
       };
     } catch (error) {
       console.error("Error accessing microphone:", error);
-      alert("Please allow microphone access to record audio.");
+      errorTost("Something wrong", [
+        { message: "Please allow microphone access to record audio." },
+      ]);
     }
   };
 

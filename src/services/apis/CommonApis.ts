@@ -3,6 +3,8 @@ import { axiosBaseQuery } from "../axios/axiosBaseQuery";
 import { IContactUsData } from "@/@types/interface/IUserApisQuery";
 import { CommonApiEndPoints } from "../endPoints/CommonEndPoints";
 import { INotification } from "@/@types/interface/INotification";
+import { IPaymentHistoryStatus } from "@/@types/IPaymentStatus";
+import { PaymentStatus } from "@/@types/paymentEnum";
 
 export const commonApi = createApi({
   reducerPath: "commonApi",
@@ -178,7 +180,9 @@ export const commonApi = createApi({
         method: "POST",
         data: data,
       }),
-    }), // Create Subscription Checkout Session
+    }),
+
+    // Create Subscription Checkout Session
     useUpdateBookingPlan: builder.mutation({
       query: ({ data, id }) => ({
         url: `${CommonApiEndPoints.updateBookingPaymet}/${id}`,
@@ -197,8 +201,95 @@ export const commonApi = createApi({
 
     // fetch  Bookings
     fetchBookings: builder.mutation({
-      query: ({ userId, page }: { userId: string; page: number }) => ({
-        url: `${CommonApiEndPoints.fetchBookings}/${userId}/${page}`,
+      query: ({
+        userId,
+        page,
+        status,
+      }: {
+        userId: string;
+        page: number;
+        status: PaymentStatus | "all";
+      }) => ({
+        url: `${CommonApiEndPoints.fetchBookings}?userId=${userId}&&page=${page}&&status=${status}`,
+        method: "GET",
+      }),
+    }),
+
+    // Cancle booking
+    cancelBooking: builder.mutation({
+      query: (id: string) => ({
+        url: `${CommonApiEndPoints.cancelBooking}/${id}`,
+        method: "PATCH",
+      }),
+    }),
+
+    // fetch  PaymentHistory
+    fetchPaymentHistory: builder.mutation({
+      query: ({
+        userId,
+        page,
+        status,
+        searchData,
+      }: {
+        userId: string;
+        page: number;
+        status: IPaymentHistoryStatus | "all";
+        searchData?: string;
+      }) => ({
+        url: `${CommonApiEndPoints.fetchPaymentHistory}?userId=${userId}&&page=${page}&&status=${status}&&searchData=${searchData}`,
+        method: "GET",
+      }),
+    }),
+
+    // Upload payment history
+    addPaymetHistory: builder.mutation({
+      query: (data) => ({
+        url: CommonApiEndPoints.addPaymetHistory,
+        method: "POST",
+        data: data,
+      }),
+    }),
+
+    // Upload bank statement
+    uploadBankStatement: builder.mutation({
+      query: ({ data, userId }) => ({
+        url: `${CommonApiEndPoints.uploadBankStatement}?userId=${userId}`,
+        method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        data: data,
+      }),
+    }),
+
+    // Fetch Feedback
+    fetchFeedback: builder.mutation({
+      query: ({
+        page,
+        mentorId,
+        searchData = "",
+      }: {
+        page: number;
+        mentorId: string;
+        searchData?: string;
+      }) => ({
+        url: `${CommonApiEndPoints.fetchFeedback}?page=${page}&&mentorId=${mentorId}&&searchData=${searchData}`,
+        method: "GET",
+      }),
+    }),
+
+    // fetch All advs
+    fetchAllAdvs: builder.mutation({
+      query: () => ({
+        url: CommonApiEndPoints.fetchAllAdvs,
+        method: "GET",
+      }),
+    }),
+
+    // fetch All trustedUs
+    fetchAllTrustedUs: builder.mutation({
+      query: () => ({
+        url: CommonApiEndPoints.fetchAllTrustedus,
         method: "GET",
       }),
     }),
@@ -229,4 +320,11 @@ export const {
   useUseUpdateSubscriptionPlanMutation,
   useFetchOnePaymetMutation,
   useFetchBookingsMutation,
+  useCancelBookingMutation,
+  useFetchPaymentHistoryMutation,
+  useAddPaymetHistoryMutation,
+  useUploadBankStatementMutation,
+  useFetchFeedbackMutation,
+  useFetchAllAdvsMutation,
+  useFetchAllTrustedUsMutation,
 } = commonApi;
