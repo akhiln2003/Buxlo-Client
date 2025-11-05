@@ -191,7 +191,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response: IAxiosResponse = await fetchIncomeSummery();
+        const response: IAxiosResponse = await fetchIncomeSummery({});
         if (response.data) {
           const { totalIncome, incomeData } = response.data;
           setDashboardData((prev) => ({
