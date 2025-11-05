@@ -1,4 +1,4 @@
-import React, { useState, useRef, ChangeEvent } from "react";
+import  { useState, useRef, ChangeEvent } from "react";
 import { Camera, Video, File, Images, X, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";

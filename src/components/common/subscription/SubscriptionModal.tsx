@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { X, Check, Star, Crown, CreditCard, Calendar } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -225,7 +225,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
 
   const fetchSubscriptions = async () => {
     try {
-      const response: IAxiosResponse = await fetchPlan();
+      const response: IAxiosResponse = await fetchPlan({});
 
       if (response.data.data && Array.isArray(response.data.data)) {
         setRowPlans(response.data.data);

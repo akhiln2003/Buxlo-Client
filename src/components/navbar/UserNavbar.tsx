@@ -1,5 +1,3 @@
-// UserNavbar.tsx
-import React from "react";
 import { USER_ROLE } from "@/@types/userRoleEnum";
 import { UserUrls } from "@/@types/urlEnums/UserUrls";
 import ReusableNavbar from "./naveBarr";

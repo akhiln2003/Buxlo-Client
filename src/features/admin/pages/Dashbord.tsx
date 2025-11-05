@@ -108,7 +108,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const planResponse: IAxiosResponse = await fetchPlan();
+        const planResponse: IAxiosResponse = await fetchPlan({});
         const newPlans = planResponse.data.data;
         if (planResponse.data.data) {
           setPlans(planResponse.data.data);
@@ -130,7 +130,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response: IAxiosResponse = await fetchUserSummery();
+        const response: IAxiosResponse = await fetchUserSummery({});
         if (response.data) {
           const { totalUsers, userGrowth } = response.data;
 
@@ -161,7 +161,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response: IAxiosResponse = await fetchMentorSummery();
+        const response: IAxiosResponse = await fetchMentorSummery({});
         if (response.data) {
           const { totalMentors, mentorGrowth } = response.data;
           setDashboardData((prev) => ({

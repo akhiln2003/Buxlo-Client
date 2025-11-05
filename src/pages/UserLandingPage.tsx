@@ -105,7 +105,7 @@ function LandingPage() {
 
   const fetchTrustedUsDatas = async () => {
     try {
-      const response: IAxiosResponse = await fetchTrustedUs();
+      const response: IAxiosResponse = await fetchTrustedUs({});
       if (response.data) {
         console.log("edededed ", response.data);
 

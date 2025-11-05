@@ -109,7 +109,7 @@ function MentorLandingPage() {
 
   const fetchTrustedUsDatas = async () => {
     try {
-      const response: IAxiosResponse = await fetchTrustedUs();
+      const response: IAxiosResponse = await fetchTrustedUs({});
       if (response.data) {
         console.log("Trusted brands data: ", response.data);
         setBrandLogos(response.data);
