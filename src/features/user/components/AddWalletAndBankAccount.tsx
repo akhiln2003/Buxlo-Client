@@ -1,4 +1,4 @@
-import { Database, Pencil, Wallet, Plus } from "lucide-react";
+import { Database,  Wallet, Plus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +16,7 @@ import { errorTost } from "@/components/ui/tosastMessage";
 import {
   useCreateWalletMutation,
   useFetchUserWalletMutation,
-  useUpdateWalletNameMutation,
+  // useUpdateWalletNameMutation,
 } from "@/services/apis/CommonApis";
 
 interface Iwallet {
@@ -31,23 +31,23 @@ interface InewWallet {
   userId: string;
 }
 
-interface IchangeWalletName {
-  id: string;
-  currentName?: string;
-  name: string;
-}
+// interface IchangeWalletName {
+//   id: string;
+//   currentName?: string;
+//   name: string;
+// }
 
 function AddWalletAndBankAccount() {
   const [activeTab, setActiveTab] = useState("wallet");
   const user = useGetUser();
 
   const [wallet, setWallet] = useState<Iwallet[] | null>(null);
-  const [changeWalletName, setChangeWalletName] = useState<IchangeWalletName>({
-    id: "",
-    name: "",
-    currentName: "",
-  });
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  // const [changeWalletName, setChangeWalletName] = useState<IchangeWalletName>({
+  //   id: "",
+  //   name: "",
+  //   currentName: "",
+  // });
+  // const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [newWallet, setNewWallet] = useState<InewWallet>({
     name: "",
@@ -56,7 +56,7 @@ function AddWalletAndBankAccount() {
   });
 
   const [fetchWalletData] = useFetchUserWalletMutation();
-  const [updateWalletName] = useUpdateWalletNameMutation();
+  // const [updateWalletName] = useUpdateWalletNameMutation();
   const [createWallet] = useCreateWalletMutation();
 
   useEffect(() => {
@@ -80,39 +80,39 @@ function AddWalletAndBankAccount() {
     }
   };
 
-  const handilChangeWalletName = async () => {
-    try {
-      const data = { name: changeWalletName.name };
-      const response: IAxiosResponse = await updateWalletName({
-        name: changeWalletName.currentName as string,
-        id: changeWalletName.id,
-        data,
-      });
-      if (response.data) {
-        setWallet(
-          (prev) =>
-            prev?.map((w) =>
-              w.id === changeWalletName.id
-                ? { ...w, name: response.data.updateData.name }
-                : w
-            ) || []
-        );
-        setIsEditDialogOpen(false);
-      } else {
-        errorTost(
-          "Something went wrong",
-          response.error.data.error || [
-            { message: `${response.error.data} please try again later` },
-          ]
-        );
-      }
-    } catch (error) {
-      console.error("error:", error);
-      errorTost("Something wrong", [
-        { message: "Something went wrong please try again" },
-      ]);
-    }
-  };
+  // const handilChangeWalletName = async () => {
+  //   try {
+  //     const data = { name: changeWalletName.name };
+  //     const response: IAxiosResponse = await updateWalletName({
+  //       name: changeWalletName.currentName as string,
+  //       id: changeWalletName.id,
+  //       data,
+  //     });
+  //     if (response.data) {
+  //       setWallet(
+  //         (prev) =>
+  //           prev?.map((w) =>
+  //             w.id === changeWalletName.id
+  //               ? { ...w, name: response.data.updateData.name }
+  //               : w
+  //           ) || []
+  //       );
+  //       setIsEditDialogOpen(false);
+  //     } else {
+  //       errorTost(
+  //         "Something went wrong",
+  //         response.error.data.error || [
+  //           { message: `${response.error.data} please try again later` },
+  //         ]
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.error("error:", error);
+  //     errorTost("Something wrong", [
+  //       { message: "Something went wrong please try again" },
+  //     ]);
+  //   }
+  // };
 
   const handleCreateWallet = async () => {
     try {

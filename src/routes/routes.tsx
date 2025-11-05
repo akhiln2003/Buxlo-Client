@@ -59,9 +59,9 @@ const MentorFeedBackPage = lazy(
   () => import("@/features/mentor/pages/feedBack")
 );
 
-const MentorDashbordPage = lazy(
-  () => import("@/features/mentor/pages/dashboard")
-);
+// const MentorDashbordPage = lazy(
+//   () => import("@/features/mentor/pages/dashboard")
+// );
 
 ////////////////////////--Mentor side--/////////////////////
 ////////////////////////--Admin side--/////////////////////
@@ -365,16 +365,16 @@ const routes = createBrowserRouter(
             </MentorProtected>
           ),
         },
-        {
-          path: MentorUrl.dashboard,
-          element: (
-            <MentorProtected>
-              <Suspense fallback={<div>Loading...</div>}>
-                <MentorDashbordPage />
-              </Suspense>
-            </MentorProtected>
-          ),
-        },
+        // {
+        //   path: MentorUrl.dashboard,
+        //   element: (
+        //     <MentorProtected>
+        //       <Suspense fallback={<div>Loading...</div>}>
+        //         <MentorDashbordPage />
+        //       </Suspense>
+        //     </MentorProtected>
+        //   ),
+        // },
         {
           path: MentorUrl.contact,
           element: (

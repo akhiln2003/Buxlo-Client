@@ -3,8 +3,6 @@ import {
   PhoneOff,
   Mic,
   MicOff,
-  Video,
-  VideoOff,
   Minimize2,
   Maximize2,
 } from "lucide-react";
@@ -31,7 +29,7 @@ export function VideoCallModal({
   const remoteRef = useRef<HTMLVideoElement>(null);
   const [isMinimized, setIsMinimized] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [isVideoOff, setIsVideoOff] = useState(false);
+  // const [isVideoOff, setIsVideoOff] = useState(false);
 
   const isConnected = callInfo.state === CallState.CONNECTED;
   const isRemoteOnline = onlineUsers.has(callInfo.remoteUserId);
@@ -95,16 +93,16 @@ export function VideoCallModal({
     }
   };
 
-  const toggleVideo = () => {
-    if (localRef.current?.srcObject) {
-      const stream = localRef.current.srcObject as MediaStream;
-      const videoTrack = stream.getVideoTracks()[0];
-      if (videoTrack) {
-        videoTrack.enabled = !videoTrack.enabled;
-        setIsVideoOff(!videoTrack.enabled);
-      }
-    }
-  };
+  // const toggleVideo = () => {
+  //   if (localRef.current?.srcObject) {
+  //     const stream = localRef.current.srcObject as MediaStream;
+  //     const videoTrack = stream.getVideoTracks()[0];
+  //     if (videoTrack) {
+  //       videoTrack.enabled = !videoTrack.enabled;
+  //       setIsVideoOff(!videoTrack.enabled);
+  //     }
+  //   }
+  // };
 
   const toggleMinimize = () => {
     setIsMinimized(!isMinimized);
@@ -187,11 +185,11 @@ export function VideoCallModal({
               playsInline
               className="w-full h-full object-cover"
             />
-            {isVideoOff && (
+            {/* {isVideoOff && (
               <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
                 <VideoOff className="text-white w-6 h-6" />
               </div>
-            )}
+            )} */}
           </div>
         </div>
 
