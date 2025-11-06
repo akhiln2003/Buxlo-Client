@@ -5,7 +5,7 @@ export const EditProfileSchema = z.object({
     .string()
     .trim()
     .min(2, "Name must be at least 2 characters long")
-    .min(10, "Name must be lesdan 10 characters long"),
+    .max(10, "Name must be lesdan 10 characters long"),
   email: z.string().email("Invalid email address"),
   bio: z.string().optional(),
   expertise: z.string().optional(),
