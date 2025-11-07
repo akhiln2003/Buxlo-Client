@@ -1,4 +1,5 @@
 import { MentorUrl } from "@/@types/urlEnums/MentorUrl";
+import { UserUrls } from "@/@types/urlEnums/UserUrls";
 import MentorFooter from "@/components/footer/MentorFooter";
 import MentorNavbar from "@/components/navbar/MentorNavvar";
 import { Outlet, useLocation } from "react-router-dom";
@@ -12,7 +13,18 @@ function MentorLayout() {
     MentorUrl.forgotPassword,
     "/mentor/resetpassword",
   ];
+  const routeWithoutFooter = [
+    MentorUrl.signIn,
+    MentorUrl.signUp,
+    MentorUrl.otp,
+    MentorUrl.forgotPassword,
+    "/mentor/resetpassword",
+     UserUrls.chat
+  ];
   const higeNavbar = routeWithoutNav.some((route) =>
+    pathname.startsWith(route)
+  );
+   const higeFooter = routeWithoutFooter.some((route) =>
     pathname.startsWith(route)
   );
 
@@ -22,7 +34,7 @@ function MentorLayout() {
       <div className={higeNavbar ? "" : "pt-16"}>
         <Outlet />
       </div>
-      {!higeNavbar && <MentorFooter />}
+      {!higeFooter && <MentorFooter />}
     </>
   );
 }
