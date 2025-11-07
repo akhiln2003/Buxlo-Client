@@ -1,11 +1,11 @@
 import { MentorUrl } from "@/@types/urlEnums/MentorUrl";
-import { UserUrls } from "@/@types/urlEnums/UserUrls";
 import MentorFooter from "@/components/footer/MentorFooter";
 import MentorNavbar from "@/components/navbar/MentorNavvar";
 import { Outlet, useLocation } from "react-router-dom";
 
 function MentorLayout() {
   const { pathname } = useLocation();
+
   const routeWithoutNav = [
     MentorUrl.signIn,
     MentorUrl.signUp,
@@ -13,28 +13,30 @@ function MentorLayout() {
     MentorUrl.forgotPassword,
     "/mentor/resetpassword",
   ];
+
   const routeWithoutFooter = [
     MentorUrl.signIn,
     MentorUrl.signUp,
     MentorUrl.otp,
     MentorUrl.forgotPassword,
     "/mentor/resetpassword",
-     UserUrls.chat
+    "/mentor/chat", // ✅ Hide footer on chat page
   ];
-  const higeNavbar = routeWithoutNav.some((route) =>
+
+  const hideNavbar = routeWithoutNav.some((route) =>
     pathname.startsWith(route)
   );
-   const higeFooter = routeWithoutFooter.some((route) =>
+  const hideFooter = routeWithoutFooter.some((route) =>
     pathname.startsWith(route)
   );
 
   return (
     <>
-      {!higeNavbar && <MentorNavbar />}
-      <div className={higeNavbar ? "" : "pt-16"}>
+      {!hideNavbar && <MentorNavbar />}
+      <div className={hideNavbar ? "" : "pt-16"}>
         <Outlet />
       </div>
-      {!higeFooter && <MentorFooter />}
+      {!hideFooter && <MentorFooter />}
     </>
   );
 }
