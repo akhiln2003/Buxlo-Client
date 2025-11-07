@@ -5,6 +5,7 @@ import UserFooter from "@/components/footer/UserFooter";
 
 function UserLayout() {
   const { pathname } = useLocation();
+
   const routeWithoutNav = [
     UserUrls.signIn,
     UserUrls.signUp,
@@ -13,6 +14,7 @@ function UserLayout() {
     "/resetpassword",
     UserUrls.videoCall,
   ];
+
   const routeWithoutFooter = [
     UserUrls.signIn,
     UserUrls.signUp,
@@ -21,21 +23,23 @@ function UserLayout() {
     "/resetpassword",
     UserUrls.videoCall,
     UserUrls.call,
+    UserUrls.chat,
   ];
-  const higeNavbar = routeWithoutNav.some((route) =>
+
+  const hideNavbar = routeWithoutNav.some((route) =>
     pathname.startsWith(route)
   );
-  const higeFooter = routeWithoutFooter.some((route) =>
+  const hideFooter = routeWithoutFooter.some((route) =>
     pathname.startsWith(route)
   );
+
   return (
     <>
-      {!higeNavbar && <UserNavbar />}
-      <div className={higeNavbar ? "" : "pt-16"}>
-        {" "}
+      {!hideNavbar && <UserNavbar />}
+      <div className={hideNavbar ? "" : "pt-16"}>
         <Outlet />
       </div>
-      {!higeFooter && <UserFooter />}
+      {!hideFooter && <UserFooter />}
     </>
   );
 }
