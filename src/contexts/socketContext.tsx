@@ -21,6 +21,9 @@ const SOCKET_CONFIG = {
     notification: import.meta.env.VITE_API_NOTIFICATION,
   },
 };
+console.log(import.meta.env.VITE_API_CHAT);
+console.log(import.meta.env.VITE_API_NOTIFICATION);
+
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
