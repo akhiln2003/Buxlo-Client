@@ -10,10 +10,14 @@ import { CallProvider } from "./contexts/videoCallContext";
 import AdPopup from "./components/common/AdPopup/AdPopupComponent";
 import { useFetchUserProfileMutation } from "./services/apis/UserApis";
 import { useFetchMentorProfileMutation } from "./services/apis/MentorApis";
+import { useTheme } from "./contexts/themeContext";
+import logoWhite from "@/assets/images/logoWhite.png";
+import logoBlack from "@/assets/images/logoBlack-.png";
 
 function App() {
   const socketContext = useContext(SocketContext);
   const user = useGetUser();
+  const { isDarkMode } = useTheme();
   
   const [fetchUserProfileData] = useFetchUserProfileMutation();
   const [fetchMentorProfileData] = useFetchMentorProfileMutation();
@@ -61,6 +65,7 @@ function App() {
             fetchUserProfileData={fetchUserProfileData}
             fetchMentorProfileData={fetchMentorProfileData}
             user={user}
+            brandLogo={isDarkMode ? logoWhite : logoBlack}
           />
           <Toaster />
         </CallProvider>

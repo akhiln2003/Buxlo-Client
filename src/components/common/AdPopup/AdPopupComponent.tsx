@@ -29,18 +29,28 @@ interface AdPopupProps {
   fetchUserProfileData: (id: string) => Promise<ProfileResponse>;
   fetchMentorProfileData: (id: string) => Promise<ProfileResponse>;
   user?: User | null;
+  brandLogo?: string;
 }
 
 const AdPopup: React.FC<AdPopupProps> = ({
   fetchUserProfileData,
   fetchMentorProfileData,
   user,
+  brandLogo,
 }) => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [currentAd, setCurrentAd] = useState<Ad | null>(null);
   const [hasSubscription, setHasSubscription] = useState<boolean>(false);
   const [isChecking, setIsChecking] = useState<boolean>(true);
   const [fetchAdv] = useFetchRandomAdvMutation();
+
+  // Default/dummy ad data for when no ads are available
+  const dummyAd: Ad = {
+    id: "default",
+    image: brandLogo || "/path/to/your/brand-logo.png",
+    title: "Welcome to BUXLO",
+    description: "Discover amazing mentorship opportunities and connect with expert mentors. Upgrade to premium for an ad-free experience!",
+  };
 
   // Check subscription status on mount
   useEffect(() => {
@@ -109,29 +119,31 @@ const AdPopup: React.FC<AdPopupProps> = ({
       const response: IAxiosResponse = await fetchAdv({});
 
       if (response.data) {
-        console.log("response" , response.data);
+        // Check if the response has valid data (not empty strings)
+        const hasValidData = response.data.id && response.data.image && response.data.title;
         
-        setCurrentAd(response.data);
+        if (hasValidData) {
+          setCurrentAd(response.data);
+        } else {
+          // Use dummy ad if no valid ad data
+          setCurrentAd(dummyAd);
+        }
+        setShowModal(true);
+      } else {
+        // Use dummy ad if response failed
+        setCurrentAd(dummyAd);
         setShowModal(true);
       }
     } catch (error) {
       console.error("Error fetching ad:", error);
+      // Use dummy ad on error
+      setCurrentAd(dummyAd);
+      setShowModal(true);
     }
   };
 
   const closeModal = (): void => {
     setShowModal(false);
-  };
-
-  const handleAdClick = (): void => {
-    if (currentAd) {
-      // Track ad click if needed
-      // fetch('/api/ads/track-click', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ adId: currentAd.id })
-      // });
-      closeModal();
-    }
   };
 
   // Don't render anything if:
@@ -144,39 +156,66 @@ const AdPopup: React.FC<AdPopupProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-zinc-900 rounded-xl max-w-lg w-full relative shadow-2xl transform transition-all duration-300 scale-100">
-        {/* Close Button */}
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[9999] p-4"
+      onClick={(e) => {
+        // Prevent closing when clicking the modal content
+        if (e.target === e.currentTarget) {
+          return;
+        }
+      }}
+    >
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl max-w-md w-full relative shadow-2xl transform transition-all duration-300 animate-in fade-in zoom-in">
+        {/* Close Button - Only way to close */}
         <button
           onClick={closeModal}
-          className="absolute top-4 right-4 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-full p-2 transition-colors z-10"
-          aria-label="Close"
+          className="absolute -top-3 -right-3 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 shadow-lg transition-all duration-200 hover:scale-110 z-10"
+          aria-label="Close advertisement"
         >
-          <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+          <X className="w-5 h-5" />
         </button>
 
         {/* Ad Content */}
         <div className="p-6">
-          <img
-            src={currentAd.image}
-            alt={currentAd.title}
-            className="w-full h-48 object-cover rounded-lg mb-4"
-          />
+          {/* Ad Image */}
+          <div className="relative mb-4 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800">
+            <img
+              src={currentAd.image}
+              alt={currentAd.title}
+              className="w-full h-56 object-contain"
+              onError={(e) => {
+                // Fallback if image fails to load
+                const target = e.target as HTMLImageElement;
+                target.src = brandLogo || "/path/to/fallback-image.png";
+              }}
+            />
+          </div>
 
-          <h3 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">
-            {currentAd.title}
+          {/* Ad Title */}
+          <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white leading-tight">
+            {currentAd.title || "Special Offer"}
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            {currentAd.description}
+
+          {/* Ad Description */}
+          <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+            {currentAd.description || "Check out this amazing opportunity!"}
           </p>
 
+          {/* Close Button (Secondary) */}
           <button
-            onClick={handleAdClick}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold transition-colors"
+            onClick={closeModal}
+            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-6 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg"
           >
-            View Details
+            Close
           </button>
         </div>
+
+        {/* Optional: Ad indicator */}
+        {currentAd.id !== "default" && (
+          <div className="absolute top-3 left-3 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded">
+            AD
+          </div>
+        )}
       </div>
     </div>
   );
