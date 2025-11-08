@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { X, Sparkles } from "lucide-react";
 import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { useFetchRandomAdvMutation } from "@/services/apis/CommonApis";
 
@@ -49,7 +49,8 @@ const AdPopup: React.FC<AdPopupProps> = ({
     id: "default",
     image: brandLogo || "/path/to/your/brand-logo.png",
     title: "Welcome to BUXLO",
-    description: "Discover amazing mentorship opportunities and connect with expert mentors. Upgrade to premium for an ad-free experience!",
+    description:
+      "Discover amazing mentorship opportunities and connect with expert mentors. Upgrade to premium for an ad-free experience!",
   };
 
   // Check subscription status on mount
@@ -120,8 +121,9 @@ const AdPopup: React.FC<AdPopupProps> = ({
 
       if (response.data) {
         // Check if the response has valid data (not empty strings)
-        const hasValidData = response.data.id && response.data.image && response.data.title;
-        
+        const hasValidData =
+          response.data.id && response.data.image && response.data.title;
+
         if (hasValidData) {
           setCurrentAd(response.data);
         } else {
@@ -155,67 +157,101 @@ const AdPopup: React.FC<AdPopupProps> = ({
     return null;
   }
 
+  const isDefaultAd = currentAd.id === "default";
+
   return (
-    <div 
-      className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[9999] p-4"
-      onClick={(e) => {
-        // Prevent closing when clicking the modal content
-        if (e.target === e.currentTarget) {
-          return;
-        }
-      }}
-    >
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl max-w-md w-full relative shadow-2xl transform transition-all duration-300 animate-in fade-in zoom-in">
-        {/* Close Button - Only way to close */}
+    <div className="fixed inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-in fade-in duration-300">
+      <div className="bg-white dark:bg-gradient-to-br dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-900 rounded-3xl max-w-lg w-full relative shadow-2xl transform transition-all duration-500 animate-in zoom-in-95 slide-in-from-bottom-4 border border-gray-200 dark:border-zinc-700">
+        {/* Decorative gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5 rounded-3xl pointer-events-none" />
+
+        {/* Close Button */}
         <button
           onClick={closeModal}
-          className="absolute -top-3 -right-3 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 shadow-lg transition-all duration-200 hover:scale-110 z-10"
+          className="absolute -top-4 -right-4 bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-full p-3 shadow-xl transition-all duration-200 hover:scale-110 hover:rotate-90 z-20 group"
           aria-label="Close advertisement"
         >
-          <X className="w-5 h-5" />
+          <X className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
         </button>
 
+        {/* Ad indicator badge */}
+        {!isDefaultAd && (
+          <div className="absolute top-4 left-4 z-10">
+            <div className="bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 animate-pulse">
+              <Sparkles className="w-3 h-3" />
+              <span>SPONSORED</span>
+            </div>
+          </div>
+        )}
+
         {/* Ad Content */}
-        <div className="p-6">
-          {/* Ad Image */}
-          <div className="relative mb-4 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800">
-            <img
-              src={currentAd.image}
-              alt={currentAd.title}
-              className="w-full h-56 object-contain"
-              onError={(e) => {
-                // Fallback if image fails to load
-                const target = e.target as HTMLImageElement;
-                target.src = brandLogo || "/path/to/fallback-image.png";
-              }}
-            />
+        <div className="relative p-8">
+          {/* Ad Image Container */}
+          <div className="relative mb-6 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-zinc-800 dark:to-zinc-900 shadow-inner">
+            <div className="aspect-video flex items-center justify-center p-6">
+              <img
+                src={currentAd.image}
+                alt={currentAd.title}
+                className="w-full h-full object-contain max-h-64 rounded-xl"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = brandLogo || "/path/to/fallback-image.png";
+                }}
+              />
+            </div>
+            {/* Image overlay effect */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none" />
           </div>
 
           {/* Ad Title */}
-          <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white leading-tight">
+          <h3 className="text-3xl font-extrabold mb-4 text-gray-900 dark:text-white leading-tight bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
             {currentAd.title || "Special Offer"}
           </h3>
 
           {/* Ad Description */}
-          <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+          <p className="text-base text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
             {currentAd.description || "Check out this amazing opportunity!"}
           </p>
 
-          {/* Close Button (Secondary) */}
-          <button
-            onClick={closeModal}
-            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-6 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg"
-          >
-            Close
-          </button>
+          {/* Action Buttons */}
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={closeModal}
+              className="w-full bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-white py-4 px-6 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] group relative overflow-hidden"
+            >
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                Continue
+                <svg
+                  className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
+                </svg>
+              </span>
+              {/* Button shine effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+            </button>
+
+            {!isDefaultAd && (
+              <button
+                onClick={closeModal}
+                className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200 py-2"
+              >
+                Skip this ad
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Optional: Ad indicator */}
-        {currentAd.id !== "default" && (
-          <div className="absolute top-3 left-3 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded">
-            AD
-          </div>
-        )}
+        {/* Bottom decorative border */}
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-b-3xl" />
       </div>
     </div>
   );
