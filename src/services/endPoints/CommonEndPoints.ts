@@ -27,6 +27,7 @@ export enum CommonApiEndPoints {
   addPaymetHistory = "/payment/common/addpaymenthistory",
   fetchFeedback = "/user/common/fetchfeedback",
   fetchAllAdvs = "/adv/common/fetchalladvs",
-  fetchAllTrustedus = "/adv/common/fetchalltrustedus"
+  fetchAllTrustedus = "/adv/common/fetchalltrustedus",
+  fetchRandomAdv = "/adv/common/fetchrandomadvs"
 
 }

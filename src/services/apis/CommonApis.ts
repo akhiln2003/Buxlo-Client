@@ -294,6 +294,14 @@ export const commonApi = createApi({
       }),
     }),
 
+    // fetch random adv's
+    fetchRandomAdv: builder.mutation({
+      query: () => ({
+        url: CommonApiEndPoints.fetchRandomAdv,
+        method: "GET",
+      }),
+    }),
+
     //////////////////////////////////////////////////////////////////////////////////
   }),
 });
@@ -327,4 +335,5 @@ export const {
   useFetchFeedbackMutation,
   useFetchAllAdvsMutation,
   useFetchAllTrustedUsMutation,
+  useFetchRandomAdvMutation
 } = commonApi;
