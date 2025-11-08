@@ -13,6 +13,7 @@ import { Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EditSubscriptionModal } from "./EditSubscriptionModal";
+import { AddSubscriptionModal } from "./AddSubscriptionModal";
 import { ISubscription } from "@/@types/interface/ISubscription";
 
 type GrowthData = {
@@ -128,6 +129,7 @@ const GrowthCharts = ({
             <CardTitle className="text-lg font-semibold text-gray-700 dark:text-zinc-100">
               Subscription Plans
             </CardTitle>
+            <AddSubscriptionModal plans={plans} setPlans={setPlans} />
           </CardHeader>
           <CardContent>
             <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
