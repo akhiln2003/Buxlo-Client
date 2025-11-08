@@ -109,6 +109,8 @@ const AdPopup: React.FC<AdPopupProps> = ({
       const response: IAxiosResponse = await fetchAdv({});
 
       if (response.data) {
+        console.log("response" , response.data);
+        
         setCurrentAd(response.data);
         setShowModal(true);
       }
