@@ -55,8 +55,14 @@ const AdPopup: React.FC<AdPopupProps> = ({
 
   // Check subscription status on mount
   useEffect(() => {
+    // Don't show ads for admin users
+    if (user?.role === "admin") {
+      setHasSubscription(true);
+      setIsChecking(false);
+      return;
+    }
     checkSubscriptionStatus();
-  }, [user?.id]);
+  }, [user?.id, user?.role]);
 
   // Setup ad intervals after subscription check
   useEffect(() => {
@@ -80,6 +86,13 @@ const AdPopup: React.FC<AdPopupProps> = ({
 
   const checkSubscriptionStatus = async (): Promise<void> => {
     if (!user?.id) {
+      setIsChecking(false);
+      return;
+    }
+
+    // Don't show ads for admin users
+    if (user.role === "admin") {
+      setHasSubscription(true);
       setIsChecking(false);
       return;
     }
