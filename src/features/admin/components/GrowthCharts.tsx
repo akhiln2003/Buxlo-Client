@@ -9,12 +9,11 @@ import {
   Line,
   ResponsiveContainer,
 } from "recharts";
-import { Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { EditSubscriptionModal } from "./EditSubscriptionModal";
 import { AddSubscriptionModal } from "./AddSubscriptionModal";
 import { ISubscription } from "@/@types/interface/ISubscription";
+import { DeleteConfirmationModal } from "./DeleteConfirmationModal";
 
 type GrowthData = {
   month: string;
@@ -177,16 +176,11 @@ const GrowthCharts = ({
                         subscription={subscription}
                         setPlans={setPlans}
                       />
-                      {!isFixedPlan && (
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => onDeletePlan(subscription)}
-                          className="flex items-center gap-1 h-8 w-8 p-0"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      )}
+                      <DeleteConfirmationModal
+                        subscription={subscription}
+                        onDeleteConfirm={onDeletePlan}
+                        isFixedPlan={isFixedPlan}
+                      />
                     </div>
                   </div>
                 );
