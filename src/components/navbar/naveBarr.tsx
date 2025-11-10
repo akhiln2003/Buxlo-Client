@@ -91,12 +91,12 @@ const getDefaultNavigationItems = (
   switch (role) {
     case USER_ROLE.USER:
       return [
-        { name: "About", url: UserUrls.about },
+        // { name: "About", url: UserUrls.about },
         { name: "Contact", url: UserUrls.contact },
       ];
     case USER_ROLE.MENTOR:
       return [
-        { name: "About", url: MentorUrl.about },
+        // { name: "About", url: MentorUrl.about },
         { name: "Contact", url: MentorUrl.contact },
       ];
     default:
@@ -133,7 +133,7 @@ const getDefaultPageCategories = (
           icon: <HelpCircle size={16} />,
           routes: [
             { name: "Contact", url: UserUrls.contact },
-            { name: "About Us", url: UserUrls.about },
+            // { name: "About Us", url: UserUrls.about },
           ],
         },
         {
@@ -164,7 +164,7 @@ const getDefaultPageCategories = (
           icon: <HelpCircle size={16} />,
           routes: [
             { name: "Contact", url: MentorUrl.contact },
-            { name: "About Us", url: MentorUrl.about },
+            // { name: "About Us", url: MentorUrl.about },
           ],
         },
       ];
@@ -365,7 +365,7 @@ function ReusableNavbar({
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button className="flex items-center text-sm font-extrabold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200 uppercase tracking-wide">
-                        Pages <ChevronDown className="ml-1 h-4 w-4" />
+                        Explore <ChevronDown className="ml-1 h-4 w-4" />
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-auto p-4 mt-2 min-w-[600px]">
@@ -655,7 +655,7 @@ function ReusableNavbar({
                             onClick={() => setIsPageMenuOpen(!isPageMenuOpen)}
                             className="flex w-full px-3 py-2 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md items-center justify-between transition-colors duration-200"
                           >
-                            Pages
+                            Explore
                             <ChevronDown
                               className={`h-4 w-4 transition-transform duration-200 ${
                                 isPageMenuOpen ? "rotate-180" : ""

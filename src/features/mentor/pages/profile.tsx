@@ -1,8 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Star,
-  ThumbsUp,
-  ThumbsDown,
   Mail,
   Pencil,
   Camera,
@@ -10,6 +8,8 @@ import {
   Settings,
   Lock,
   ChevronDown,
+  MessageSquare,
+  ArrowRight,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-// Using built-in menu solution
+import { Link } from "react-router-dom";
 import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { errorTost, successToast } from "@/components/ui/tosastMessage";
 import { useGetUser } from "@/hooks/useGetUser";
@@ -36,7 +36,12 @@ import dummyProfileImage from "@/assets/images/dummy-profile.webp";
 import { ChangePasswordForm } from "@/components/ui/ChangePasswordForm";
 import { z } from "zod";
 import { ChangePasswordSchema } from "@/features/user/zodeSchema/ChangePasswordSchema";
-import { useChanegePasswordMutation } from "@/services/apis/CommonApis";
+import {
+  useChanegePasswordMutation,
+  useFetchFeedbackMutation,
+} from "@/services/apis/CommonApis";
+import FeedbackCard from "@/components/common/feedback/FeedbackCard";
+import { MentorUrl } from "@/@types/urlEnums/MentorUrl";
 
 type ChangePasswordType = z.infer<typeof ChangePasswordSchema>;
 
@@ -46,7 +51,7 @@ const Profile = () => {
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
+  const [feedbacks, setFeedbacks] = useState([]);
   const [fetchProfileData] = useFetchMentorProfileMutation();
   const [fetchProfileImages] = useFetchMentorProfileImageMutation();
   const [users, setUsers] = useState<Partial<IMentor>>({});
@@ -54,6 +59,7 @@ const Profile = () => {
   const storUserData = useGetUser();
   const [updatePassword, { isLoading: isLoadingChangePassword }] =
     useChanegePasswordMutation();
+  const [fetchFeedbacks] = useFetchFeedbackMutation();
 
   const onSubmitChangePassword = async (data: ChangePasswordType) => {
     try {
@@ -135,38 +141,42 @@ const Profile = () => {
     fetchUserData();
   }, []);
 
-  const profile = {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    phone: "+1 234 567 8900",
-    about:
-      "Passionate developer with expertise in frontend technologies and a keen eye for user experience.",
-    expertise: ["React", "JavaScript", "UI/UX", "Node.js"],
-    yearsOfExperience: 5,
-    rating: 4.5,
-    image: "/api/placeholder/128/128",
-    feedback: [
-      {
-        id: 1,
-        name: "Sarah Johnson",
-        image: "/api/placeholder/40/40",
-        comment:
-          "Excellent work on our latest project! Very professional and delivered on time.",
-        rating: 5,
-        likes: 12,
-        dislikes: 1,
-      },
-      {
-        id: 2,
-        name: "Mike Smith",
-        image: "/api/placeholder/40/40",
-        comment: "Great communication skills and technical expertise.",
-        rating: 4,
-        likes: 8,
-        dislikes: 0,
-      },
-    ],
-  };
+  const fetchFeedbackDatas = useCallback(
+    async (page: number = 1) => {
+      try {
+        if (!storUserData?.id) return;
+        const response: IAxiosResponse = await fetchFeedbacks({
+          page,
+          mentorId: storUserData?.id as string,
+        });
+
+        if (response.data) {
+          setFeedbacks(response.data.feedbacks);
+        } else {
+          const errorMessage = response.error?.data?.error || [
+            {
+              message: `${
+                response.error?.data || "Unknown error"
+              } please try again later`,
+            },
+          ];
+          errorTost("Something went wrong", errorMessage);
+          setFeedbacks([]);
+        }
+      } catch (error) {
+        console.error("Error fetching feedbacks:", error);
+        errorTost("Something went wrong", [
+          { message: "Something went wrong please try again" },
+        ]);
+        setFeedbacks([]);
+      }
+    },
+    [fetchFeedbacks]
+  );
+
+  useEffect(() => {
+    fetchFeedbackDatas(1);
+  }, [fetchFeedbackDatas, storUserData?.id]);
 
   const renderStars = (rating: number) => {
     return [...Array(5)].map((_, index) => (
@@ -323,7 +333,7 @@ const Profile = () => {
                 <div className="flex items-center gap-2 justify-center md:justify-start">
                   {renderStars(5)}
                   <span className="text-sm text-gray-600 dark:text-gray-400 ml-2">
-                    ({profile.rating})
+                    (5.0)
                   </span>
                 </div>
               </div>
@@ -397,51 +407,49 @@ const Profile = () => {
         <Card className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800">
           <CardHeader>
             <CardTitle className="text-gray-900 dark:text-white">
-              Feedback
+              Recent Feedback
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
-              {profile.feedback.map((item) => (
-                <div
-                  key={item.id}
-                  className="border-b border-gray-200 dark:border-zinc-800 last:border-0 pb-6 last:pb-0"
-                >
-                  <div className="flex items-start gap-4">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-10 h-10 rounded-full ring-2 ring-gray-100 dark:ring-zinc-800"
+            {feedbacks.length > 0 ? (
+              <>
+                <div className="space-y-4">
+                  {feedbacks.map((feedback, index) => (
+                    <FeedbackCard
+                      key={index}
+                      feedback={feedback}
+                      btnAcction={false}
                     />
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-medium text-gray-900 dark:text-white">
-                            {item.name}
-                          </h3>
-                          <div className="flex items-center gap-1 mt-1">
-                            {renderStars(item.rating)}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <button className="flex items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                            <ThumbsUp className="w-4 h-4" />
-                            <span className="text-sm">{item.likes}</span>
-                          </button>
-                          <button className="flex items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
-                            <ThumbsDown className="w-4 h-4" />
-                            <span className="text-sm">{item.dislikes}</span>
-                          </button>
-                        </div>
-                      </div>
-                      <p className="mt-2 text-gray-600 dark:text-gray-400">
-                        {item.comment}
-                      </p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+
+                {/* View All Feedback Button */}
+                <div className="mt-6 flex justify-center">
+                  <Link to={MentorUrl.feedBack}>
+                    <Button
+                      variant="outline"
+                      className="flex items-center gap-2 px-6 py-2 border-2 border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
+                    >
+                      View All Feedback
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gray-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MessageSquare className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  No Feedback Yet
+                </h3>
+                <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
+                  You haven't received any feedback yet. Keep mentoring to start
+                  receiving reviews!
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
