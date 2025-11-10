@@ -18,7 +18,7 @@ function AdminLayout() {
         {!hideNavbar && <AdminSideNavBar />}
 
         {/* Main content in the center */}
-        <main className="flex-1 pt-8 rounded-xl dark:bg-black bg-gray-100 overflow-auto">
+        <main className="flex-1 pt-10 rounded-xl dark:bg-black bg-gray-100 overflow-auto">
           <Outlet />
         </main>
       </div>

@@ -107,7 +107,7 @@ function UserManagement() {
 
   return (
     <div className="w-full h-full p-5">
-      <div className="w-full mt-2 bg-slate-00 flex justify-end h-10">
+      <div className="w-full  bg-slate-00 flex justify-end h-10">
         <SearchInput
           onSearch={(value) => setSearchQuery(value)}
           debounceDelay={400}
