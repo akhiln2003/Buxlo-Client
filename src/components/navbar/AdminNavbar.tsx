@@ -66,26 +66,28 @@ function AdminNavbar() {
       navigate(AdminUrls.signIn);
     } else {
       errorTost(
-        "Somthing when wrong ",
+        "Something went wrong",
         response.error.data.error || [
-          { message: `${response.error.data} please try again laiter` },
+          { message: `${response.error.data} please try again later` },
         ]
       );
     }
   };
 
+  const userAvatar = user?.avatar || profileImage;
+
   return (
     <>
-      <nav className=" top-0 left-0 right-0  dark:bg-zinc-950 ">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8">
+      <nav className="fixed top-0 left-0 right-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md z-50 border-b border-gray-200/20 dark:border-gray-800/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Desktop Logo */}
-            <div className="flex-shrink-0 ">
+            <div className="flex-shrink-0">
               <Link to={AdminUrls.home}>
                 <img
                   src={isDarkMode ? logoWhite : logoBlack}
                   alt="BUXLo Logo"
-                  className="h-16 w-auto "
+                  className="h-10 w-auto sm:h-12 md:h-14"
                 />
               </Link>
             </div>
@@ -99,82 +101,64 @@ function AdminNavbar() {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <div className="flex cursor-pointer">
-                    {user?.avatar ? (
-                      <img
-                        src={user?.avatar}
-                        alt="User profile"
-                        className="h-8 w-8 rounded-full overflow-hidden object-cover"
-                      />
-                    ) : (
-                      <img
-                        src={profileImage}
-                        alt="User profile"
-                        className="h-8 w-8 rounded-full overflow-hidden object-cover"
-                      />
-                    )}
-                    {/* <ChevronDown color='#6e6e6e' size={25} className='mt-1' /> */}
-                  </div>
+                  <button className="flex items-center p-1 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200">
+                    <img
+                      src={userAvatar}
+                      alt="User profile"
+                      className="h-8 w-8 rounded-full overflow-hidden object-cover"
+                    />
+                  </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="mr-9 min-w-[12rem]">
+                <DropdownMenuContent className="w-56 mr-4">
                   <DropdownMenuLabel>
-                    <div className="flex cursor-pointer items-center  justify-start   ">
-                      {user?.avatar ? (
-                        <img
-                          src={user?.avatar}
-                          alt="User profile"
-                          className="h-8 w-8 rounded-full overflow-hidden object-cover"
-                        />
-                      ) : (
-                        <img
-                          src={profileImage}
-                          alt="User profile"
-                          className="h-8 w-8 rounded-full overflow-hidden object-cover"
-                        />
-                      )}
-                      <p className="ml-[0.5rem] font-semibold text-lg capitalize">
-                        {user ? user.name : "User"}
-                      </p>
+                    <div className="flex items-center space-x-3">
+                      <img
+                        src={userAvatar}
+                        alt="User profile"
+                        className="h-8 w-8 rounded-full overflow-hidden object-cover"
+                      />
+                      <div className="flex flex-col">
+                        <p className="font-semibold capitalize">
+                          {user ? user.name : "User"}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {user?.email || ""}
+                        </p>
+                      </div>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <Link to={"#"} className="flex">
-                      <User size={15} />
-                      <span className="ml-[0.5rem]">Profile</span>
-                    </Link>
+                  <DropdownMenuItem onClick={() => navigate("#")}>
+                    <User size={16} className="mr-2" />
+                    Profile
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={toggleTheme}>
-                    <button className="flex">
-                      {isDarkMode ? (
-                        <Sun color="white" strokeWidth={1.5} size={19} />
-                      ) : (
-                        <SunMoon strokeWidth={1.5} />
-                      )}
-                      <span className="ml-[0.5rem]">Theme</span>
-                    </button>
+                    {isDarkMode ? (
+                      <Sun size={16} className="mr-2" />
+                    ) : (
+                      <SunMoon size={16} className="mr-2" />
+                    )}
+                    Theme
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link to={"#"} className="flex">
-                      <Sparkles size={15} strokeWidth={2.5} />
-                      <span className="ml-[0.5rem]">Subscription</span>
-                    </Link>
+                  <DropdownMenuItem onClick={() => navigate("#")}>
+                    <Sparkles size={16} className="mr-2" />
+                    Subscription
                   </DropdownMenuItem>
                   {user?.role !== USER_ROLE.ADMIN ? (
                     <DropdownMenuItem onClick={navigateSignIn}>
-                      <LogIn size={20} />
-                      <span className="ml-[0.5rem]">SignIn</span>
+                      <LogIn size={16} className="mr-2" />
+                      Sign In
                     </DropdownMenuItem>
                   ) : (
                     <AlertDialog>
                       <DropdownMenuItem
                         onSelect={(e) => e.preventDefault()}
-                        className="w-full flex text-red-700"
+                        className="text-red-600 focus:text-red-600"
                       >
                         <AlertDialogTrigger asChild>
-                          <div className="flex items-center cursor-pointer">
-                            <LogOut size={20} />
-                            <span className="ml-[0.5rem]">SignOut</span>
+                          <div className="flex items-center cursor-pointer w-full">
+                            <LogOut size={16} className="mr-2" />
+                            Sign Out
                           </div>
                         </AlertDialogTrigger>
                       </DropdownMenuItem>
@@ -185,15 +169,13 @@ function AdminNavbar() {
                             Are you absolutely sure?
                           </AlertDialogTitle>
                           <AlertDialogDescription>
-                            This action cannot be undu. This will sign you out
-                            from buxlo.
+                            This action cannot be undone. This will sign you out
+                            from BUXLo.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleSignOutUser()}
-                          >
+                          <AlertDialogAction onClick={handleSignOutUser}>
                             Continue
                           </AlertDialogAction>
                         </AlertDialogFooter>
@@ -212,12 +194,12 @@ function AdminNavbar() {
               />
               <motion.button
                 onClick={() => setIsOpen(!isOpen)}
-                className="p-2 text-gray-500 hover:text-gray-900"
+                className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
                 initial={{ rotate: 0 }}
                 animate={{ rotate: isOpen ? 90 : 0 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.2 }}
               >
-                {isOpen ? <X /> : <Menu size={20} />}
+                {isOpen ? <X size={24} /> : <Menu size={24} />}
               </motion.button>
             </div>
           </div>
@@ -231,33 +213,120 @@ function AdminNavbar() {
                 : { height: 0, opacity: 0 }
             }
             transition={{ duration: 0.3 }}
-            className={`md:hidden overflow-hidden`}
+            className="md:hidden overflow-hidden border-t border-gray-200 dark:border-gray-800"
           >
-            <div className="space-y-1 px-2 pb-3 pt-2">
-              <a
-                href="#"
-                className="block px-3 py-2 text-gray-500 hover:text-gray-900  "
+            <div className="px-2 pt-4 pb-6 space-y-1">
+              {/* Mobile Profile Section */}
+              <div
+                className="bg-gray-50 dark:bg-zinc-800/50 p-4 rounded-lg mb-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200"
+                onClick={() => {
+                  navigate("#");
+                  setIsOpen(false);
+                }}
+              >
+                <div className="flex items-center space-x-3">
+                  <img
+                    src={userAvatar}
+                    alt="User profile"
+                    className="h-12 w-12 rounded-full object-cover"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-gray-900 dark:text-white capitalize truncate">
+                      {user?.name || "User"}
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                      {user?.email || ""}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile Navigation Links */}
+              <Link
+                to="#"
+                className="block px-3 py-2 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors duration-200"
+                onClick={() => setIsOpen(false)}
               >
                 Dashboard
-              </a>
-              <a
-                href="#"
-                className="block px-3 py-2 text-gray-500 hover:text-gray-900"
+              </Link>
+              <Link
+                to="#"
+                className="block px-3 py-2 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors duration-200"
+                onClick={() => setIsOpen(false)}
               >
                 PAGES
-              </a>
-              <a
-                href="#"
-                className="block px-3 py-2 text-gray-500 hover:text-gray-900"
+              </Link>
+              <Link
+                to="#"
+                className="block px-3 py-2 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors duration-200"
+                onClick={() => setIsOpen(false)}
               >
                 ABOUT
-              </a>
-              <a
-                href="#"
-                className="block px-3 py-2 text-gray-500 hover:text-gray-900"
+              </Link>
+              <Link
+                to="#"
+                className="block px-3 py-2 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors duration-200"
+                onClick={() => setIsOpen(false)}
               >
                 Contact
-              </a>
+              </Link>
+
+              {/* Mobile Quick Actions */}
+              <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800 space-y-1">
+                <button
+                  onClick={() => {
+                    toggleTheme();
+                    setIsOpen(false);
+                  }}
+                  className="flex items-center w-full px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors duration-200"
+                >
+                  {isDarkMode ? (
+                    <Sun size={16} className="mr-3" />
+                  ) : (
+                    <SunMoon size={16} className="mr-3" />
+                  )}
+                  <span className="text-sm">Toggle Theme</span>
+                </button>
+
+                {user?.role !== USER_ROLE.ADMIN ? (
+                  <button
+                    onClick={() => {
+                      navigateSignIn();
+                      setIsOpen(false);
+                    }}
+                    className="flex items-center w-full px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors duration-200"
+                  >
+                    <LogIn size={16} className="mr-3" />
+                    <span className="text-sm">Sign In</span>
+                  </button>
+                ) : (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <button className="flex items-center w-full px-3 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors duration-200">
+                        <LogOut size={16} className="mr-3" />
+                        <span className="text-sm">Sign Out</span>
+                      </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Are you absolutely sure?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will sign you out
+                          from BUXLo.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleSignOutUser}>
+                          Continue
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+              </div>
             </div>
           </motion.div>
         </div>
