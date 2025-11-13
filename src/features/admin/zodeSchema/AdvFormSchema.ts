@@ -9,6 +9,10 @@ export const CreateAdvFormSchema = z.object({
     .string()
     .min(10, { message: "Description must be at least 10 characters" })
     .max(500, { message: "Description must be less than 500 characters" }),
+  link: z
+    .string().trim()
+    .url({ message: "Please enter a valid URL" })
+    .min(1, { message: "Link is required" }),
   image: z
     .instanceof(FileList)
     .refine((files) => files.length > 0, { message: "Image is required" })
@@ -31,6 +35,10 @@ export const EditAdvFormSchema = z.object({
     .string()
     .min(10, { message: "Description must be at least 10 characters" })
     .max(500, { message: "Description must be less than 500 characters" }),
+  link: z
+    .string().trim()
+    .url({ message: "Please enter a valid URL" })
+    .min(1, { message: "Link is required" }),
   image: z
     .instanceof(FileList)
     .refine(

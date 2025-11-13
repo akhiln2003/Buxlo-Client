@@ -42,6 +42,7 @@ export const AdvForm = ({
   const [initialValues, setInitialValues] = useState<{
     title: string;
     description: string;
+    link: string;
     image?: FileList;
   } | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -70,11 +71,13 @@ export const AdvForm = ({
       const initialData = {
         title: editData.title,
         description: editData.description,
+        link: editData.link,
         image: undefined, // No initial image file
       };
       setInitialValues(initialData);
       setValue("title", editData.title);
       setValue("description", editData.description);
+      setValue("link", editData.link);
       if (editData.image) {
         setPreviewUrl(`${editData.currentImageUrl}`);
       }
@@ -113,7 +116,8 @@ export const AdvForm = ({
 
     const formDataChanged =
       initialValues.title !== formValues.title ||
-      initialValues.description !== formValues.description;
+      initialValues.description !== formValues.description ||
+      initialValues.link !== formValues.link;
 
     const imageChanged = formValues.image && formValues.image.length > 0;
 
@@ -138,17 +142,21 @@ export const AdvForm = ({
       if (data.title?.trim() !== initialValues?.title) {
         formData.append("data[title]", data.title.trim());
       }
+      if (data.description?.trim() !== initialValues?.description) {
+        formData.append("data[description]", data.description.trim());
+      }
+      if (data.link?.trim() !== initialValues?.link) {
+        formData.append("data[link]", data.link.trim());
+      }
+      
       if (
         (editMode && data.title?.trim() !== initialValues?.title) ||
         data.description?.trim() !== initialValues?.description ||
+        data.link?.trim() !== initialValues?.link ||
         data.image?.length > 0
       ) {
         formData.append("data[id]", editData?.id as string);
         formData.append("data[currentImage]", editData?.image as string);
-      }
-
-      if (data.description?.trim() !== initialValues?.description) {
-        formData.append("data[description]", data.description.trim());
       }
 
       // Only append image if it exists and has changed
@@ -297,6 +305,20 @@ export const AdvForm = ({
         />
         {errors.description && (
           <p className="text-red-500 text-sm">{errors.description.message}</p>
+        )}
+      </div>
+
+      <div>
+        <Label htmlFor="link">Link</Label>
+        <Input
+          id="link"
+          type="url"
+          placeholder="https://example.com"
+          {...register("link")}
+          className={errors.link ? "border-red-500" : ""}
+        />
+        {errors.link && (
+          <p className="text-red-500 text-sm">{errors.link.message}</p>
         )}
       </div>
 
