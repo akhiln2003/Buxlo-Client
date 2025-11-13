@@ -132,7 +132,6 @@ const GrowthCharts = ({
           </CardHeader>
           <CardContent>
             <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
-              // Replace the subscription card rendering section in GrowthCharts
               {plans.map((subscription) => {
                 const hasOffer = subscription.offer && subscription.offer > 0;
                 const offerPrice = hasOffer
