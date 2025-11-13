@@ -30,24 +30,21 @@ import ProfileInfo from "../components/ProfileInfo";
 import SubscriptionCard from "../components/SubscriptionCard";
 import WalletCard from "../components/WalletCard";
 import MentorCard from "../components/MentorCard";
+import { ISubscription } from "@/@types/interface/ISubscription";
 
 type ChangePasswordType = z.infer<typeof ChangePasswordSchema>;
-
-interface ISubscription {
-  id: string;
-  price: number;
-  offer: number;
-  type: "Day" | "Month" | "Year";
-  createdAt: string;
-  updatedAt: string;
-}
 
 const Profile = () => {
   const [showEditData, setShowEditData] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [fetchProfileData] = useFetchUserProfileMutation();
   const [profileImage, setProfileImage] = useState("");
-  const [subscription, setSubscription] = useState<ISubscription | null>(null);
+  const [subscription, setSubscription] = useState<ISubscription>({
+    duration: 0,
+    offer: 0,
+    price: 0,
+    type: "",
+  });
   const [fetchProfileImages] = useFetchUserProfileImageMutation();
   const [users, setUsers] = useState<Partial<IUser>>({});
   const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);

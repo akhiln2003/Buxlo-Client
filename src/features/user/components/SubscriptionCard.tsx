@@ -14,7 +14,7 @@ import {
 
 interface SubscriptionCardProps {
   users: Partial<IUser>;
-  subscription: ISubscription | null;
+  subscription: ISubscription;
   fetchSubscriptionIsloading: boolean;
   handleSubscriptionClick: () => void;
   formatDate: (dateString: string) => string;
