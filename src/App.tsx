@@ -7,7 +7,7 @@ import { SocketContext } from "./contexts/socketContext";
 import { useContext, useEffect } from "react";
 import { useGetUser } from "./hooks/useGetUser";
 import { CallProvider } from "./contexts/videoCallContext";
-import AdPopup from "./components/common/AdPopup/AdPopupComponent";
+import AdPopup from "./components/common/AdvPopup/AdPopupComponent";
 import { useFetchUserProfileMutation } from "./services/apis/UserApis";
 import { useFetchMentorProfileMutation } from "./services/apis/MentorApis";
 import { useTheme } from "./contexts/themeContext";
