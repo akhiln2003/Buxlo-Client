@@ -132,12 +132,29 @@ const GrowthCharts = ({
           </CardHeader>
           <CardContent>
             <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+              // Replace the subscription card rendering section in GrowthCharts
               {plans.map((subscription) => {
                 const hasOffer = subscription.offer && subscription.offer > 0;
                 const offerPrice = hasOffer
-                  ? (subscription.price * (1 - subscription.offer / 100)).toFixed(2)
+                  ? (
+                      subscription.price *
+                      (1 - subscription.offer / 100)
+                    ).toFixed(2)
                   : null;
                 const isFixedPlan = fixedPlanTypes.includes(subscription.type);
+
+                // Format duration display
+                const getDurationText = (days: number) => {
+                  if (days === 1) return "1 day";
+                  if (days === 7) return "1 week";
+                  if (days === 30) return "1 month";
+                  if (days === 90) return "3 months";
+                  if (days === 365) return "1 year";
+                  if (days >= 36500) return "Lifetime";
+                  if (days < 30) return `${days} days`;
+                  if (days < 365) return `${Math.floor(days / 30)} months`;
+                  return `${Math.floor(days / 365)} years`;
+                };
 
                 return (
                   <div
@@ -148,7 +165,10 @@ const GrowthCharts = ({
                       <h3 className="font-cabinet font-semibold text-gray-800 dark:text-zinc-100 text-sm">
                         {subscription.type}
                       </h3>
-                      <div className="text-xs text-gray-600 dark:text-zinc-300">
+                      <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
+                        Duration: {getDurationText(subscription.duration)}
+                      </p>
+                      <div className="text-xs text-gray-600 dark:text-zinc-300 mt-1">
                         {hasOffer ? (
                           <>
                             <div className="flex items-center space-x-2">

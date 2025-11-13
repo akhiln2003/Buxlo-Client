@@ -50,11 +50,13 @@ const Dashboard = () => {
 
   const fixedPlanTypes = ["Day", "Month", "Year"];
 
+  // Add this to your Dashboard component - replace the existing checkPlans function
+
   const checkPlans = async () => {
     const allPlans = [
-      { price: 1999, offer: 0, type: "Year" },
-      { price: 599, offer: 0, type: "Month" },
-      { price: 199, offer: 0, type: "Day" },
+      { price: 1999, offer: 0, type: "Year", duration: 365 },
+      { price: 599, offer: 0, type: "Month", duration: 30 },
+      { price: 199, offer: 0, type: "Day", duration: 1 },
     ];
 
     const filteredPlans = allPlans.filter(

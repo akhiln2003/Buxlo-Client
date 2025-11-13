@@ -23,11 +23,13 @@ const AddSubscriptionForm = ({
     type: "",
     price: "",
     offer: "",
+    duration: "",
   });
   const [errors, setErrors] = useState<{
     type?: string;
     price?: string;
     offer?: string;
+    duration?: string;
   }>({});
   const [isLoading, setIsLoading] = useState(false);
 
@@ -50,6 +52,11 @@ const AddSubscriptionForm = ({
       newErrors.offer = "Offer must be between 0 and 100";
     }
 
+    const duration = parseInt(formData.duration);
+    if (!formData.duration || isNaN(duration) || duration <= 0) {
+      newErrors.duration = "Duration must be greater than 0";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -63,6 +70,7 @@ const AddSubscriptionForm = ({
         type: formData.type.trim(),
         price: parseFloat(formData.price),
         offer: formData.offer ? parseFloat(formData.offer) : 0,
+        duration: parseInt(formData.duration),
       };
 
       const response: IAxiosResponse = await addPlans([newPlan]);
@@ -110,6 +118,26 @@ const AddSubscriptionForm = ({
         {errors.type && (
           <p className="text-sm text-red-500 mt-1">{errors.type}</p>
         )}
+      </div>
+
+      <div>
+        <Label htmlFor="duration">Duration (days) *</Label>
+        <Input
+          id="duration"
+          type="number"
+          value={formData.duration}
+          onChange={(e) => handleChange("duration", e.target.value)}
+          placeholder="e.g., 1, 7, 30, 365"
+          min="1"
+          step="1"
+          className={errors.duration ? "border-red-500" : ""}
+        />
+        {errors.duration && (
+          <p className="text-sm text-red-500 mt-1">{errors.duration}</p>
+        )}
+        <p className="text-xs text-gray-500 mt-1">
+          Common values: 1 (Day), 7 (Week), 30 (Month), 365 (Year)
+        </p>
       </div>
 
       <div>
