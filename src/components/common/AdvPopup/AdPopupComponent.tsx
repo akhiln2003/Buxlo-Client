@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, Sparkles } from "lucide-react";
+import { X, Sparkles, ExternalLink } from "lucide-react";
 import { IAxiosResponse } from "@/@types/interface/IAxiosResponse";
 import { useFetchRandomAdvMutation } from "@/services/apis/CommonApis";
 
@@ -9,6 +9,7 @@ interface Ad {
   image: string;
   title: string;
   description: string;
+  link: string;
 }
 
 interface User {
@@ -51,6 +52,7 @@ const AdPopup: React.FC<AdPopupProps> = ({
     title: "Welcome to BUXLO",
     description:
       "Discover amazing mentorship opportunities and connect with expert mentors. Upgrade to premium for an ad-free experience!",
+    link: "#",
   };
 
   // Check subscription status on mount
@@ -161,6 +163,36 @@ const AdPopup: React.FC<AdPopupProps> = ({
     setShowModal(false);
   };
 
+  const handleRedirect = (): void => {
+    if (!currentAd?.link || currentAd.link === "#") {
+      closeModal();
+      return;
+    }
+
+    try {
+      // Validate URL before opening
+      const url = new URL(currentAd.link);
+      if (url.protocol === "http:" || url.protocol === "https:") {
+        // Open in new tab for security
+        window.open(currentAd.link, "_blank", "noopener,noreferrer");
+        closeModal();
+      } else {
+        console.error("Invalid URL protocol");
+        closeModal();
+      }
+    } catch (error) {
+      console.error("Invalid URL:", error);
+      closeModal();
+    }
+  };
+
+  const handleImageClick = (): void => {
+    // Also allow clicking the image to redirect
+    if (!isDefaultAd) {
+      handleRedirect();
+    }
+  };
+
   // Don't render anything if:
   // - Still checking subscription status
   // - User has subscription
@@ -171,6 +203,7 @@ const AdPopup: React.FC<AdPopupProps> = ({
   }
 
   const isDefaultAd = currentAd.id === "default";
+  const hasValidLink = currentAd.link && currentAd.link !== "#";
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-in fade-in duration-300">
@@ -200,7 +233,14 @@ const AdPopup: React.FC<AdPopupProps> = ({
         {/* Ad Content */}
         <div className="relative p-8">
           {/* Ad Image Container */}
-          <div className="relative mb-6 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-zinc-800 dark:to-zinc-900 shadow-inner">
+          <div
+            className={`relative mb-6 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-zinc-800 dark:to-zinc-900 shadow-inner ${
+              !isDefaultAd && hasValidLink
+                ? "cursor-pointer hover:scale-[1.02] transition-transform duration-300"
+                : ""
+            }`}
+            onClick={handleImageClick}
+          >
             <div className="aspect-video flex items-center justify-center p-6">
               <img
                 src={currentAd.image}
@@ -214,6 +254,16 @@ const AdPopup: React.FC<AdPopupProps> = ({
             </div>
             {/* Image overlay effect */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none" />
+            
+            {/* Click hint overlay on hover */}
+            {!isDefaultAd && hasValidLink && (
+              <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-colors duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
+                <div className="bg-white/90 dark:bg-zinc-900/90 px-4 py-2 rounded-full flex items-center gap-2 shadow-lg">
+                  <ExternalLink className="w-4 h-4" />
+                  <span className="text-sm font-semibold">Click to visit</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Ad Title */}
@@ -228,36 +278,53 @@ const AdPopup: React.FC<AdPopupProps> = ({
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-3">
-            <button
-              onClick={closeModal}
-              className="w-full bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-white py-4 px-6 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] group relative overflow-hidden"
-            >
-              <span className="relative z-10 flex items-center justify-center gap-2">
-                Continue
-                <svg
-                  className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+            {!isDefaultAd && hasValidLink ? (
+              <>
+                {/* Visit Link Button */}
+                <button
+                  onClick={handleRedirect}
+                  className="w-full bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-white py-4 px-6 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] group relative overflow-hidden"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
-              </span>
-              {/* Button shine effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-            </button>
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    Visit Link
+                    <ExternalLink className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
+                  </span>
+                  {/* Button shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                </button>
 
-            {!isDefaultAd && (
+                {/* Skip Button */}
+                <button
+                  onClick={closeModal}
+                  className="w-full bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 py-3 px-6 rounded-xl font-semibold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  Skip this ad
+                </button>
+              </>
+            ) : (
+              /* Continue Button (for default ad or no link) */
               <button
                 onClick={closeModal}
-                className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200 py-2"
+                className="w-full bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-white py-4 px-6 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] group relative overflow-hidden"
               >
-                Skip this ad
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  Continue
+                  <svg
+                    className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 8l4 4m0 0l-4 4m4-4H3"
+                    />
+                  </svg>
+                </span>
+                {/* Button shine effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
               </button>
             )}
           </div>

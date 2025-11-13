@@ -15,6 +15,7 @@ import {
 import { ConfirmDeletion } from "../components/ConfirmDeletion";
 import EditAndDeleteDropdownMenu from "../components/EditAndDeleteDropdownMenu";
 import { PageNation } from "@/components/ui/pageNation";
+import { Link } from "react-router-dom";
 
 const AdvManagement = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -244,6 +245,7 @@ const AdvManagement = () => {
                 <p className="font-cabinet font-light text-center text-sm text-gray-600 dark:text-zinc-300 line-clamp-2">
                   {item.description}
                 </p>
+                <Link className="w-full p-2 flex justify-center bg-green-500" to={item.link}>Link</Link>
               </div>
             </div>
           ))}
