@@ -331,7 +331,7 @@ const Profile = () => {
           isOpen={isSubscriptionModalOpen}
           onClose={() => setIsSubscriptionModalOpen(false)}
           currentSubscription={subscription?.id}
-          currentSubscriptionType={subscription?.type} // Add this line
+          currentSubscriptionDuration={subscription?.duration} 
         />
       </div>
     </div>
