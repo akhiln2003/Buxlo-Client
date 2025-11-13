@@ -293,13 +293,7 @@ const AdPopup: React.FC<AdPopupProps> = ({
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                 </button>
 
-                {/* Skip Button */}
-                <button
-                  onClick={closeModal}
-                  className="w-full bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 py-3 px-6 rounded-xl font-semibold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  Skip this ad
-                </button>
+            
               </>
             ) : (
               /* Continue Button (for default ad or no link) */
@@ -330,8 +324,6 @@ const AdPopup: React.FC<AdPopupProps> = ({
           </div>
         </div>
 
-        {/* Bottom decorative border */}
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-b-3xl" />
       </div>
     </div>
   );

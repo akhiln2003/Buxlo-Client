@@ -245,7 +245,7 @@ const AdvManagement = () => {
                 <p className="font-cabinet font-light text-center text-sm text-gray-600 dark:text-zinc-300 line-clamp-2">
                   {item.description}
                 </p>
-                <Link className="w-full p-2 flex justify-center bg-green-500" to={item.link}>Link</Link>
+                <Link className="w-full p-2 flex justify-center bg-green-600 rounded-md" to={item.link}>Link</Link>
               </div>
             </div>
           ))}
