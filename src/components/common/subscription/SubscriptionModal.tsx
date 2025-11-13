@@ -1,4 +1,4 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { X, Check, Star, Crown, CreditCard, Calendar } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -14,7 +14,8 @@ interface BackendSubscriptionPlan {
   id: string;
   price: string;
   offer: string;
-  type: string; // 'Year', 'Month', 'Day'
+  type: string;
+  duration: number; // Duration in days
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
@@ -26,6 +27,7 @@ interface SubscriptionPlan {
   name: string;
   price: string;
   period: string;
+  duration: number;
   originalPrice?: string;
   features: string[];
   popular?: boolean;
@@ -37,41 +39,94 @@ interface SubscriptionModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentSubscription?: string;
-  currentSubscriptionType?: string; // Add this prop to pass current plan type
+  currentSubscriptionDuration?: number; // Use duration instead of type
 }
 
-// Plan hierarchy: Day < Month < Year
-const PLAN_HIERARCHY: { [key: string]: number } = {
-  day: 1,
-  month: 2,
-  year: 3,
-};
+// Standard benefits that all plans have
+const STANDARD_FEATURES = [
+  "Access to premium content",
+  "Email support",
+  "Mobile app access",
+  "Basic analytics",
+  "HD video streaming",
+  "Download for offline viewing",
+  "Multi-device access",
+  "Regular content updates",
+];
 
 const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
   isOpen,
   onClose,
   currentSubscription,
-  currentSubscriptionType,
+  currentSubscriptionDuration,
 }) => {
   const [selectedPlan, setSelectedPlan] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
-  const [rowPlans, setRowPlans] = useState<SubscriptionPlan[]>([]);
+  const [rowPlans, setRowPlans] = useState<BackendSubscriptionPlan[]>([]);
   const [filteredPlans, setFilteredPlans] = useState<SubscriptionPlan[]>([]);
 
   const [fetchPlan] = useFetchSubscriptionPlanMutation();
-  const [createChecKoutSession] =
-    useCreateSubscriptionCheckoutSessionMutation();
+  const [createChecKoutSession] = useCreateSubscriptionCheckoutSessionMutation();
   const user = useGetUser();
 
-  // Function to transform backend data to frontend format with percentage-based offers
+  // Helper function to get plan display name based on duration
+  const getPlanDisplayName = (duration: number): string => {
+    if (duration === 1) return "Daily Plan";
+    if (duration === 7) return "Weekly Plan";
+    if (duration === 30) return "Monthly Plan";
+    if (duration === 90) return "Quarterly Plan";
+    if (duration === 180) return "Semi-Annual Plan";
+    if (duration === 365) return "Yearly Plan";
+    if (duration >= 36500) return "Lifetime Plan";
+    return `${duration}-Day Plan`;
+  };
+
+  // Helper function to get period display text
+  const getPeriodDisplay = (duration: number): string => {
+    if (duration === 1) return "per day";
+    if (duration === 7) return "per week";
+    if (duration === 30) return "per month";
+    if (duration === 90) return "per quarter";
+    if (duration === 180) return "per 6 months";
+    if (duration === 365) return "per year";
+    if (duration >= 36500) return "one-time payment";
+    return `for ${duration} days`;
+  };
+
+  // Helper function to get plan description
+  const getPlanDescription = (duration: number): string => {
+    if (duration === 1) return "Perfect for short-term access";
+    if (duration === 7) return "Great for weekly learners";
+    if (duration === 30) return "Most flexible option";
+    if (duration === 90) return "Ideal for committed learners";
+    if (duration === 180) return "Extended learning journey";
+    if (duration === 365) return "Best value for serious learners";
+    if (duration >= 36500) return "Unlimited lifetime access";
+    return "Flexible learning duration";
+  };
+
+  // Determine which plan should be marked as popular (longest non-lifetime)
+  const getPopularPlanDuration = (allPlans: BackendSubscriptionPlan[]): number => {
+    const nonLifetimePlans = allPlans.filter(p => p.duration < 36500);
+    if (nonLifetimePlans.length === 0) return 0;
+    
+    // Find the plan with maximum duration (likely yearly)
+    const maxDuration = Math.max(...nonLifetimePlans.map(p => p.duration));
+    // If there's a yearly plan (365 days), mark it as popular, otherwise mark the longest
+    return nonLifetimePlans.some(p => p.duration === 365) ? 365 : maxDuration;
+  };
+
+  // Transform backend data to frontend format
   const transformBackendData = (
     backendPlans: BackendSubscriptionPlan[]
   ): SubscriptionPlan[] => {
+    const popularDuration = getPopularPlanDuration(backendPlans);
+
     return backendPlans.map((backendPlan) => {
       const originalPrice = parseFloat(backendPlan.price);
       const offerPercentage = parseFloat(backendPlan.offer);
-      const type = backendPlan.type.toLowerCase();
+      const duration = backendPlan.duration;
 
       // Calculate discounted price if there's an offer percentage
       let finalPrice = originalPrice;
@@ -79,128 +134,53 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
       let originalPriceString = undefined;
 
       if (offerPercentage > 0 && offerPercentage <= 100) {
-        // Calculate discount amount
         const discountAmount = (originalPrice * offerPercentage) / 100;
         finalPrice = originalPrice - discountAmount;
-
-        // Set up display strings
         originalPriceString = `₹${originalPrice.toFixed(2)}`;
         savings = `Save ${offerPercentage}%`;
       }
 
-      // Define features based on plan type
-      const getFeatures = (planType: string): string[] => {
-        const baseFeatures = [
-          "Access to premium content",
-          "Email support",
-          "Mobile app access",
-          "Basic analytics",
-        ];
-
-        const proFeatures = [
-          "Priority support",
-          "Advanced analytics",
-          "Video tutorials",
-          "Progress tracking",
-          "Certificate of completion",
-        ];
-
-        const premiumFeatures = [
-          "All Pro features",
-          "1-on-1 mentoring sessions",
-          "Custom learning paths",
-          "API access",
-          "White-label options",
-          "Dedicated account manager",
-        ];
-
-        switch (planType) {
-          case "day":
-            return [...baseFeatures];
-          case "month":
-            return [...baseFeatures, ...proFeatures];
-          case "year":
-            return [...baseFeatures, ...proFeatures, ...premiumFeatures];
-          default:
-            return baseFeatures;
-        }
-      };
-
-      // Define plan names and descriptions
-      const getPlanInfo = (planType: string) => {
-        switch (planType) {
-          case "day":
-            return {
-              name: "Daily Plan",
-              description: "Perfect for short-term access",
-              period: "per day",
-            };
-          case "month":
-            return {
-              name: "Monthly Plan",
-              description: "Most flexible option for regular users",
-              period: "per month",
-            };
-          case "year":
-            return {
-              name: "Yearly Plan",
-              description: "Best value for serious learners",
-              period: "per year",
-            };
-          default:
-            return {
-              name: `${backendPlan.type} Plan`,
-              description: "Subscription plan",
-              period: `per ${planType}`,
-            };
-        }
-      };
-
-      const planInfo = getPlanInfo(type);
-
       return {
         id: backendPlan.id,
-        name: planInfo.name,
+        name: getPlanDisplayName(duration),
         price: `₹${finalPrice.toFixed(2)}`,
-        period: planInfo.period,
+        period: getPeriodDisplay(duration),
+        duration: duration,
         originalPrice: originalPriceString,
-        features: getFeatures(type),
-        popular: type === "month",
+        features: STANDARD_FEATURES,
+        popular: duration === popularDuration,
         savings,
-        description: planInfo.description,
+        description: getPlanDescription(duration),
       };
     });
   };
 
-  // Filter plans based on current subscription
+  // Filter plans based on current subscription duration
   const filterUpgradeablePlans = (
     allPlans: SubscriptionPlan[],
-    currentType?: string
+    currentDuration?: number
   ): SubscriptionPlan[] => {
-    if (!currentType) {
-      // No current subscription, show all plans
+    if (!currentDuration) {
       return allPlans;
     }
 
-    const currentTypeKey = currentType.toLowerCase();
-    const currentHierarchy = PLAN_HIERARCHY[currentTypeKey] || 0;
-
-    // Filter plans that are higher in hierarchy
-    return allPlans.filter((plan) => {
-      const planTypeKey = plan.period.split(" ").pop()?.toLowerCase() || "";
-      const planHierarchy = PLAN_HIERARCHY[planTypeKey] || 0;
-      return planHierarchy > currentHierarchy;
-    });
+    // Filter plans with longer duration than current
+    return allPlans.filter((plan) => plan.duration > currentDuration);
   };
 
   const handlePurchase = async (plan: SubscriptionPlan) => {
     setIsLoading(true);
     try {
-      const select = rowPlans.filter((data) => data.id == plan.id);
+      const select = rowPlans.find((data) => data.id === plan.id);
+
+      if (!select) {
+        errorTost("Error", [{ message: "Plan not found" }]);
+        return;
+      }
 
       const response: IAxiosResponse = await createChecKoutSession({
         userId: user?.id as string,
-        data: select[0],
+        data: select,
         type: "subscription",
       });
 
@@ -231,18 +211,15 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
         setRowPlans(response.data.data);
         const transformedPlans = transformBackendData(response.data.data);
 
-        const sortedPlans = transformedPlans.sort((a, b) => {
-          const priceA = parseFloat(a.price.replace("₹", ""));
-          const priceB = parseFloat(b.price.replace("₹", ""));
-          return priceA - priceB;
-        });
+        // Sort plans by duration (ascending)
+        const sortedPlans = transformedPlans.sort((a, b) => a.duration - b.duration);
 
         setPlans(sortedPlans);
 
         // Filter plans based on current subscription
         const filtered = filterUpgradeablePlans(
           sortedPlans,
-          currentSubscriptionType
+          currentSubscriptionDuration
         );
         setFilteredPlans(filtered);
       } else {
@@ -264,14 +241,24 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       fetchSubscriptions();
-      setSelectedPlan(""); // Reset selection when modal opens
+      setSelectedPlan("");
     }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
   const plansToDisplay = filteredPlans.length > 0 ? filteredPlans : plans;
-  const hasNoUpgrades = currentSubscriptionType && filteredPlans.length === 0;
+  const hasNoUpgrades = currentSubscriptionDuration && filteredPlans.length === 0;
+
+  // Determine grid columns based on number of plans
+  const getGridColumns = (planCount: number): string => {
+    if (planCount === 1) return "grid-cols-1 max-w-md mx-auto";
+    if (planCount === 2) return "md:grid-cols-2 max-w-4xl mx-auto";
+    if (planCount === 3) return "lg:grid-cols-3";
+    if (planCount === 4) return "md:grid-cols-2 lg:grid-cols-4";
+    if (planCount >= 5) return "md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
+    return "lg:grid-cols-3";
+  };
 
   return (
     <AnimatePresence>
@@ -286,11 +273,11 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className="bg-white dark:bg-black rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl scrollbar-none"
+          className="bg-white dark:bg-black rounded-2xl max-w-7xl w-full max-h-[90vh] overflow-y-auto shadow-2xl scrollbar-none"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800 p-6 flex justify-between items-center rounded-t-2xl">
+          <div className="bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800 p-6 flex justify-between items-center rounded-t-2xl sticky top-0 z-10">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 <Crown className="w-8 h-8 text-yellow-500" />
@@ -342,12 +329,12 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                 </p>
               </div>
             ) : (
-              <div className="grid lg:grid-cols-3 gap-8">
+              <div className={`grid ${getGridColumns(plansToDisplay.length)} gap-6`}>
                 {plansToDisplay.map((plan) => (
                   <motion.div
                     key={plan.id}
                     whileHover={{ scale: 1.02 }}
-                    className={`relative border-2 rounded-2xl p-6 cursor-pointer transition-all flex flex-col h-full min-h-[500px] ${
+                    className={`relative border-2 rounded-2xl p-6 cursor-pointer transition-all flex flex-col ${
                       selectedPlan === plan.id
                         ? "border-blue-500 bg-blue-50 dark:bg-gray-900"
                         : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
@@ -356,27 +343,26 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                     }`}
                     onClick={() => setSelectedPlan(plan.id)}
                   >
-                    {/* Popular Badge */}
-                    {plan.popular && (
-                      <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    {/* Badges Container */}
+                    <div className="absolute -top-4 left-0 right-0 flex justify-between px-4">
+                      {/* Popular Badge */}
+                      {plan.popular && (
                         <span className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center gap-1 shadow-lg">
                           <Star className="w-4 h-4" />
                           Most Popular
                         </span>
-                      </div>
-                    )}
-
-                    {/* Savings Badge */}
-                    {plan.savings && (
-                      <div className="absolute -top-4 right-4">
-                        <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+                      )}
+                      
+                      {/* Savings Badge */}
+                      {plan.savings && (
+                        <span className={`bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg ${!plan.popular ? 'ml-auto' : ''}`}>
                           {plan.savings}
                         </span>
-                      </div>
-                    )}
+                      )}
+                    </div>
 
                     {/* Plan Header */}
-                    <div className="text-center mb-6">
+                    <div className="text-center mb-6 mt-2">
                       <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                         {plan.name}
                       </h3>
@@ -398,8 +384,8 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                       </div>
                     </div>
 
-                    {/* Features List */}
-                    <ul className="space-y-3 flex-grow mb-6">
+                    {/* Features List - Fixed height for alignment */}
+                    <ul className="space-y-3 flex-grow mb-6 min-h-[280px]">
                       {plan.features.map((feature, index) => (
                         <li key={index} className="flex items-start gap-3">
                           <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
@@ -410,7 +396,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                       ))}
                     </ul>
 
-                    {/* Action Button - Fixed at bottom */}
+                    {/* Action Button */}
                     <div className="mt-auto">
                       <button
                         className={`w-full py-3 px-4 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 ${
@@ -449,7 +435,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                             Upgrade to {plan.name}
                           </>
                         ) : (
-                          <>Select Plan</>
+                          "Select Plan"
                         )}
                       </button>
                     </div>
@@ -460,7 +446,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
 
             {/* No Upgrades Available Message */}
             {hasNoUpgrades && (
-              <div className="text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-xl">
+              <div className="text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-xl mt-6">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white mb-4">
                   <Crown className="w-8 h-8" />
                 </div>
