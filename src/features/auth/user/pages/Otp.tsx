@@ -104,6 +104,8 @@ function Otp() {
     setTimeout(() => setresendTimer(true), 100000);
     const response: IAxiosResponse = await resendOtp({ email, name });
     if (response.data) {
+      setMinutes(1);
+      setSeconds(59);
       successToast("OTP sended", response.data.message);
     } else {
       errorTost(
